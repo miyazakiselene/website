@@ -13,8 +13,8 @@ export default function HomePage() {
     <main className="min-h-screen">
       <Header />
       <Hero />
-      <TeamAbout />
       <News />
+      <TeamAbout />
       <Results />
       <InstagramFeed />
       <ContactForm />

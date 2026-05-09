@@ -1,6 +1,6 @@
 "use client"
 
-import { Trophy, Users } from "lucide-react"
+import { Trophy } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
@@ -150,32 +150,10 @@ export function Hero() {
           >
             宮崎県の女子中学生バスケットボールクラブ「SELENE」。
             <br />
-            心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。
+            <span className="md:whitespace-nowrap">
+              心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。
+            </span>
           </p>
-
-          {/* Stats with Animation */}
-          <div 
-            className={`grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 max-w-2xl mx-auto transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: "0.9s" }}
-          >
-            {[
-              { icon: Users, value: "10", label: "選手在籍" },
-              { icon: Trophy, value: "1", label: "参加大会" },
-            ].map((stat, index) => (
-              <div 
-                key={index}
-                className="flex flex-col items-center p-5 md:p-6 rounded-xl bg-card/50 border border-border backdrop-blur-sm hover:border-primary/50 hover:bg-card/70 transition-all duration-300 group w-full"
-              >
-                <stat.icon className="h-7 w-7 md:h-8 md:w-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
-                <span className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">
-                  {stat.value}
-                </span>
-                <span className="text-sm md:text-base text-muted-foreground mt-1">
-                  {stat.label}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 

@@ -18,8 +18,8 @@ import { cn } from "@/lib/utils"
 
 const navItems = [
   { label: "ホーム", href: "#hero" },
-  { label: "チーム紹介", href: "#about" },
   { label: "お知らせ", href: "#news" },
+  { label: "チーム紹介", href: "#about" },
   { label: "大会参加・活動記録", href: "#results" },
   { label: "Instagram", href: "#instagram" },
   { label: "お問い合わせ", href: "#contact" },
