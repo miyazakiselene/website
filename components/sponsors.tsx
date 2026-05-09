@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Heart } from "lucide-react"
+import { Heart, Instagram } from "lucide-react"
 import { AnimatedSection } from "@/components/animated-section"
 
 const sponsors = [
@@ -87,6 +87,28 @@ export function Sponsors() {
           <p className="text-center text-base md:text-lg text-muted-foreground mt-12">
             ご支援いただきありがとうございます
           </p>
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={600} className="mt-10 max-w-2xl mx-auto">
+          <div className="rounded-xl border border-primary/30 bg-primary/5 px-5 py-6 md:px-8 md:py-7 text-center space-y-4">
+            <p className="text-base md:text-lg text-foreground leading-relaxed">
+              <span className="block">
+                新たにご支援いただける法人・団体様は、お気軽にご連絡ください。
+              </span>
+              <span className="block mt-1">
+                InstagramのDMよりお問い合わせをお待ちしております。
+              </span>
+            </p>
+            <Link
+              href="https://www.instagram.com/2026.selene/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              <Instagram className="h-5 w-5 shrink-0" />
+              @2026.selene にDMする
+            </Link>
+          </div>
         </AnimatedSection>
       </div>
     </section>
