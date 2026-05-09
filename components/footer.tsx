@@ -57,8 +57,10 @@ export function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-base text-muted-foreground leading-relaxed md:whitespace-nowrap">
-              宮崎県の女子中学生バスケットボールクラブ。全国大会出場を目指して活動中。
+            <p className="text-base text-muted-foreground leading-relaxed">
+              宮崎県の女子中学生バスケットボールクラブ。
+              <br />
+              全国大会出場を目指して活動中。
             </p>
           </AnimatedSection>
 
