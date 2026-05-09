@@ -175,6 +175,7 @@ export function StaffResultsManager() {
     ourScore: "",
     theirScore: "",
   })
+  const [videoDrafts, setVideoDrafts] = useState<Record<string, string[]>>({})
 
   const expectedCode = process.env.NEXT_PUBLIC_STAFF_ACCESS_CODE ?? "123456"
 
@@ -326,7 +327,24 @@ export function StaffResultsManager() {
   const totalQuarterByTournament = (record: TournamentRecord) =>
     record.matches.reduce((sum, match) => sum + Math.max(0, match.quarter), 0)
 
-  const updateTournamentVideoUrl = (tournamentId: string, index: number, value: string) => {
+  const getVideoDraftValue = (record: TournamentRecord, index: number) =>
+    videoDrafts[record.id]?.[index] ?? record.videoUrls?.[index] ?? ""
+
+  const setVideoDraftValue = (tournamentId: string, index: number, value: string) => {
+    setVideoDrafts((prev) => {
+      const next = { ...prev }
+      const current = [...(next[tournamentId] ?? [])]
+      if (index >= current.length) {
+        current.push(...Array(index - current.length + 1).fill(""))
+      }
+      current[index] = value
+      next[tournamentId] = current
+      return next
+    })
+  }
+
+  const saveTournamentVideoUrl = (tournamentId: string, index: number) => {
+    const draft = (videoDrafts[tournamentId]?.[index] ?? "").trim()
     setRecords((prev) =>
       prev.map((tournament) => {
         if (tournament.id !== tournamentId) return tournament
@@ -334,10 +352,20 @@ export function StaffResultsManager() {
         if (index >= current.length) {
           current.push(...Array(index - current.length + 1).fill(""))
         }
-        current[index] = value
+        current[index] = draft
         return { ...tournament, videoUrls: current }
       }),
     )
+    setVideoDrafts((prev) => {
+      const next = { ...prev }
+      const current = [...(next[tournamentId] ?? [])]
+      if (index >= current.length) {
+        current.push(...Array(index - current.length + 1).fill(""))
+      }
+      current[index] = draft
+      next[tournamentId] = current
+      return next
+    })
   }
 
   const addTournamentVideoUrlRow = (tournamentId: string) => {
@@ -355,6 +383,11 @@ export function StaffResultsManager() {
         }
       }),
     )
+    setVideoDrafts((prev) => {
+      const next = { ...prev }
+      next[tournamentId] = [...(next[tournamentId] ?? []), ""]
+      return next
+    })
   }
 
   const removeTournamentVideoUrl = (tournamentId: string, index: number) => {
@@ -373,6 +406,15 @@ export function StaffResultsManager() {
         return { ...tournament, videoUrls: next, videoRowCount: Math.max(0, currentCount - 1) }
       }),
     )
+    setVideoDrafts((prev) => {
+      const next = { ...prev }
+      const current = [...(next[tournamentId] ?? [])]
+      if (index >= 0 && index < current.length) {
+        current.splice(index, 1)
+      }
+      next[tournamentId] = current
+      return next
+    })
   }
 
   const openVideo = (record: TournamentRecord) => {
@@ -382,6 +424,16 @@ export function StaffResultsManager() {
       return
     }
     const input = document.getElementById(`video-url-${record.id}-0`) as HTMLInputElement | null
+    input?.focus()
+  }
+
+  const openTournamentVideoUrl = (record: TournamentRecord, index: number) => {
+    const url = (record.videoUrls?.[index] ?? "").trim()
+    if (url !== "") {
+      window.open(url, "_blank", "noopener,noreferrer")
+      return
+    }
+    const input = document.getElementById(`video-url-${record.id}-${index}`) as HTMLInputElement | null
     input?.focus()
   }
 
@@ -655,12 +707,30 @@ export function StaffResultsManager() {
                   <div key={`${record.id}-video-${index}`} className="flex gap-2">
                     <Input
                       id={`video-url-${record.id}-${index}`}
-                      value={record.videoUrls?.[index] ?? ""}
+                      value={getVideoDraftValue(record, index)}
                       onChange={(e) =>
-                        updateTournamentVideoUrl(record.id, index, e.target.value)
+                        setVideoDraftValue(record.id, index, e.target.value)
                       }
                       placeholder={`試合動画URL ${index + 1}`}
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => saveTournamentVideoUrl(record.id, index)}
+                      className="shrink-0"
+                    >
+                      保存
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openTournamentVideoUrl(record, index)}
+                      className="shrink-0"
+                    >
+                      開く
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"
