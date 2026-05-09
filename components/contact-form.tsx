@@ -80,7 +80,7 @@ export function ContactForm() {
                 <AnimatedSection animation="fadeInUp" delay={520}>
                   <div className="text-center text-base text-muted-foreground flex items-center justify-center gap-2">
                     <MessageCircle className="h-4 w-4" />
-                    通常2〜3営業日以内にご返信いたします
+                    なるべく早急に対応いたしますが、返信が遅れる場合はご了承ください
                   </div>
                 </AnimatedSection>
               </div>
