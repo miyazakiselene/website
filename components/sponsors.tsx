@@ -54,22 +54,27 @@ export function Sponsors() {
         </AnimatedSection>
 
         {/* Sponsor Logos */}
-        <div className="flex flex-wrap items-center justify-center gap-10 md:gap-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
           {sponsors.map((sponsor, index) => (
             <AnimatedSection key={sponsor.id} animation="scaleIn" delay={100 + index * 150}>
               <Link
                 href={sponsor.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group p-5 rounded-xl bg-white/90 hover:bg-white transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:scale-110 hover:-translate-y-1"
+                className="group h-full flex flex-col items-center justify-center gap-4 p-4 md:p-5 rounded-xl border border-border/60 bg-white/95 hover:bg-white transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1"
               >
-                <Image
-                  src={sponsor.logo}
-                  alt={sponsor.name}
-                  width={sponsor.width}
-                  height={sponsor.height}
-                  className="object-contain max-h-24 md:max-h-28 w-auto opacity-90 group-hover:opacity-100 transition-opacity"
-                />
+                <div className="relative w-full h-20 sm:h-24 md:h-28">
+                  <Image
+                    src={sponsor.logo}
+                    alt={sponsor.name}
+                    fill
+                    sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 320px"
+                    className="object-contain opacity-95 group-hover:opacity-100 transition-opacity"
+                  />
+                </div>
+                <p className="text-sm md:text-base text-center font-semibold text-foreground leading-snug">
+                  {sponsor.name}
+                </p>
               </Link>
             </AnimatedSection>
           ))}
