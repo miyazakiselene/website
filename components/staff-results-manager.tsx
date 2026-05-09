@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
+import { ExternalLink, Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -21,6 +21,7 @@ type TournamentRecord = {
   year: string
   name: string
   venue: string
+  videoUrl?: string
   matches: MatchRecord[]
 }
 
@@ -143,6 +144,7 @@ export function StaffResultsManager() {
     year: "",
     name: "",
     venue: "",
+    videoUrl: "",
   })
 
   const [newMatch, setNewMatch] = useState({
@@ -201,10 +203,11 @@ export function StaffResultsManager() {
       year: newTournament.year.trim(),
       name: newTournament.name.trim(),
       venue: newTournament.venue.trim(),
+      videoUrl: newTournament.videoUrl.trim(),
       matches: [],
     }
     setRecords((prev) => [...prev, newRecord])
-    setNewTournament({ year: "", name: "", venue: "" })
+    setNewTournament({ year: "", name: "", venue: "", videoUrl: "" })
     setNewMatch((prev) => ({ ...prev, tournamentId: newRecord.id }))
   }
 
@@ -244,7 +247,7 @@ export function StaffResultsManager() {
 
   const updateTournamentField = (
     tournamentId: string,
-    field: "year" | "name" | "venue",
+    field: "year" | "name" | "venue" | "videoUrl",
     value: string,
   ) => {
     setRecords((prev) =>
@@ -374,7 +377,7 @@ export function StaffResultsManager() {
                 onChange={(e) =>
                   setNewTournament((prev) => ({ ...prev, name: e.target.value }))
                 }
-                placeholder="例: 日の出ホルモンスプリングカップ"
+                placeholder="例: 練習試合(⚪︎/⚪︎)"
               />
             </div>
             <div className="space-y-2">
@@ -386,6 +389,17 @@ export function StaffResultsManager() {
                   setNewTournament((prev) => ({ ...prev, venue: e.target.value }))
                 }
                 placeholder="例: 宮崎市内"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="video-url">試合動画URL（任意）</Label>
+              <Input
+                id="video-url"
+                value={newTournament.videoUrl}
+                onChange={(e) =>
+                  setNewTournament((prev) => ({ ...prev, videoUrl: e.target.value }))
+                }
+                placeholder="例: https://www.youtube.com/watch?v=..."
               />
             </div>
             <Button onClick={addTournament} disabled={!canAddTournament} className="w-full">
@@ -402,21 +416,33 @@ export function StaffResultsManager() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="tournament">対象大会</Label>
-              <select
-                id="tournament"
-                value={newMatch.tournamentId}
-                onChange={(e) =>
-                  setNewMatch((prev) => ({ ...prev, tournamentId: e.target.value }))
-                }
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="">大会を選択</option>
-                {records.map((record) => (
-                  <option key={record.id} value={record.id}>
-                    {record.year} / {record.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  id="tournament"
+                  value={newMatch.tournamentId}
+                  onChange={(e) =>
+                    setNewMatch((prev) => ({ ...prev, tournamentId: e.target.value }))
+                  }
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">大会を選択</option>
+                  {records.map((record) => (
+                    <option key={record.id} value={record.id}>
+                      {record.year} / {record.name}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={newMatch.tournamentId === ""}
+                  onClick={() => removeTournament(newMatch.tournamentId)}
+                  className="text-red-500 hover:text-red-400 shrink-0"
+                >
+                  削除
+                </Button>
+              </div>
             </div>
             <div className="grid md:grid-cols-3 gap-3">
               <div className="space-y-2">
@@ -491,16 +517,30 @@ export function StaffResultsManager() {
           <Card key={record.id} className="border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-xl">大会情報（編集可）</CardTitle>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => removeTournament(record.id)}
-                className="text-red-500 hover:text-red-400"
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                削除
-              </Button>
+              <div className="flex items-center gap-2">
+                {record.videoUrl && record.videoUrl.trim() !== "" ? (
+                  <Button type="button" asChild variant="outline" size="sm">
+                    <a href={record.videoUrl} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      試合動画
+                    </a>
+                  </Button>
+                ) : (
+                  <Button type="button" variant="outline" size="sm" disabled>
+                    試合動画
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeTournament(record.id)}
+                  className="text-red-500 hover:text-red-400"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  削除
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-3">
@@ -533,6 +573,17 @@ export function StaffResultsManager() {
                   onChange={(e) =>
                     updateTournamentField(record.id, "venue", e.target.value)
                   }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor={`video-url-${record.id}`}>試合動画URL（任意）</Label>
+                <Input
+                  id={`video-url-${record.id}`}
+                  value={record.videoUrl ?? ""}
+                  onChange={(e) =>
+                    updateTournamentField(record.id, "videoUrl", e.target.value)
+                  }
+                  placeholder="例: https://www.youtube.com/watch?v=..."
                 />
               </div>
 

@@ -29,7 +29,7 @@ export function ContactForm() {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mt-3 mb-6">
             お問い合わせ
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl md:max-w-4xl mx-auto leading-relaxed md:whitespace-nowrap">
             練習試合のお申し込み、その他ご質問などお気軽にお問い合わせください。
           </p>
         </AnimatedSection>
