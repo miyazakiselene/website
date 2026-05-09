@@ -110,8 +110,8 @@ export function Header() {
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-                <Menu className="h-6 w-6" />
+              <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-primary/10">
+                <Menu className="h-7 w-7" />
                 <span className="sr-only">メニューを開く</span>
               </Button>
             </SheetTrigger>
