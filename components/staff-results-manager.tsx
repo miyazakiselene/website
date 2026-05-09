@@ -308,10 +308,14 @@ export function StaffResultsManager() {
   }
 
   const removeTournament = (tournamentId: string) => {
+    const confirmed = window.confirm("この大会情報を削除します。よろしいですか？")
+    if (!confirmed) return
     setRecords((prev) => prev.filter((tournament) => tournament.id !== tournamentId))
   }
 
   const removeMatch = (tournamentId: string, matchId: string) => {
+    const confirmed = window.confirm("この試合記録を削除します。よろしいですか？")
+    if (!confirmed) return
     setRecords((prev) =>
       prev.map((tournament) =>
         tournament.id !== tournamentId
@@ -391,6 +395,8 @@ export function StaffResultsManager() {
   }
 
   const removeTournamentVideoUrl = (tournamentId: string, index: number) => {
+    const confirmed = window.confirm("この試合動画URL行を削除します。よろしいですか？")
+    if (!confirmed) return
     setRecords((prev) =>
       prev.map((tournament) => {
         if (tournament.id !== tournamentId) return tournament
