@@ -1,6 +1,6 @@
 "use client"
 
-import { Instagram, Mail, ArrowUp } from "lucide-react"
+import { Instagram, ArrowUp } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -85,20 +85,13 @@ export function Footer() {
             <h4 className="font-bold text-lg text-foreground mb-5">お問い合わせ</h4>
             <div className="space-y-3">
               <a
-                href="mailto:info@miyazaki-selene.example.com"
-                className="flex items-center gap-3 text-base text-muted-foreground hover:text-primary transition-colors group"
-              >
-                <Mail className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                info@miyazaki-selene.example.com
-              </a>
-              <a
                 href="https://www.instagram.com/2026.selene/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-base text-muted-foreground hover:text-primary transition-colors group"
               >
                 <Instagram className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                @2026.selene
+                @2026.selene（DMはこちら）
               </a>
             </div>
           </AnimatedSection>
