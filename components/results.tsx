@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar, Handshake, MapPin } from "lucide-react"
+import { Calendar, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AnimatedSection } from "@/components/animated-section"
@@ -22,23 +22,14 @@ export type Tournament = {
 
 const tournaments: Tournament[] = [
   {
-    id: "2026-04-04",
+    id: "2026-spring-cup",
     year: "R8年度",
-    period: "2026年4月4日",
+    period: "2026年4月4日-5日",
     name: "日の出ホルモンスプリングカップ",
     venue: "生目中学",
     matches: [
       { id: "2026-04-04-1", date: "4/4", opponent: "本郷中学" },
       { id: "2026-04-04-2", date: "4/4", opponent: "東海中学" },
-    ],
-  },
-  {
-    id: "2026-04-05",
-    year: "R8年度",
-    period: "2026年4月5日",
-    name: "日の出ホルモンスプリングカップ",
-    venue: "生目中学",
-    matches: [
       { id: "2026-04-05-1", date: "4/5", opponent: "EPSIRON" },
       { id: "2026-04-05-2", date: "4/5", opponent: "赤江東中学" },
     ],
@@ -144,12 +135,8 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
             {match.date}
           </Badge>
           <span className="text-base md:text-xl text-foreground font-semibold group-hover:text-primary transition-colors">
-            対戦いただいたチーム：{match.opponent}
+            対戦チーム：{match.opponent}
           </span>
-        </div>
-        <div className="hidden md:flex items-center gap-2 text-muted-foreground">
-          <Handshake className="h-5 w-5" />
-          <span className="text-sm">ありがとうございました</span>
         </div>
       </div>
     </AnimatedSection>
@@ -226,13 +213,6 @@ export function Results() {
                       ))}
                     </div>
 
-                    <div className="mt-8 pt-8 border-t border-border">
-                      <p className="text-sm md:text-base text-muted-foreground text-center leading-relaxed">
-                        対戦いただいたチームの皆さま、運営関係者の皆さま、
-                        <br className="hidden sm:block" />
-                        貴重な機会をいただきありがとうございました。
-                      </p>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
