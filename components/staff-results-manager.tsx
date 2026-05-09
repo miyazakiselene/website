@@ -21,11 +21,11 @@ type TournamentRecord = {
   year: string
   name: string
   venue: string
-  videoUrl?: string
+  videoUrls?: string[]
   matches: MatchRecord[]
 }
 
-const STORAGE_KEY = "selene-staff-results-v3"
+const STORAGE_KEY = "selene-staff-results-v4"
 
 const defaultRecords: TournamentRecord[] = [
   {
@@ -127,7 +127,19 @@ function loadInitialRecords() {
   if (!raw) return defaultRecords
   try {
     const parsed = JSON.parse(raw) as TournamentRecord[]
-    return Array.isArray(parsed) ? parsed : defaultRecords
+    if (!Array.isArray(parsed)) return defaultRecords
+    return parsed.map((record) => {
+      const legacyUrl =
+        typeof (record as TournamentRecord & { videoUrl?: string }).videoUrl === "string"
+          ? (record as TournamentRecord & { videoUrl?: string }).videoUrl?.trim() ?? ""
+          : ""
+      const nextUrls = Array.isArray(record.videoUrls)
+        ? record.videoUrls
+        : legacyUrl !== ""
+          ? [legacyUrl]
+          : []
+      return { ...record, videoUrls: nextUrls }
+    })
   } catch {
     return defaultRecords
   }
@@ -144,7 +156,6 @@ export function StaffResultsManager() {
     year: "",
     name: "",
     venue: "",
-    videoUrl: "",
   })
 
   const [newMatch, setNewMatch] = useState({
@@ -203,11 +214,11 @@ export function StaffResultsManager() {
       year: newTournament.year.trim(),
       name: newTournament.name.trim(),
       venue: newTournament.venue.trim(),
-      videoUrl: newTournament.videoUrl.trim(),
+      videoUrls: [],
       matches: [],
     }
     setRecords((prev) => [...prev, newRecord])
-    setNewTournament({ year: "", name: "", venue: "", videoUrl: "" })
+    setNewTournament({ year: "", name: "", venue: "" })
     setNewMatch((prev) => ({ ...prev, tournamentId: newRecord.id }))
   }
 
@@ -247,7 +258,7 @@ export function StaffResultsManager() {
 
   const updateTournamentField = (
     tournamentId: string,
-    field: "year" | "name" | "venue" | "videoUrl",
+    field: "year" | "name" | "venue",
     value: string,
   ) => {
     setRecords((prev) =>
@@ -302,13 +313,52 @@ export function StaffResultsManager() {
     )
   }
 
+  const totalQuarterByTournament = (record: TournamentRecord) =>
+    record.matches.reduce((sum, match) => sum + Math.max(0, match.quarter), 0)
+
+  const updateTournamentVideoUrl = (tournamentId: string, index: number, value: string) => {
+    setRecords((prev) =>
+      prev.map((tournament) => {
+        if (tournament.id !== tournamentId) return tournament
+        const current = Array.isArray(tournament.videoUrls) ? [...tournament.videoUrls] : []
+        if (index >= current.length) {
+          current.push(...Array(index - current.length + 1).fill(""))
+        }
+        current[index] = value
+        return { ...tournament, videoUrls: current }
+      }),
+    )
+  }
+
+  const addTournamentVideoUrlRow = (tournamentId: string) => {
+    setRecords((prev) =>
+      prev.map((tournament) =>
+        tournament.id !== tournamentId
+          ? tournament
+          : { ...tournament, videoUrls: [...(tournament.videoUrls ?? []), ""] },
+      ),
+    )
+  }
+
+  const removeTournamentVideoUrl = (tournamentId: string, index: number) => {
+    setRecords((prev) =>
+      prev.map((tournament) => {
+        if (tournament.id !== tournamentId) return tournament
+        const next = [...(tournament.videoUrls ?? [])]
+        if (index < 0 || index >= next.length) return tournament
+        next.splice(index, 1)
+        return { ...tournament, videoUrls: next }
+      }),
+    )
+  }
+
   const openVideo = (record: TournamentRecord) => {
-    const url = record.videoUrl?.trim() ?? ""
+    const url = (record.videoUrls ?? []).map((item) => item.trim()).find((item) => item !== "") ?? ""
     if (url !== "") {
       window.open(url, "_blank", "noopener,noreferrer")
       return
     }
-    const input = document.getElementById(`video-url-${record.id}`) as HTMLInputElement | null
+    const input = document.getElementById(`video-url-${record.id}-0`) as HTMLInputElement | null
     input?.focus()
   }
 
@@ -399,17 +449,6 @@ export function StaffResultsManager() {
                   setNewTournament((prev) => ({ ...prev, venue: e.target.value }))
                 }
                 placeholder="例: 宮崎市内"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="video-url">試合動画URL（任意）</Label>
-              <Input
-                id="video-url"
-                value={newTournament.videoUrl}
-                onChange={(e) =>
-                  setNewTournament((prev) => ({ ...prev, videoUrl: e.target.value }))
-                }
-                placeholder="例: https://www.youtube.com/watch?v=..."
               />
             </div>
             <Button onClick={addTournament} disabled={!canAddTournament} className="w-full">
@@ -582,16 +621,43 @@ export function StaffResultsManager() {
                   }
                 />
               </div>
-              <div className="space-y-1">
-                <Label htmlFor={`video-url-${record.id}`}>試合動画URL（任意）</Label>
-                <Input
-                  id={`video-url-${record.id}`}
-                  value={record.videoUrl ?? ""}
-                  onChange={(e) =>
-                    updateTournamentField(record.id, "videoUrl", e.target.value)
-                  }
-                  placeholder="例: https://www.youtube.com/watch?v=..."
-                />
+              <div className="space-y-2">
+                <Label>試合動画URL</Label>
+                {Array.from({
+                  length: Math.max(totalQuarterByTournament(record), (record.videoUrls ?? []).length),
+                }).map((_, index) => (
+                  <div key={`${record.id}-video-${index}`} className="flex gap-2">
+                    <Input
+                      id={`video-url-${record.id}-${index}`}
+                      value={record.videoUrls?.[index] ?? ""}
+                      onChange={(e) =>
+                        updateTournamentVideoUrl(record.id, index, e.target.value)
+                      }
+                      placeholder={`試合動画URL ${index + 1}`}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeTournamentVideoUrl(record.id, index)}
+                      className="text-red-500 hover:text-red-400 shrink-0"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      削除
+                    </Button>
+                  </div>
+                ))}
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addTournamentVideoUrlRow(record.id)}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    最後の行に追加
+                  </Button>
+                </div>
               </div>
 
               {record.matches.length === 0 ? (
