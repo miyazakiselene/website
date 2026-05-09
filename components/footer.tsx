@@ -93,6 +93,12 @@ export function Footer() {
                 <Instagram className="h-5 w-5 group-hover:scale-110 transition-transform" />
                 @2026.selene（DMはこちら）
               </a>
+              <Link
+                href="/staff"
+                className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
+              >
+                チーム関係者専用ページ
+              </Link>
             </div>
           </AnimatedSection>
         </div>
