@@ -23,8 +23,12 @@ export const metadata: Metadata = {
   description:
     '宮崎県の女子中学生バスケットボールクラブ「宮崎 SELENE」。全国大会出場を目指し、心身の健全な育成に取り組んでいます。体験入部受付中！',
   icons: {
-    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
-    apple: '/icon.svg',
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
 }
 
