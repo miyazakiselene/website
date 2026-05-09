@@ -14,6 +14,7 @@ type MatchRecord = {
   quarter: number
   ourScore: number
   theirScore: number
+  videoUrls?: string[]
 }
 
 type TournamentRecord = {
@@ -21,8 +22,6 @@ type TournamentRecord = {
   year: string
   name: string
   venue: string
-  videoUrls?: string[]
-  videoRowCount?: number
   matches: MatchRecord[]
 }
 
@@ -122,35 +121,58 @@ function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+function normalizeMatchVideoUrls(match: MatchRecord): MatchRecord {
+  const q = Math.max(0, match.quarter)
+  let urls = Array.isArray(match.videoUrls) ? [...match.videoUrls] : []
+  while (urls.length < q) urls.push("")
+  urls = urls.slice(0, q)
+  return { ...match, videoUrls: urls }
+}
+
+function defaultRecordsNormalized(): TournamentRecord[] {
+  return defaultRecords.map((tournament) => ({
+    ...tournament,
+    matches: tournament.matches.map((match) => normalizeMatchVideoUrls({ ...match })),
+  }))
+}
+
 function loadInitialRecords() {
-  if (typeof window === "undefined") return defaultRecords
+  if (typeof window === "undefined") return defaultRecordsNormalized()
   const raw = window.localStorage.getItem(STORAGE_KEY)
-  if (!raw) return defaultRecords
+  if (!raw) return defaultRecordsNormalized()
   try {
-    const parsed = JSON.parse(raw) as TournamentRecord[]
-    if (!Array.isArray(parsed)) return defaultRecords
+    const parsed = JSON.parse(raw) as (TournamentRecord & {
+      videoUrls?: string[]
+      videoRowCount?: number
+      videoUrl?: string
+    })[]
+    if (!Array.isArray(parsed)) return defaultRecordsNormalized()
     return parsed.map((record) => {
-      const totalQuarter = record.matches.reduce((sum, match) => sum + Math.max(0, match.quarter), 0)
-      const legacyUrl =
-        typeof (record as TournamentRecord & { videoUrl?: string }).videoUrl === "string"
-          ? (record as TournamentRecord & { videoUrl?: string }).videoUrl?.trim() ?? ""
-          : ""
-      const nextUrls = Array.isArray(record.videoUrls)
-        ? record.videoUrls
-        : legacyUrl !== ""
-          ? [legacyUrl]
-          : []
-      return {
-        ...record,
-        videoUrls: nextUrls,
-        videoRowCount:
-          typeof record.videoRowCount === "number"
-            ? Math.max(0, record.videoRowCount)
-            : totalQuarter,
-      }
+      const legacyTournamentUrls = Array.isArray(record.videoUrls) ? [...record.videoUrls] : []
+      const legacySingle =
+        typeof record.videoUrl === "string" ? record.videoUrl.trim() : ""
+      if (legacySingle !== "") legacyTournamentUrls.unshift(legacySingle)
+
+      const { videoUrls: _drop, videoRowCount: _drop2, videoUrl: _drop3, ...rest } = record
+
+      const matches = record.matches.map((match, index) => {
+        let next = normalizeMatchVideoUrls(match)
+        if (index === 0 && legacyTournamentUrls.length > 0) {
+          const merged = [...(next.videoUrls ?? [])]
+          const cap = Math.max(0, next.quarter)
+          for (let i = 0; i < cap && i < legacyTournamentUrls.length; i++) {
+            const slot = legacyTournamentUrls[i]?.trim() ?? ""
+            if (slot !== "" && (merged[i] ?? "") === "") merged[i] = slot
+          }
+          next = { ...next, videoUrls: merged }
+        }
+        return normalizeMatchVideoUrls(next)
+      })
+
+      return { ...rest, matches } as TournamentRecord
     })
   } catch {
-    return defaultRecords
+    return defaultRecordsNormalized()
   }
 }
 
@@ -224,8 +246,6 @@ export function StaffResultsManager() {
       year: newTournament.year.trim(),
       name: newTournament.name.trim(),
       venue: newTournament.venue.trim(),
-      videoUrls: [],
-      videoRowCount: 0,
       matches: [],
     }
     setRecords((prev) => [...prev, newRecord])
@@ -247,6 +267,7 @@ export function StaffResultsManager() {
       quarter,
       ourScore,
       theirScore,
+      videoUrls: Array.from({ length: Math.max(0, quarter) }, () => ""),
     }
 
     setRecords((prev) =>
@@ -295,9 +316,16 @@ export function StaffResultsManager() {
                 if (match.id !== matchId) return match
                 if (field === "quarter" || field === "ourScore" || field === "theirScore") {
                   const numeric = Number(value)
+                  const nextNum = Number.isNaN(numeric) ? 0 : numeric
+                  if (field === "quarter") {
+                    let urls = [...(match.videoUrls ?? [])]
+                    while (urls.length < nextNum) urls.push("")
+                    urls = urls.slice(0, nextNum)
+                    return { ...match, quarter: nextNum, videoUrls: urls }
+                  }
                   return {
                     ...match,
-                    [field]: Number.isNaN(numeric) ? 0 : numeric,
+                    [field]: nextNum,
                   }
                 }
                 return { ...match, [field]: value }
@@ -326,120 +354,107 @@ export function StaffResultsManager() {
             },
       ),
     )
-  }
-
-  const totalQuarterByTournament = (record: TournamentRecord) =>
-    record.matches.reduce((sum, match) => sum + Math.max(0, match.quarter), 0)
-
-  const getVideoDraftValue = (record: TournamentRecord, index: number) =>
-    videoDrafts[record.id]?.[index] ?? record.videoUrls?.[index] ?? ""
-
-  const setVideoDraftValue = (tournamentId: string, index: number, value: string) => {
     setVideoDrafts((prev) => {
       const next = { ...prev }
-      const current = [...(next[tournamentId] ?? [])]
+      delete next[matchId]
+      return next
+    })
+  }
+
+  const getMatchVideoDraftValue = (matchId: string, index: number, saved: string) =>
+    videoDrafts[matchId]?.[index] ?? saved
+
+  const setMatchVideoDraftValue = (matchId: string, index: number, value: string) => {
+    setVideoDrafts((prev) => {
+      const next = { ...prev }
+      const current = [...(next[matchId] ?? [])]
       if (index >= current.length) {
         current.push(...Array(index - current.length + 1).fill(""))
       }
       current[index] = value
-      next[tournamentId] = current
+      next[matchId] = current
       return next
     })
   }
 
-  const saveTournamentVideoUrl = (tournamentId: string, index: number) => {
-    const draft = (videoDrafts[tournamentId]?.[index] ?? "").trim()
+  const saveMatchVideoUrl = (tournamentId: string, matchId: string, index: number) => {
+    const draft = (videoDrafts[matchId]?.[index] ?? "").trim()
     setRecords((prev) =>
       prev.map((tournament) => {
         if (tournament.id !== tournamentId) return tournament
-        const current = Array.isArray(tournament.videoUrls) ? [...tournament.videoUrls] : []
-        if (index >= current.length) {
-          current.push(...Array(index - current.length + 1).fill(""))
-        }
-        current[index] = draft
-        return { ...tournament, videoUrls: current }
-      }),
-    )
-    setVideoDrafts((prev) => {
-      const next = { ...prev }
-      const current = [...(next[tournamentId] ?? [])]
-      if (index >= current.length) {
-        current.push(...Array(index - current.length + 1).fill(""))
-      }
-      current[index] = draft
-      next[tournamentId] = current
-      return next
-    })
-  }
-
-  const addTournamentVideoUrlRow = (tournamentId: string) => {
-    setRecords((prev) =>
-      prev.map((tournament) => {
-        if (tournament.id !== tournamentId) return tournament
-        const currentCount = Math.max(
-          tournament.videoRowCount ?? totalQuarterByTournament(tournament),
-          (tournament.videoUrls ?? []).length,
-        )
         return {
           ...tournament,
-          videoUrls: [...(tournament.videoUrls ?? []), ""],
-          videoRowCount: currentCount + 1,
+          matches: tournament.matches.map((match) => {
+            if (match.id !== matchId) return match
+            const urls = [...(match.videoUrls ?? [])]
+            while (urls.length <= index) urls.push("")
+            urls[index] = draft
+            return normalizeMatchVideoUrls({ ...match, videoUrls: urls })
+          }),
         }
       }),
     )
     setVideoDrafts((prev) => {
       const next = { ...prev }
-      next[tournamentId] = [...(next[tournamentId] ?? []), ""]
+      const current = [...(next[matchId] ?? [])]
+      while (current.length <= index) current.push("")
+      current[index] = draft
+      next[matchId] = current
       return next
     })
   }
 
-  const removeTournamentVideoUrl = (tournamentId: string, index: number) => {
-    const confirmed = window.confirm("この試合動画URL行を削除します。よろしいですか？")
+  const clearMatchVideoUrlSlot = (tournamentId: string, matchId: string, index: number) => {
+    const confirmed = window.confirm("この試合動画URLを削除します。よろしいですか？")
     if (!confirmed) return
     setRecords((prev) =>
       prev.map((tournament) => {
         if (tournament.id !== tournamentId) return tournament
-        const next = [...(tournament.videoUrls ?? [])]
-        const currentCount = Math.max(
-          tournament.videoRowCount ?? totalQuarterByTournament(tournament),
-          (tournament.videoUrls ?? []).length,
-        )
-        if (index < 0 || index >= currentCount) return tournament
-        if (index < next.length) {
-          next.splice(index, 1)
+        return {
+          ...tournament,
+          matches: tournament.matches.map((match) => {
+            if (match.id !== matchId) return match
+            const urls = [...(match.videoUrls ?? [])]
+            while (urls.length <= index) urls.push("")
+            urls[index] = ""
+            return normalizeMatchVideoUrls({ ...match, videoUrls: urls })
+          }),
         }
-        return { ...tournament, videoUrls: next, videoRowCount: Math.max(0, currentCount - 1) }
       }),
     )
     setVideoDrafts((prev) => {
       const next = { ...prev }
-      const current = [...(next[tournamentId] ?? [])]
-      if (index >= 0 && index < current.length) {
-        current.splice(index, 1)
-      }
-      next[tournamentId] = current
+      const current = [...(next[matchId] ?? [])]
+      while (current.length <= index) current.push("")
+      current[index] = ""
+      next[matchId] = current
       return next
     })
   }
 
   const openVideo = (record: TournamentRecord) => {
-    const url = (record.videoUrls ?? []).map((item) => item.trim()).find((item) => item !== "") ?? ""
-    if (url !== "") {
-      window.open(url, "_blank", "noopener,noreferrer")
-      return
+    for (const match of record.matches) {
+      const url =
+        (match.videoUrls ?? []).map((item) => item.trim()).find((item) => item !== "") ?? ""
+      if (url !== "") {
+        window.open(url, "_blank", "noopener,noreferrer")
+        return
+      }
     }
-    const input = document.getElementById(`video-url-${record.id}-0`) as HTMLInputElement | null
+    const firstMatch = record.matches[0]
+    const input = firstMatch
+      ? (document.getElementById(`video-url-${firstMatch.id}-0`) as HTMLInputElement | null)
+      : null
     input?.focus()
   }
 
-  const openTournamentVideoUrl = (record: TournamentRecord, index: number) => {
-    const url = (record.videoUrls?.[index] ?? "").trim()
+  const openMatchVideoUrl = (match: MatchRecord, index: number) => {
+    const url = (match.videoUrls?.[index] ?? "").trim()
     if (url !== "") {
       window.open(url, "_blank", "noopener,noreferrer")
       return
     }
-    const input = document.getElementById(`video-url-${record.id}-${index}`) as HTMLInputElement | null
+    const input = document.getElementById(`video-url-${match.id}-${index}`) as HTMLInputElement | null
     input?.focus()
   }
 
@@ -702,65 +717,6 @@ export function StaffResultsManager() {
                   }
                 />
               </div>
-              <div className="space-y-2">
-                <Label>試合動画URL</Label>
-                {Array.from({
-                  length: Math.max(
-                    record.videoRowCount ?? totalQuarterByTournament(record),
-                    (record.videoUrls ?? []).length,
-                  ),
-                }).map((_, index) => (
-                  <div key={`${record.id}-video-${index}`} className="flex gap-2">
-                    <Input
-                      id={`video-url-${record.id}-${index}`}
-                      value={getVideoDraftValue(record, index)}
-                      onChange={(e) =>
-                        setVideoDraftValue(record.id, index, e.target.value)
-                      }
-                      placeholder={`試合動画URL ${index + 1}`}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => saveTournamentVideoUrl(record.id, index)}
-                      className="shrink-0"
-                    >
-                      保存
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openTournamentVideoUrl(record, index)}
-                      className="shrink-0"
-                    >
-                      開く
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeTournamentVideoUrl(record.id, index)}
-                      className="text-red-500 hover:text-red-400 shrink-0"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      削除
-                    </Button>
-                  </div>
-                ))}
-                <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addTournamentVideoUrlRow(record.id)}
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    最後の行に追加
-                  </Button>
-                </div>
-              </div>
 
               {record.matches.length === 0 ? (
                 <p className="text-muted-foreground">まだ試合記録はありません。</p>
@@ -855,6 +811,63 @@ export function StaffResultsManager() {
                           }
                         />
                       </div>
+                    </div>
+                    <div className="space-y-2 border-t border-border pt-3">
+                      <Label className="text-sm text-muted-foreground">
+                        試合動画URL（Qの数だけ）
+                      </Label>
+                      {Array.from({ length: Math.max(0, match.quarter) }).map((_, vIndex) => (
+                        <div
+                          key={`${match.id}-video-${vIndex}`}
+                          className="flex flex-wrap gap-2 items-center"
+                        >
+                          <Input
+                            id={`video-url-${match.id}-${vIndex}`}
+                            className="min-w-0 flex-1 basis-[min(100%,18rem)]"
+                            value={getMatchVideoDraftValue(
+                              match.id,
+                              vIndex,
+                              match.videoUrls?.[vIndex] ?? "",
+                            )}
+                            onChange={(e) =>
+                              setMatchVideoDraftValue(match.id, vIndex, e.target.value)
+                            }
+                            placeholder={`試合動画URL ${vIndex + 1}`}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0"
+                            onClick={() =>
+                              saveMatchVideoUrl(record.id, match.id, vIndex)
+                            }
+                          >
+                            保存
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0"
+                            onClick={() => openMatchVideoUrl(match, vIndex)}
+                          >
+                            開く
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="text-red-500 hover:text-red-400 shrink-0"
+                            onClick={() =>
+                              clearMatchVideoUrlSlot(record.id, match.id, vIndex)
+                            }
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            削除
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))
