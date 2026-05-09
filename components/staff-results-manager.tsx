@@ -77,7 +77,7 @@ export function StaffResultsManager() {
     theirScore: "",
   })
 
-  const expectedCode = process.env.NEXT_PUBLIC_STAFF_ACCESS_CODE ?? "selene-staff"
+  const expectedCode = process.env.NEXT_PUBLIC_STAFF_ACCESS_CODE ?? "123456"
 
   useEffect(() => {
     if (!isUnlocked) return
