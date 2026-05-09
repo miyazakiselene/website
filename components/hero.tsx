@@ -1,8 +1,6 @@
 "use client"
 
-import { ArrowRight, Trophy, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { Trophy, Users } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
@@ -146,57 +144,34 @@ export function Hero() {
           </h1>
 
           {/* Sub Headline with Animation */}
-          <p 
-            className={`text-xl md:text-2xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty leading-relaxed transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          <p
+            className={`text-xl md:text-2xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl md:max-w-4xl mx-auto text-pretty leading-relaxed md:whitespace-nowrap transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             style={{ transitionDelay: "0.6s" }}
           >
-            宮崎県の女子中学生バスケットボールクラブ「SELENE」。
-            <br />
-            心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。
+            宮崎県の女子中学生バスケットボールクラブ「SELENE」。心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。
           </p>
-
-          {/* CTA Buttons with Animation */}
-          <div 
-            className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: "0.8s" }}
-          >
-            <Button asChild size="lg" className="w-full sm:w-auto text-lg px-10 py-6 group hover:scale-105 transition-transform">
-              <Link href="#contact">
-                お問い合わせ
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto text-lg px-10 py-6 hover:scale-105 transition-transform"
-            >
-              <Link href="#about">チーム紹介を見る</Link>
-            </Button>
-          </div>
 
           <div
             className={`max-w-3xl mx-auto mb-14 rounded-xl border border-amber-400/40 bg-amber-500/10 px-5 py-4 text-center transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: "0.9s" }}
+            style={{ transitionDelay: "0.8s" }}
           >
             <p className="text-sm md:text-base text-amber-100 leading-relaxed">
-              お知らせ：今年度の体験入部および入部受付は締め切りました。
+              お知らせ：今年度の募集は行なっておりません。
             </p>
           </div>
 
           {/* Stats with Animation */}
           <div 
-            className={`grid grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: "1s" }}
+            className={`grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 max-w-2xl mx-auto transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            style={{ transitionDelay: "0.9s" }}
           >
             {[
               { icon: Users, value: "10", label: "選手在籍" },
-              { icon: Trophy, value: "1", label: "参加大会（R8）" },
+              { icon: Trophy, value: "1", label: "参加大会" },
             ].map((stat, index) => (
               <div 
                 key={index}
-                className="flex flex-col items-center p-5 md:p-6 rounded-xl bg-card/50 border border-border backdrop-blur-sm hover:border-primary/50 hover:bg-card/70 transition-all duration-300 group"
+                className="flex flex-col items-center p-5 md:p-6 rounded-xl bg-card/50 border border-border backdrop-blur-sm hover:border-primary/50 hover:bg-card/70 transition-all duration-300 group w-full"
               >
                 <stat.icon className="h-7 w-7 md:h-8 md:w-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
                 <span className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground">

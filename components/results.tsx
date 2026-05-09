@@ -13,7 +13,6 @@ export type Match = {
 
 export type Tournament = {
   id: string
-  year: string
   period: string
   name: string
   venue?: string
@@ -23,7 +22,6 @@ export type Tournament = {
 const tournaments: Tournament[] = [
   {
     id: "2026-spring-cup",
-    year: "R8年度",
     period: "2026年4月4日-5日",
     name: "日の出ホルモンスプリングカップ",
     venue: "生目中学",
@@ -36,7 +34,6 @@ const tournaments: Tournament[] = [
   },
   {
     id: "2026-04-18",
-    year: "R8年度",
     period: "2026年4月18日",
     name: "練習試合",
     venue: "木花中学",
@@ -44,7 +41,6 @@ const tournaments: Tournament[] = [
   },
   {
     id: "2026-04-25",
-    year: "R8年度",
     period: "2026年4月25日",
     name: "練習試合",
     venue: "日向学院高校",
@@ -55,7 +51,6 @@ const tournaments: Tournament[] = [
   },
   {
     id: "2026-04-29",
-    year: "R8年度",
     period: "2026年4月29日",
     name: "練習試合",
     venue: "国光春中学",
@@ -71,7 +66,6 @@ const tournaments: Tournament[] = [
   },
   {
     id: "2026-05-02",
-    year: "R8年度",
     period: "2026年5月2日",
     name: "練習試合",
     venue: "宮商高校",
@@ -79,7 +73,6 @@ const tournaments: Tournament[] = [
   },
   {
     id: "2026-05-04",
-    year: "R8年度",
     period: "2026年5月4日",
     name: "練習試合",
     venue: "祝吉中学",
@@ -93,7 +86,6 @@ const tournaments: Tournament[] = [
   },
   {
     id: "2026-05-06",
-    year: "R8年度",
     period: "2026年5月6日",
     name: "練習試合",
     venue: "宮崎市総合体育館",
@@ -101,7 +93,6 @@ const tournaments: Tournament[] = [
   },
   {
     id: "2026-05-09",
-    year: "R8年度",
     period: "2026年5月9日",
     name: "練習試合",
     venue: "生目台中学",
@@ -166,11 +157,6 @@ export function Results() {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mt-3 mb-6">
             大会参加・活動記録
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            参加した大会と対戦記録を掲載しています。
-            <br />
-            相互の敬意の観点から、試合結果の詳細（得点・勝敗）は掲載しておりません。
-          </p>
         </AnimatedSection>
 
         {/* Tournament Results */}
@@ -189,7 +175,7 @@ export function Results() {
                         <div>
                           <div className="flex items-center gap-2 text-base text-muted-foreground mb-2">
                             <Calendar className="h-5 w-5" />
-                            {tournament.year} / {tournament.period}
+                            {tournament.period}
                           </div>
                           <h3 className="text-2xl md:text-3xl font-bold text-foreground">
                             {tournament.name}

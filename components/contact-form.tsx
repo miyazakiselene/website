@@ -30,7 +30,7 @@ export function ContactForm() {
             お問い合わせ
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            入部や練習試合のお申し込み、その他ご質問などお気軽にお問い合わせください。
+            練習試合のお申し込み、その他ご質問などお気軽にお問い合わせください。
           </p>
         </AnimatedSection>
 
@@ -42,7 +42,7 @@ export function ContactForm() {
                 <AnimatedSection animation="fadeInUp" delay={300}>
                   <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 md:p-6">
                     <p className="text-base md:text-lg text-foreground leading-relaxed">
-                      今年度の体験入部および入部受付は締め切りました。
+                      今年度の募集は行なっておりません。
                       <br />
                       練習試合のお申し込み・その他のご相談は、
                       <br className="hidden sm:block" />

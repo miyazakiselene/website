@@ -1,6 +1,7 @@
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
 import { TeamAbout } from "@/components/team-about"
+import { News } from "@/components/news"
 import { Results } from "@/components/results"
 import { InstagramFeed } from "@/components/instagram-feed"
 import { ContactForm } from "@/components/contact-form"
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Header />
       <Hero />
       <TeamAbout />
+      <News />
       <Results />
       <InstagramFeed />
       <ContactForm />
