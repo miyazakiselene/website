@@ -126,7 +126,7 @@ function MatchRow({ match, index }: { match: Match; index: number }) {
             {match.date}
           </Badge>
           <span className="text-base md:text-xl text-foreground font-semibold group-hover:text-primary transition-colors">
-            対戦チーム：{match.opponent}
+            {match.opponent}
           </span>
         </div>
       </div>
