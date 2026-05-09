@@ -1,0 +1,118 @@
+"use client"
+
+import { Instagram, Mail, ArrowUp } from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { AnimatedSection } from "@/components/animated-section"
+
+const navLinks = [
+  { label: "ホーム", href: "#hero" },
+  { label: "チーム紹介", href: "#about" },
+  { label: "戦績", href: "#results" },
+  { label: "Instagram", href: "#instagram" },
+  { label: "お問い合わせ", href: "#contact" },
+]
+
+export function Footer() {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  return (
+    <footer className="bg-secondary/50 border-t border-border py-16 relative">
+      {/* Back to Top Button */}
+      <AnimatedSection animation="fadeIn" className="absolute -top-7 left-1/2 -translate-x-1/2">
+        <Button
+          onClick={scrollToTop}
+          size="icon"
+          className="rounded-full shadow-lg hover:scale-110 transition-transform w-14 h-14"
+        >
+          <ArrowUp className="h-6 w-6" />
+          <span className="sr-only">トップへ戻る</span>
+        </Button>
+      </AnimatedSection>
+
+      <div className="container mx-auto px-4">
+        <div className="grid md:grid-cols-3 gap-10 mb-10">
+          {/* Logo & Description */}
+          <AnimatedSection animation="fadeInUp" delay={100}>
+            <Link href="/" className="flex items-center gap-4 mb-5 group">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Image
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
+                  alt="宮崎 SELENE ロゴ"
+                  width={56}
+                  height={56}
+                  className="rounded-full relative z-10"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">
+                  宮崎 SELENE
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  Girls Basketball Club
+                </span>
+              </div>
+            </Link>
+            <p className="text-base text-muted-foreground leading-relaxed">
+              宮崎県の女子中学生バスケットボールクラブ。
+              <br />
+              全国大会出場を目指して活動中。
+            </p>
+          </AnimatedSection>
+
+          {/* Navigation */}
+          <AnimatedSection animation="fadeInUp" delay={200}>
+            <h4 className="font-bold text-lg text-foreground mb-5">ナビゲーション</h4>
+            <nav className="grid grid-cols-2 gap-3">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-base text-muted-foreground hover:text-primary hover:translate-x-1 transition-all"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </AnimatedSection>
+
+          {/* Contact */}
+          <AnimatedSection animation="fadeInUp" delay={300}>
+            <h4 className="font-bold text-lg text-foreground mb-5">お問い合わせ</h4>
+            <div className="space-y-3">
+              <a
+                href="mailto:info@miyazaki-selene.example.com"
+                className="flex items-center gap-3 text-base text-muted-foreground hover:text-primary transition-colors group"
+              >
+                <Mail className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                info@miyazaki-selene.example.com
+              </a>
+              <a
+                href="https://www.instagram.com/2026.selene/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-base text-muted-foreground hover:text-primary transition-colors group"
+              >
+                <Instagram className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                @2026.selene
+              </a>
+            </div>
+          </AnimatedSection>
+        </div>
+
+        {/* Copyright */}
+        <AnimatedSection animation="fadeIn" delay={400}>
+          <div className="border-t border-border pt-10">
+            <p className="text-center text-base text-muted-foreground">
+              &copy; {new Date().getFullYear()} 宮崎 SELENE. All rights reserved.
+            </p>
+          </div>
+        </AnimatedSection>
+      </div>
+    </footer>
+  )
+}
