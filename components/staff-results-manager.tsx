@@ -152,6 +152,46 @@ export function StaffResultsManager() {
     })
   }
 
+  const updateTournamentField = (
+    tournamentId: string,
+    field: "year" | "name" | "venue",
+    value: string,
+  ) => {
+    setRecords((prev) =>
+      prev.map((tournament) =>
+        tournament.id === tournamentId ? { ...tournament, [field]: value } : tournament,
+      ),
+    )
+  }
+
+  const updateMatchField = (
+    tournamentId: string,
+    matchId: string,
+    field: "date" | "opponent" | "ourScore" | "theirScore",
+    value: string,
+  ) => {
+    setRecords((prev) =>
+      prev.map((tournament) =>
+        tournament.id !== tournamentId
+          ? tournament
+          : {
+              ...tournament,
+              matches: tournament.matches.map((match) => {
+                if (match.id !== matchId) return match
+                if (field === "ourScore" || field === "theirScore") {
+                  const numeric = Number(value)
+                  return {
+                    ...match,
+                    [field]: Number.isNaN(numeric) ? 0 : numeric,
+                  }
+                }
+                return { ...match, [field]: value }
+              }),
+            },
+      ),
+    )
+  }
+
   if (!isUnlocked) {
     return (
       <Card className="max-w-lg mx-auto border-border bg-card">
@@ -331,28 +371,110 @@ export function StaffResultsManager() {
         {records.map((record) => (
           <Card key={record.id} className="border-border">
             <CardHeader>
-              <CardTitle className="text-xl">
-                {record.year} / {record.name}
-              </CardTitle>
-              {record.venue !== "" ? (
-                <p className="text-muted-foreground">{record.venue}</p>
-              ) : null}
+              <CardTitle className="text-xl">大会情報（編集可）</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor={`year-${record.id}`}>年度</Label>
+                  <Input
+                    id={`year-${record.id}`}
+                    value={record.year}
+                    onChange={(e) =>
+                      updateTournamentField(record.id, "year", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-1 md:col-span-2">
+                  <Label htmlFor={`name-${record.id}`}>大会名</Label>
+                  <Input
+                    id={`name-${record.id}`}
+                    value={record.name}
+                    onChange={(e) =>
+                      updateTournamentField(record.id, "name", e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor={`venue-${record.id}`}>会場</Label>
+                <Input
+                  id={`venue-${record.id}`}
+                  value={record.venue}
+                  onChange={(e) =>
+                    updateTournamentField(record.id, "venue", e.target.value)
+                  }
+                />
+              </div>
+
               {record.matches.length === 0 ? (
                 <p className="text-muted-foreground">まだ試合記録はありません。</p>
               ) : (
                 record.matches.map((match) => (
                   <div
                     key={match.id}
-                    className="rounded-lg border border-border px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+                    className="rounded-lg border border-border px-4 py-3 space-y-3"
                   >
-                    <div className="text-sm md:text-base">
-                      <span className="text-muted-foreground mr-3">{match.date}</span>
-                      <span className="font-medium">vs {match.opponent}</span>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label htmlFor={`date-${match.id}`}>日付</Label>
+                        <Input
+                          id={`date-${match.id}`}
+                          value={match.date}
+                          onChange={(e) =>
+                            updateMatchField(record.id, match.id, "date", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor={`opponent-${match.id}`}>対戦相手</Label>
+                        <Input
+                          id={`opponent-${match.id}`}
+                          value={match.opponent}
+                          onChange={(e) =>
+                            updateMatchField(
+                              record.id,
+                              match.id,
+                              "opponent",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </div>
                     </div>
-                    <div className="font-bold text-lg">
-                      {match.ourScore} - {match.theirScore}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label htmlFor={`our-score-${match.id}`}>自チーム得点</Label>
+                        <Input
+                          id={`our-score-${match.id}`}
+                          type="number"
+                          value={match.ourScore}
+                          onChange={(e) =>
+                            updateMatchField(
+                              record.id,
+                              match.id,
+                              "ourScore",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor={`their-score-${match.id}`}>相手チーム得点</Label>
+                        <Input
+                          id={`their-score-${match.id}`}
+                          type="number"
+                          value={match.theirScore}
+                          onChange={(e) =>
+                            updateMatchField(
+                              record.id,
+                              match.id,
+                              "theirScore",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                 ))
@@ -362,6 +484,9 @@ export function StaffResultsManager() {
         ))}
       </div>
 
+      <p className="text-sm text-muted-foreground text-center">
+        入力した内容は自動保存されます。
+      </p>
       <p className="text-sm text-muted-foreground text-center">
         現在の登録件数: 大会 {records.length} 件 / 試合 {totalMatches} 件
       </p>
