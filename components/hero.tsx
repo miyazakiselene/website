@@ -192,7 +192,7 @@ export function Hero() {
           >
             {[
               { icon: Users, value: "10", label: "選手在籍" },
-              { icon: Trophy, value: "3位", label: "日の出ホルモンスプリングカップ" },
+              { icon: Trophy, value: "1", label: "参加大会（R8）" },
             ].map((stat, index) => (
               <div 
                 key={index}

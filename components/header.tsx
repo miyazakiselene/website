@@ -19,9 +19,10 @@ import { cn } from "@/lib/utils"
 const navItems = [
   { label: "ホーム", href: "#hero" },
   { label: "チーム紹介", href: "#about" },
-  { label: "戦績", href: "#results" },
+  { label: "大会参加・活動記録", href: "#results" },
   { label: "Instagram", href: "#instagram" },
   { label: "お問い合わせ", href: "#contact" },
+  { label: "関係者専用", href: "/staff" },
 ]
 
 export function Header() {

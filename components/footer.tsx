@@ -9,7 +9,7 @@ import { AnimatedSection } from "@/components/animated-section"
 const navLinks = [
   { label: "ホーム", href: "#hero" },
   { label: "チーム紹介", href: "#about" },
-  { label: "戦績", href: "#results" },
+  { label: "活動記録", href: "#results" },
   { label: "Instagram", href: "#instagram" },
   { label: "お問い合わせ", href: "#contact" },
 ]
