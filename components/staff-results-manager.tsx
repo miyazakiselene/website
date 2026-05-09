@@ -23,19 +23,94 @@ type TournamentRecord = {
   matches: MatchRecord[]
 }
 
-const STORAGE_KEY = "selene-staff-results-v1"
+const STORAGE_KEY = "selene-staff-results-v2"
 
 const defaultRecords: TournamentRecord[] = [
   {
-    id: "spring-cup-r8",
+    id: "spring-cup-r8-2026",
     year: "R8年度",
     name: "日の出ホルモンスプリングカップ",
-    venue: "宮崎市内",
+    venue: "生目中学",
     matches: [
-      { id: "m1", date: "4/13", opponent: "本郷中", ourScore: 45, theirScore: 30 },
-      { id: "m2", date: "4/14", opponent: "東海中", ourScore: 49, theirScore: 32 },
-      { id: "m3", date: "4/20", opponent: "EPSIRON", ourScore: 42, theirScore: 58 },
-      { id: "m4", date: "4/21", opponent: "赤江東中", ourScore: 49, theirScore: 48 },
+      { id: "2026-04-04-1", date: "4/4", opponent: "本郷中学", ourScore: 45, theirScore: 30 },
+      { id: "2026-04-04-2", date: "4/4", opponent: "東海中学", ourScore: 49, theirScore: 32 },
+      { id: "2026-04-05-1", date: "4/5", opponent: "EPSIRON", ourScore: 42, theirScore: 58 },
+      { id: "2026-04-05-2", date: "4/5", opponent: "赤江東中学", ourScore: 49, theirScore: 48 },
+    ],
+  },
+  {
+    id: "practice-2026-04-18",
+    year: "R8年度",
+    name: "練習試合（4/18）",
+    venue: "木花中学",
+    matches: [
+      { id: "2026-04-18-1", date: "4/18", opponent: "木花中学", ourScore: 117, theirScore: 87 },
+    ],
+  },
+  {
+    id: "practice-2026-04-25",
+    year: "R8年度",
+    name: "練習試合（4/25）",
+    venue: "日向学院高校",
+    matches: [
+      { id: "2026-04-25-1", date: "4/25", opponent: "日向学院高校", ourScore: 63, theirScore: 34 },
+      { id: "2026-04-25-2", date: "4/25", opponent: "タートル（社会人）", ourScore: 37, theirScore: 86 },
+    ],
+  },
+  {
+    id: "practice-2026-04-29",
+    year: "R8年度",
+    name: "練習試合（4/29）",
+    venue: "国光春中学",
+    matches: [
+      { id: "2026-04-29-1", date: "4/29", opponent: "宮附中学", ourScore: 48, theirScore: 1 },
+      { id: "2026-04-29-2", date: "4/29", opponent: "国光春中学", ourScore: 36, theirScore: 13 },
+      { id: "2026-04-29-3", date: "4/29", opponent: "南郷中学", ourScore: 60, theirScore: 2 },
+      { id: "2026-04-29-4", date: "4/29", opponent: "都農中学", ourScore: 37, theirScore: 10 },
+      { id: "2026-04-29-5", date: "4/29", opponent: "日向中学", ourScore: 27, theirScore: 37 },
+      { id: "2026-04-29-6", date: "4/29", opponent: "富田・高鍋東中学", ourScore: 40, theirScore: 7 },
+      { id: "2026-04-29-7", date: "4/29", opponent: "野尻・飯野中学", ourScore: 39, theirScore: 10 },
+    ],
+  },
+  {
+    id: "practice-2026-05-02",
+    year: "R8年度",
+    name: "練習試合（5/2）",
+    venue: "宮商高校",
+    matches: [
+      { id: "2026-05-02-1", date: "5/2", opponent: "宮商高校", ourScore: 50, theirScore: 171 },
+    ],
+  },
+  {
+    id: "practice-2026-05-04",
+    year: "R8年度",
+    name: "練習試合（5/4）",
+    venue: "祝吉中学",
+    matches: [
+      { id: "2026-05-04-1", date: "5/4", opponent: "EPSIRON", ourScore: 51, theirScore: 44 },
+      { id: "2026-05-04-2", date: "5/4", opponent: "REDSUNS", ourScore: 42, theirScore: 35 },
+      { id: "2026-05-04-3", date: "5/4", opponent: "祝吉中学", ourScore: 56, theirScore: 22 },
+      { id: "2026-05-04-4", date: "5/4", opponent: "ELPIS", ourScore: 21, theirScore: 24 },
+      { id: "2026-05-04-5", date: "5/4", opponent: "苅田中学", ourScore: 32, theirScore: 12 },
+    ],
+  },
+  {
+    id: "practice-2026-05-06",
+    year: "R8年度",
+    name: "練習試合（5/6）",
+    venue: "宮崎市総合体育館",
+    matches: [
+      { id: "2026-05-06-1", date: "5/6", opponent: "CRISIS", ourScore: 101, theirScore: 43 },
+    ],
+  },
+  {
+    id: "practice-2026-05-09",
+    year: "R8年度",
+    name: "練習試合（5/9）",
+    venue: "生目台中学",
+    matches: [
+      { id: "2026-05-09-1", date: "5/9", opponent: "清武中学", ourScore: 81, theirScore: 18 },
+      { id: "2026-05-09-2", date: "5/9", opponent: "生目台中学", ourScore: 61, theirScore: 51 },
     ],
   },
 ]
