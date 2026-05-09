@@ -176,6 +176,15 @@ export function Hero() {
             </Button>
           </div>
 
+          <div
+            className={`max-w-3xl mx-auto mb-14 rounded-xl border border-amber-400/40 bg-amber-500/10 px-5 py-4 text-center transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            style={{ transitionDelay: "0.9s" }}
+          >
+            <p className="text-sm md:text-base text-amber-100 leading-relaxed">
+              お知らせ：今年度の体験入部および入部受付は締め切りました。
+            </p>
+          </div>
+
           {/* Stats with Animation */}
           <div 
             className={`grid grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
