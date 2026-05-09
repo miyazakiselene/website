@@ -10,7 +10,7 @@ const sponsors = [
     id: "1",
     name: "花笑み すずらんこども園",
     url: "https://hanaemi-suzuran.com/overview/",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-90leTCUKotq6xL1tSnUUt2F7aKTxxW.png",
+    logo: "/sponsor-suzuran.png",
     width: 300,
     height: 80,
   },
@@ -18,7 +18,7 @@ const sponsors = [
     id: "2",
     name: "株式会社クラタカ",
     url: "https://kurataka.com/",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-XvXbsKCgmAEOguhwzv90kBAbrVjMr5.png",
+    logo: "/sponsor-kurataka.png",
     width: 200,
     height: 60,
   },
@@ -26,7 +26,7 @@ const sponsors = [
     id: "3",
     name: "医療法人社団 誠友会 南部病院",
     url: "https://nanbuhp.or.jp/",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-MM6RLkuFm5aXD7ZgkAjHs7m0foFOCy.png",
+    logo: "/sponsor-nanbu-hospital.png",
     width: 150,
     height: 120,
   },
@@ -61,9 +61,9 @@ export function Sponsors() {
                 href={sponsor.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group h-full flex flex-col items-center justify-center gap-4 p-4 md:p-5 rounded-xl border border-border/60 bg-white/95 hover:bg-white transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1"
+                className="group h-full flex flex-col items-center justify-between gap-4 p-4 md:p-5 rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1"
               >
-                <div className="relative w-full h-20 sm:h-24 md:h-28">
+                <div className="relative w-full h-20 sm:h-24 md:h-28 rounded-lg bg-white">
                   <Image
                     src={sponsor.logo}
                     alt={sponsor.name}
@@ -72,9 +72,11 @@ export function Sponsors() {
                     className="object-contain opacity-95 group-hover:opacity-100 transition-opacity"
                   />
                 </div>
-                <p className="text-sm md:text-base text-center font-semibold text-foreground leading-snug">
-                  {sponsor.name}
-                </p>
+                <div className="w-full rounded-md bg-slate-100/90 border border-slate-200 px-3 py-2">
+                  <p className="text-sm md:text-base text-center font-bold text-slate-800 leading-snug tracking-wide">
+                    {sponsor.name}
+                  </p>
+                </div>
               </Link>
             </AnimatedSection>
           ))}
