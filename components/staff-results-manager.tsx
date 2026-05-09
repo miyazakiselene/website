@@ -161,6 +161,15 @@ export function StaffResultsManager() {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
   }, [isUnlocked, records])
 
+  useEffect(() => {
+    if (!isUnlocked) return
+    setNewMatch((prev) => {
+      if (prev.tournamentId === "") return prev
+      if (records.some((r) => r.id === prev.tournamentId)) return prev
+      return { ...prev, tournamentId: records[0]?.id ?? "" }
+    })
+  }, [isUnlocked, records])
+
   const canAddTournament =
     newTournament.year.trim() !== "" && newTournament.name.trim() !== ""
   const canAddMatch =
