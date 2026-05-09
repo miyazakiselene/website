@@ -22,6 +22,7 @@ type TournamentRecord = {
   name: string
   venue: string
   videoUrls?: string[]
+  videoRowCount?: number
   matches: MatchRecord[]
 }
 
@@ -129,6 +130,7 @@ function loadInitialRecords() {
     const parsed = JSON.parse(raw) as TournamentRecord[]
     if (!Array.isArray(parsed)) return defaultRecords
     return parsed.map((record) => {
+      const totalQuarter = record.matches.reduce((sum, match) => sum + Math.max(0, match.quarter), 0)
       const legacyUrl =
         typeof (record as TournamentRecord & { videoUrl?: string }).videoUrl === "string"
           ? (record as TournamentRecord & { videoUrl?: string }).videoUrl?.trim() ?? ""
@@ -138,7 +140,14 @@ function loadInitialRecords() {
         : legacyUrl !== ""
           ? [legacyUrl]
           : []
-      return { ...record, videoUrls: nextUrls }
+      return {
+        ...record,
+        videoUrls: nextUrls,
+        videoRowCount:
+          typeof record.videoRowCount === "number"
+            ? Math.max(0, record.videoRowCount)
+            : totalQuarter,
+      }
     })
   } catch {
     return defaultRecords
@@ -215,6 +224,7 @@ export function StaffResultsManager() {
       name: newTournament.name.trim(),
       venue: newTournament.venue.trim(),
       videoUrls: [],
+      videoRowCount: 0,
       matches: [],
     }
     setRecords((prev) => [...prev, newRecord])
@@ -332,11 +342,18 @@ export function StaffResultsManager() {
 
   const addTournamentVideoUrlRow = (tournamentId: string) => {
     setRecords((prev) =>
-      prev.map((tournament) =>
-        tournament.id !== tournamentId
-          ? tournament
-          : { ...tournament, videoUrls: [...(tournament.videoUrls ?? []), ""] },
-      ),
+      prev.map((tournament) => {
+        if (tournament.id !== tournamentId) return tournament
+        const currentCount = Math.max(
+          tournament.videoRowCount ?? totalQuarterByTournament(tournament),
+          (tournament.videoUrls ?? []).length,
+        )
+        return {
+          ...tournament,
+          videoUrls: [...(tournament.videoUrls ?? []), ""],
+          videoRowCount: currentCount + 1,
+        }
+      }),
     )
   }
 
@@ -345,9 +362,15 @@ export function StaffResultsManager() {
       prev.map((tournament) => {
         if (tournament.id !== tournamentId) return tournament
         const next = [...(tournament.videoUrls ?? [])]
-        if (index < 0 || index >= next.length) return tournament
-        next.splice(index, 1)
-        return { ...tournament, videoUrls: next }
+        const currentCount = Math.max(
+          tournament.videoRowCount ?? totalQuarterByTournament(tournament),
+          (tournament.videoUrls ?? []).length,
+        )
+        if (index < 0 || index >= currentCount) return tournament
+        if (index < next.length) {
+          next.splice(index, 1)
+        }
+        return { ...tournament, videoUrls: next, videoRowCount: Math.max(0, currentCount - 1) }
       }),
     )
   }
@@ -624,7 +647,10 @@ export function StaffResultsManager() {
               <div className="space-y-2">
                 <Label>試合動画URL</Label>
                 {Array.from({
-                  length: Math.max(totalQuarterByTournament(record), (record.videoUrls ?? []).length),
+                  length: Math.max(
+                    record.videoRowCount ?? totalQuarterByTournament(record),
+                    (record.videoUrls ?? []).length,
+                  ),
                 }).map((_, index) => (
                   <div key={`${record.id}-video-${index}`} className="flex gap-2">
                     <Input
