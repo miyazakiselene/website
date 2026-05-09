@@ -27,7 +27,7 @@ const tournaments: Tournament[] = [
   {
     id: "1",
     year: "R8年度",
-    name: "日ノ出ホルモンスプリングカップ",
+    name: "日の出ホルモンスプリングカップ",
     achievement: "第3位",
     matches: [
       { id: "m1", opponent: "本郷中", ourScore: 45, theirScore: 30, result: "win" },
