@@ -302,6 +302,16 @@ export function StaffResultsManager() {
     )
   }
 
+  const openVideo = (record: TournamentRecord) => {
+    const url = record.videoUrl?.trim() ?? ""
+    if (url !== "") {
+      window.open(url, "_blank", "noopener,noreferrer")
+      return
+    }
+    const input = document.getElementById(`video-url-${record.id}`) as HTMLInputElement | null
+    input?.focus()
+  }
+
   if (!isUnlocked) {
     return (
       <Card className="max-w-lg mx-auto border-border bg-card">
@@ -518,18 +528,15 @@ export function StaffResultsManager() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-xl">大会情報（編集可）</CardTitle>
               <div className="flex items-center gap-2">
-                {record.videoUrl && record.videoUrl.trim() !== "" ? (
-                  <Button type="button" asChild variant="outline" size="sm">
-                    <a href={record.videoUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 mr-1" />
-                      試合動画
-                    </a>
-                  </Button>
-                ) : (
-                  <Button type="button" variant="outline" size="sm" disabled>
-                    試合動画
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openVideo(record)}
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  試合動画
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
