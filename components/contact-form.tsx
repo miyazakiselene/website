@@ -30,7 +30,8 @@ export function ContactForm() {
             お問い合わせ
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl md:max-w-4xl mx-auto leading-relaxed md:whitespace-nowrap">
-            練習試合のお申し込み、その他ご質問などお気軽にお問い合わせください。
+            <span className="block sm:inline">練習試合のお申し込み、</span>
+            <span className="block sm:inline">その他ご質問などお気軽にお問い合わせください。</span>
           </p>
         </AnimatedSection>
 
@@ -43,10 +44,10 @@ export function ContactForm() {
                   <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 md:p-6">
                     <p className="text-base md:text-lg text-foreground leading-relaxed">
                       今年度の募集は行なっておりません。
-                      <br />
-                      練習試合のお申し込み・その他のご相談は、
-                      <br className="hidden sm:block" />
-                      お問い合わせは Instagram のDMをご利用ください。
+                      <span className="block mt-1">
+                        練習試合のお申し込み・その他のご相談は、
+                      </span>
+                      <span className="block">Instagram のDMをご利用ください。</span>
                     </p>
                   </div>
                 </AnimatedSection>
