@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Lock, Plus, Save, ShieldCheck } from "lucide-react"
+import { Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,6 +11,7 @@ type MatchRecord = {
   id: string
   date: string
   opponent: string
+  quarter: number
   ourScore: number
   theirScore: number
 }
@@ -23,7 +24,7 @@ type TournamentRecord = {
   matches: MatchRecord[]
 }
 
-const STORAGE_KEY = "selene-staff-results-v2"
+const STORAGE_KEY = "selene-staff-results-v3"
 
 const defaultRecords: TournamentRecord[] = [
   {
@@ -32,10 +33,10 @@ const defaultRecords: TournamentRecord[] = [
     name: "日の出ホルモンスプリングカップ",
     venue: "生目中学",
     matches: [
-      { id: "2026-04-04-1", date: "4/4", opponent: "本郷中学", ourScore: 45, theirScore: 30 },
-      { id: "2026-04-04-2", date: "4/4", opponent: "東海中学", ourScore: 49, theirScore: 32 },
-      { id: "2026-04-05-1", date: "4/5", opponent: "EPSIRON", ourScore: 42, theirScore: 58 },
-      { id: "2026-04-05-2", date: "4/5", opponent: "赤江東中学", ourScore: 49, theirScore: 48 },
+      { id: "2026-04-04-1", date: "4/4", opponent: "本郷中学", quarter: 4, ourScore: 45, theirScore: 30 },
+      { id: "2026-04-04-2", date: "4/4", opponent: "東海中学", quarter: 4, ourScore: 49, theirScore: 32 },
+      { id: "2026-04-05-1", date: "4/5", opponent: "EPSIRON", quarter: 4, ourScore: 42, theirScore: 58 },
+      { id: "2026-04-05-2", date: "4/5", opponent: "赤江東中学", quarter: 4, ourScore: 49, theirScore: 48 },
     ],
   },
   {
@@ -44,7 +45,7 @@ const defaultRecords: TournamentRecord[] = [
     name: "練習試合（4/18）",
     venue: "木花中学",
     matches: [
-      { id: "2026-04-18-1", date: "4/18", opponent: "木花中学", ourScore: 117, theirScore: 87 },
+      { id: "2026-04-18-1", date: "4/18", opponent: "木花中学", quarter: 8, ourScore: 117, theirScore: 87 },
     ],
   },
   {
@@ -53,8 +54,8 @@ const defaultRecords: TournamentRecord[] = [
     name: "練習試合（4/25）",
     venue: "日向学院高校",
     matches: [
-      { id: "2026-04-25-1", date: "4/25", opponent: "日向学院高校", ourScore: 63, theirScore: 34 },
-      { id: "2026-04-25-2", date: "4/25", opponent: "タートル（社会人）", ourScore: 37, theirScore: 86 },
+      { id: "2026-04-25-1", date: "4/25", opponent: "日向学院高校", quarter: 4, ourScore: 63, theirScore: 34 },
+      { id: "2026-04-25-2", date: "4/25", opponent: "タートル（社会人）", quarter: 4, ourScore: 37, theirScore: 86 },
     ],
   },
   {
@@ -63,13 +64,13 @@ const defaultRecords: TournamentRecord[] = [
     name: "練習試合（4/29）",
     venue: "国光春中学",
     matches: [
-      { id: "2026-04-29-1", date: "4/29", opponent: "宮附中学", ourScore: 48, theirScore: 1 },
-      { id: "2026-04-29-2", date: "4/29", opponent: "国光春中学", ourScore: 36, theirScore: 13 },
-      { id: "2026-04-29-3", date: "4/29", opponent: "南郷中学", ourScore: 60, theirScore: 2 },
-      { id: "2026-04-29-4", date: "4/29", opponent: "都農中学", ourScore: 37, theirScore: 10 },
-      { id: "2026-04-29-5", date: "4/29", opponent: "日向中学", ourScore: 27, theirScore: 37 },
-      { id: "2026-04-29-6", date: "4/29", opponent: "富田・高鍋東中学", ourScore: 40, theirScore: 7 },
-      { id: "2026-04-29-7", date: "4/29", opponent: "野尻・飯野中学", ourScore: 39, theirScore: 10 },
+      { id: "2026-04-29-1", date: "4/29", opponent: "宮附中学", quarter: 2, ourScore: 48, theirScore: 1 },
+      { id: "2026-04-29-2", date: "4/29", opponent: "国光春中学", quarter: 2, ourScore: 36, theirScore: 13 },
+      { id: "2026-04-29-3", date: "4/29", opponent: "南郷中学", quarter: 2, ourScore: 60, theirScore: 2 },
+      { id: "2026-04-29-4", date: "4/29", opponent: "都農中学", quarter: 2, ourScore: 37, theirScore: 10 },
+      { id: "2026-04-29-5", date: "4/29", opponent: "日向中学", quarter: 2, ourScore: 27, theirScore: 37 },
+      { id: "2026-04-29-6", date: "4/29", opponent: "富田・高鍋東中学", quarter: 2, ourScore: 40, theirScore: 7 },
+      { id: "2026-04-29-7", date: "4/29", opponent: "野尻・飯野中学", quarter: 2, ourScore: 39, theirScore: 10 },
     ],
   },
   {
@@ -78,7 +79,7 @@ const defaultRecords: TournamentRecord[] = [
     name: "練習試合（5/2）",
     venue: "宮商高校",
     matches: [
-      { id: "2026-05-02-1", date: "5/2", opponent: "宮商高校", ourScore: 50, theirScore: 171 },
+      { id: "2026-05-02-1", date: "5/2", opponent: "宮商高校", quarter: 9, ourScore: 50, theirScore: 171 },
     ],
   },
   {
@@ -87,11 +88,11 @@ const defaultRecords: TournamentRecord[] = [
     name: "練習試合（5/4）",
     venue: "祝吉中学",
     matches: [
-      { id: "2026-05-04-1", date: "5/4", opponent: "EPSIRON", ourScore: 51, theirScore: 44 },
-      { id: "2026-05-04-2", date: "5/4", opponent: "REDSUNS", ourScore: 42, theirScore: 35 },
-      { id: "2026-05-04-3", date: "5/4", opponent: "祝吉中学", ourScore: 56, theirScore: 22 },
-      { id: "2026-05-04-4", date: "5/4", opponent: "ELPIS", ourScore: 21, theirScore: 24 },
-      { id: "2026-05-04-5", date: "5/4", opponent: "苅田中学", ourScore: 32, theirScore: 12 },
+      { id: "2026-05-04-1", date: "5/4", opponent: "EPSIRON", quarter: 4, ourScore: 51, theirScore: 44 },
+      { id: "2026-05-04-2", date: "5/4", opponent: "REDSUNS", quarter: 4, ourScore: 42, theirScore: 35 },
+      { id: "2026-05-04-3", date: "5/4", opponent: "祝吉中学", quarter: 2, ourScore: 56, theirScore: 22 },
+      { id: "2026-05-04-4", date: "5/4", opponent: "ELPIS", quarter: 2, ourScore: 21, theirScore: 24 },
+      { id: "2026-05-04-5", date: "5/4", opponent: "苅田中学", quarter: 2, ourScore: 32, theirScore: 12 },
     ],
   },
   {
@@ -100,7 +101,7 @@ const defaultRecords: TournamentRecord[] = [
     name: "練習試合（5/6）",
     venue: "宮崎市総合体育館",
     matches: [
-      { id: "2026-05-06-1", date: "5/6", opponent: "CRISIS", ourScore: 101, theirScore: 43 },
+      { id: "2026-05-06-1", date: "5/6", opponent: "CRISIS", quarter: 6, ourScore: 101, theirScore: 43 },
     ],
   },
   {
@@ -109,8 +110,8 @@ const defaultRecords: TournamentRecord[] = [
     name: "練習試合（5/9）",
     venue: "生目台中学",
     matches: [
-      { id: "2026-05-09-1", date: "5/9", opponent: "清武中学", ourScore: 81, theirScore: 18 },
-      { id: "2026-05-09-2", date: "5/9", opponent: "生目台中学", ourScore: 61, theirScore: 51 },
+      { id: "2026-05-09-1", date: "5/9", opponent: "清武中学", quarter: 4, ourScore: 81, theirScore: 18 },
+      { id: "2026-05-09-2", date: "5/9", opponent: "生目台中学", quarter: 4, ourScore: 61, theirScore: 51 },
     ],
   },
 ]
@@ -148,6 +149,7 @@ export function StaffResultsManager() {
     tournamentId: "",
     date: "",
     opponent: "",
+    quarter: "",
     ourScore: "",
     theirScore: "",
   })
@@ -165,6 +167,7 @@ export function StaffResultsManager() {
     newMatch.tournamentId !== "" &&
     newMatch.date.trim() !== "" &&
     newMatch.opponent.trim() !== "" &&
+    newMatch.quarter.trim() !== "" &&
     newMatch.ourScore.trim() !== "" &&
     newMatch.theirScore.trim() !== ""
 
@@ -198,14 +201,16 @@ export function StaffResultsManager() {
 
   const addMatch = () => {
     if (!canAddMatch) return
+    const quarter = Number(newMatch.quarter)
     const ourScore = Number(newMatch.ourScore)
     const theirScore = Number(newMatch.theirScore)
-    if (Number.isNaN(ourScore) || Number.isNaN(theirScore)) return
+    if (Number.isNaN(quarter) || Number.isNaN(ourScore) || Number.isNaN(theirScore)) return
 
     const record: MatchRecord = {
       id: createId(),
       date: newMatch.date.trim(),
       opponent: newMatch.opponent.trim(),
+      quarter,
       ourScore,
       theirScore,
     }
@@ -222,6 +227,7 @@ export function StaffResultsManager() {
       tournamentId: newMatch.tournamentId,
       date: "",
       opponent: "",
+      quarter: "",
       ourScore: "",
       theirScore: "",
     })
@@ -242,7 +248,7 @@ export function StaffResultsManager() {
   const updateMatchField = (
     tournamentId: string,
     matchId: string,
-    field: "date" | "opponent" | "ourScore" | "theirScore",
+    field: "date" | "opponent" | "quarter" | "ourScore" | "theirScore",
     value: string,
   ) => {
     setRecords((prev) =>
@@ -253,7 +259,7 @@ export function StaffResultsManager() {
               ...tournament,
               matches: tournament.matches.map((match) => {
                 if (match.id !== matchId) return match
-                if (field === "ourScore" || field === "theirScore") {
+                if (field === "quarter" || field === "ourScore" || field === "theirScore") {
                   const numeric = Number(value)
                   return {
                     ...match,
@@ -262,6 +268,23 @@ export function StaffResultsManager() {
                 }
                 return { ...match, [field]: value }
               }),
+            },
+      ),
+    )
+  }
+
+  const removeTournament = (tournamentId: string) => {
+    setRecords((prev) => prev.filter((tournament) => tournament.id !== tournamentId))
+  }
+
+  const removeMatch = (tournamentId: string, matchId: string) => {
+    setRecords((prev) =>
+      prev.map((tournament) =>
+        tournament.id !== tournamentId
+          ? tournament
+          : {
+              ...tournament,
+              matches: tournament.matches.filter((match) => match.id !== matchId),
             },
       ),
     )
@@ -386,7 +409,7 @@ export function StaffResultsManager() {
                 ))}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid md:grid-cols-3 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="match-date">日付</Label>
                 <Input
@@ -407,6 +430,18 @@ export function StaffResultsManager() {
                     setNewMatch((prev) => ({ ...prev, opponent: e.target.value }))
                   }
                   placeholder="例: 赤江東中"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="match-quarter">Q</Label>
+                <Input
+                  id="match-quarter"
+                  type="number"
+                  value={newMatch.quarter}
+                  onChange={(e) =>
+                    setNewMatch((prev) => ({ ...prev, quarter: e.target.value }))
+                  }
+                  placeholder="例: 4"
                 />
               </div>
             </div>
@@ -445,8 +480,18 @@ export function StaffResultsManager() {
       <div className="space-y-6">
         {records.map((record) => (
           <Card key={record.id} className="border-border">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-xl">大会情報（編集可）</CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => removeTournament(record.id)}
+                className="text-red-500 hover:text-red-400"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                削除
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-3">
@@ -486,11 +531,20 @@ export function StaffResultsManager() {
                 <p className="text-muted-foreground">まだ試合記録はありません。</p>
               ) : (
                 record.matches.map((match) => (
-                  <div
-                    key={match.id}
-                    className="rounded-lg border border-border px-4 py-3 space-y-3"
-                  >
-                    <div className="grid md:grid-cols-2 gap-3">
+                  <div key={match.id} className="rounded-lg border border-border px-4 py-3 space-y-3">
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeMatch(record.id, match.id)}
+                        className="text-red-500 hover:text-red-400"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        削除
+                      </Button>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-3">
                       <div className="space-y-1">
                         <Label htmlFor={`date-${match.id}`}>日付</Label>
                         <Input
@@ -511,6 +565,22 @@ export function StaffResultsManager() {
                               record.id,
                               match.id,
                               "opponent",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor={`quarter-${match.id}`}>Q</Label>
+                        <Input
+                          id={`quarter-${match.id}`}
+                          type="number"
+                          value={match.quarter}
+                          onChange={(e) =>
+                            updateMatchField(
+                              record.id,
+                              match.id,
+                              "quarter",
                               e.target.value,
                             )
                           }

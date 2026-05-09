@@ -145,20 +145,13 @@ export function Hero() {
 
           {/* Sub Headline with Animation */}
           <p
-            className={`text-xl md:text-2xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl md:max-w-4xl mx-auto text-pretty leading-relaxed md:whitespace-nowrap transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            className={`text-xl md:text-2xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty leading-relaxed transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             style={{ transitionDelay: "0.6s" }}
           >
-            宮崎県の女子中学生バスケットボールクラブ「SELENE」。心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。
+            宮崎県の女子中学生バスケットボールクラブ「SELENE」。
+            <br />
+            心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。
           </p>
-
-          <div
-            className={`max-w-3xl mx-auto mb-14 rounded-xl border border-amber-400/40 bg-amber-500/10 px-5 py-4 text-center transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: "0.8s" }}
-          >
-            <p className="text-sm md:text-base text-amber-100 leading-relaxed">
-              お知らせ：今年度の募集は行なっておりません。
-            </p>
-          </div>
 
           {/* Stats with Animation */}
           <div 
