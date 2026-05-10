@@ -2,31 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { sortStaffRecordsNewestFirst } from "@/lib/activity-records-sort"
+import {
+  type MatchRecord,
+  normalizeMatchVideoUrls,
+  STAFF_RECORDS_STORAGE_KEY,
+  type TournamentRecord,
+} from "@/lib/staff-records"
 import { Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
-type MatchRecord = {
-  id: string
-  date: string
-  opponent: string
-  quarter: number
-  ourScore: number
-  theirScore: number
-  videoUrls?: string[]
-}
-
-type TournamentRecord = {
-  id: string
-  year: string
-  name: string
-  venue: string
-  matches: MatchRecord[]
-}
-
-const STORAGE_KEY = "selene-staff-results-v4"
 
 const defaultRecords: TournamentRecord[] = [
   {
@@ -122,14 +108,6 @@ function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-function normalizeMatchVideoUrls(match: MatchRecord): MatchRecord {
-  const q = Math.max(0, match.quarter)
-  let urls = Array.isArray(match.videoUrls) ? [...match.videoUrls] : []
-  while (urls.length < q) urls.push("")
-  urls = urls.slice(0, q)
-  return { ...match, videoUrls: urls }
-}
-
 function defaultRecordsNormalized(): TournamentRecord[] {
   const normalized = defaultRecords.map((tournament) => ({
     ...tournament,
@@ -140,7 +118,7 @@ function defaultRecordsNormalized(): TournamentRecord[] {
 
 function loadInitialRecords() {
   if (typeof window === "undefined") return defaultRecordsNormalized()
-  const raw = window.localStorage.getItem(STORAGE_KEY)
+  const raw = window.localStorage.getItem(STAFF_RECORDS_STORAGE_KEY)
   if (!raw) return defaultRecordsNormalized()
   try {
     const parsed = JSON.parse(raw) as (TournamentRecord & {
@@ -203,12 +181,49 @@ export function StaffResultsManager() {
     theirScore: "",
   })
   const [videoDrafts, setVideoDrafts] = useState<Record<string, string[]>>({})
+  const [syncStatus, setSyncStatus] = useState<"idle" | "ok" | "error">("idle")
 
   const expectedCode = process.env.NEXT_PUBLIC_STAFF_ACCESS_CODE ?? "123456"
 
   useEffect(() => {
     if (!isUnlocked) return
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(recordsOrdered))
+    window.localStorage.setItem(STAFF_RECORDS_STORAGE_KEY, JSON.stringify(recordsOrdered))
+  }, [isUnlocked, recordsOrdered])
+
+  useEffect(() => {
+    if (!isUnlocked) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch("/api/staff-records", { cache: "no-store" })
+        if (!res.ok) return
+        const data = (await res.json()) as { records?: TournamentRecord[] }
+        if (!cancelled && Array.isArray(data.records) && data.records.length > 0) {
+          setRecords(sortStaffRecordsNewestFirst(data.records))
+        }
+      } catch {
+        // 通信失敗時はローカル保存データを継続利用
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [isUnlocked])
+
+  useEffect(() => {
+    if (!isUnlocked) return
+    void (async () => {
+      try {
+        const res = await fetch("/api/staff-records", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ records: recordsOrdered }),
+        })
+        setSyncStatus(res.ok ? "ok" : "error")
+      } catch {
+        setSyncStatus("error")
+      }
+    })()
   }, [isUnlocked, recordsOrdered])
 
   const canAddTournament =
@@ -867,6 +882,11 @@ export function StaffResultsManager() {
       <p className="text-sm text-muted-foreground text-center">
         入力した内容は自動保存されます。
       </p>
+      {syncStatus === "error" ? (
+        <p className="text-sm text-red-400 text-center">
+          サーバー同期に失敗しました（この端末には保存済み）。管理者にお問い合わせください。
+        </p>
+      ) : null}
       <p className="text-sm text-muted-foreground text-center">
         現在の登録件数: 大会 {records.length} 件 / 試合 {totalMatches} 件
       </p>

@@ -1,11 +1,13 @@
 "use client"
 
+import { useEffect, useMemo, useState } from "react"
 import { Calendar, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { AnimatedSection } from "@/components/animated-section"
 import {
+  inferCalendarYearFromYearLabel,
   publicTournamentCalendarYear,
   sortMatchesNewestFirst,
   sortSlashDateStringsDesc,
@@ -16,17 +18,32 @@ export type Match = {
   id: string
   date: string
   opponent: string
+  videoUrls?: string[]
 }
 
 export type Tournament = {
   id: string
   period: string
+  year?: string
   name: string
   venue?: string
   matches: Match[]
 }
 
-const tournaments: Tournament[] = [
+type StaffRecord = {
+  id: string
+  year: string
+  name: string
+  venue?: string
+  matches: {
+    id: string
+    date: string
+    opponent: string
+    videoUrls?: string[]
+  }[]
+}
+
+const fallbackTournaments: Tournament[] = [
   {
     id: "2026-spring-cup",
     period: "2026年4月4日-5日",
@@ -110,10 +127,28 @@ const tournaments: Tournament[] = [
   },
 ]
 
-const displayTournaments: Tournament[] = sortTournamentsNewestFirst(tournaments).map((t) => ({
-  ...t,
-  matches: sortMatchesNewestFirst(t.matches, { id: t.id, period: t.period }),
-}))
+function normalizeVideoUrls(urls?: string[]): string[] {
+  if (!Array.isArray(urls)) return []
+  return urls.map((url) => (typeof url === "string" ? url.trim() : "")).filter((url) => url !== "")
+}
+
+function mapStaffRecords(records: StaffRecord[]): Tournament[] {
+  return records.map((record) => ({
+    id: record.id,
+    period: record.year,
+    year: record.year,
+    name: record.name,
+    venue: record.venue ?? "",
+    matches: Array.isArray(record.matches)
+      ? record.matches.map((match) => ({
+          id: match.id,
+          date: match.date,
+          opponent: match.opponent,
+          videoUrls: normalizeVideoUrls(match.videoUrls),
+        }))
+      : [],
+  }))
+}
 
 function BasketballIcon({ className }: { className?: string }) {
   return (
@@ -129,9 +164,11 @@ function BasketballIcon({ className }: { className?: string }) {
 
 function groupMatchesByDate(
   matches: Match[],
-  tournament: { id: string; period: string },
+  tournament: { id: string; period: string; year?: string },
 ): { date: string; matches: Match[] }[] {
-  const year = publicTournamentCalendarYear(tournament)
+  const year =
+    (tournament.year ? inferCalendarYearFromYearLabel(tournament.year) : null) ??
+    publicTournamentCalendarYear(tournament)
   const order: string[] = []
   const map = new Map<string, Match[]>()
   for (const m of matches) {
@@ -146,6 +183,40 @@ function groupMatchesByDate(
 }
 
 export function Results() {
+  const [tournaments, setTournaments] = useState<Tournament[]>(fallbackTournaments)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch("/api/staff-records", { cache: "no-store" })
+        if (!res.ok) return
+        const data = (await res.json()) as { records?: StaffRecord[] }
+        if (cancelled) return
+        if (Array.isArray(data.records) && data.records.length > 0) {
+          setTournaments(mapStaffRecords(data.records))
+        }
+      } catch {
+        // APIが使えない場合はfallbackTournamentsを表示
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const displayTournaments: Tournament[] = useMemo(
+    () =>
+      sortTournamentsNewestFirst(tournaments).map((t) => ({
+        ...t,
+        matches: sortMatchesNewestFirst(
+          t.matches,
+          t.year ? { id: t.id, year: t.year } : { id: t.id, period: t.period },
+        ),
+      })),
+    [tournaments],
+  )
+
   return (
     <section id="results" className="py-24 md:py-32 bg-background relative overflow-hidden">
       {/* Decorative elements with animation */}
@@ -225,7 +296,22 @@ export function Results() {
                                     key={match.id}
                                     className="rounded-xl border border-border/50 bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground md:text-lg"
                                   >
-                                    {match.opponent}
+                                    <p>{match.opponent}</p>
+                                    {match.videoUrls && match.videoUrls.length > 0 ? (
+                                      <div className="mt-2 flex flex-wrap gap-2">
+                                        {match.videoUrls.map((url, idx) => (
+                                          <a
+                                            key={`${match.id}-video-${idx}`}
+                                            href={url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center rounded-md border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary hover:border-primary/60 hover:bg-primary/10"
+                                          >
+                                            動画 {idx + 1}
+                                          </a>
+                                        ))}
+                                      </div>
+                                    ) : null}
                                   </li>
                                 ))}
                               </ul>
