@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import { StaffAnalyticsCallout } from "@/components/staff-analytics-callout"
 import { StaffResultsManager } from "@/components/staff-results-manager"
 
 export const metadata: Metadata = {
@@ -34,6 +35,8 @@ export default function StaffPage() {
             公開ページには掲載しない内部情報の更新にご利用ください。
           </p>
         </header>
+
+        <StaffAnalyticsCallout />
 
         <StaffResultsManager />
       </div>
