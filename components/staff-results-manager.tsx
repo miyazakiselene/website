@@ -367,6 +367,11 @@ export function StaffResultsManager() {
   const getMatchVideoDraftValue = (matchId: string, index: number, saved: string) =>
     videoDrafts[matchId]?.[index] ?? saved
 
+  const isMatchVideoSlotDirty = (matchId: string, index: number, saved: string) => {
+    const cur = getMatchVideoDraftValue(matchId, index, saved)
+    return cur.trim() !== saved.trim()
+  }
+
   const setMatchVideoDraftValue = (matchId: string, index: number, value: string) => {
     setVideoDrafts((prev) => {
       const next = { ...prev }
@@ -810,17 +815,23 @@ export function StaffResultsManager() {
                             }
                             placeholder={`試合動画URL ${vIndex + 1}`}
                           />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="shrink-0"
-                            onClick={() =>
-                              saveMatchVideoUrl(record.id, match.id, vIndex)
-                            }
-                          >
-                            保存
-                          </Button>
+                          {isMatchVideoSlotDirty(
+                            match.id,
+                            vIndex,
+                            match.videoUrls?.[vIndex] ?? "",
+                          ) ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="shrink-0"
+                              onClick={() =>
+                                saveMatchVideoUrl(record.id, match.id, vIndex)
+                              }
+                            >
+                              保存
+                            </Button>
+                          ) : null}
                           <Button
                             type="button"
                             variant="outline"
