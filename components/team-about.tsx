@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Heart, Target, Award, Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
@@ -36,30 +37,59 @@ const staff = [
   },
 ]
 
-const photoGallery = [
+type GalleryPhoto = { id: string; src: string; alt: string }
+
+const photoGallerySource: GalleryPhoto[] = [
   {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&q=80",
-    alt: "練習風景1",
+    id: "team-01",
+    src: "/images/team-gallery/team-01-timeout.png",
+    alt: "タイムアウト中のミーティング",
   },
   {
-    id: 2,
-    src: "https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=400&q=80",
-    alt: "練習風景2",
+    id: "team-02",
+    src: "/images/team-gallery/team-02-practice.png",
+    alt: "練習の様子",
   },
   {
-    id: 3,
-    src: "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&q=80",
-    alt: "練習風景3",
+    id: "team-03",
+    src: "/images/team-gallery/team-03-ceremony.png",
+    alt: "式典・会場の様子",
   },
   {
-    id: 4,
-    src: "https://images.unsplash.com/photo-1577471488278-16eec37ffcc2?w=400&q=80",
-    alt: "練習風景4",
+    id: "team-04",
+    src: "/images/team-gallery/team-04-lunch.png",
+    alt: "チームでの昼食の時間",
+  },
+  {
+    id: "team-05",
+    src: "/images/team-gallery/team-05-group.png",
+    alt: "チーム集合写真",
   },
 ]
 
+function shuffleGallery<T>(items: T[]): T[] {
+  const copy = [...items]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = copy[i]!
+    copy[i] = copy[j]!
+    copy[j] = tmp
+  }
+  return copy
+}
+
 export function TeamAbout() {
+  const [shuffledGallery, setShuffledGallery] = useState<GalleryPhoto[]>(() =>
+    [...photoGallerySource].sort((a, b) => a.id.localeCompare(b.id)),
+  )
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      setShuffledGallery(shuffleGallery([...photoGallerySource]))
+    })
+    return () => cancelAnimationFrame(id)
+  }, [])
+
   return (
     <section id="about" className="py-24 md:py-32 bg-card overflow-hidden">
       <div className="container mx-auto px-4">
@@ -82,7 +112,7 @@ export function TeamAbout() {
         <AnimatedSection className="mb-20" animation="fadeIn" delay={200}>
           <div className="relative overflow-hidden">
             <div className="flex gap-4 animate-scroll">
-              {[...photoGallery, ...photoGallery].map((photo, index) => (
+              {[...shuffledGallery, ...shuffledGallery].map((photo, index) => (
                 <div
                   key={`${photo.id}-${index}`}
                   className="relative flex-shrink-0 w-80 h-56 rounded-2xl overflow-hidden group"
@@ -94,7 +124,7 @@ export function TeamAbout() {
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-4 left-4 text-base font-semibold text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute bottom-4 left-4 max-w-[90%] text-sm font-semibold text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:text-base">
                     {photo.alt}
                   </div>
                 </div>
@@ -102,7 +132,7 @@ export function TeamAbout() {
             </div>
           </div>
           <p className="text-center text-sm text-muted-foreground mt-6">
-            ※ 写真はダミーです。後で差し替えます。
+            ※ 写真の表示順は、ページを開くたびにランダムです。
           </p>
         </AnimatedSection>
 
