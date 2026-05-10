@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { sortStaffRecordsNewestFirst } from "@/lib/activity-records-sort"
 import { ExternalLink, Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -130,10 +131,11 @@ function normalizeMatchVideoUrls(match: MatchRecord): MatchRecord {
 }
 
 function defaultRecordsNormalized(): TournamentRecord[] {
-  return defaultRecords.map((tournament) => ({
+  const normalized = defaultRecords.map((tournament) => ({
     ...tournament,
     matches: tournament.matches.map((match) => normalizeMatchVideoUrls({ ...match })),
   }))
+  return sortStaffRecordsNewestFirst(normalized)
 }
 
 function loadInitialRecords() {
@@ -147,7 +149,7 @@ function loadInitialRecords() {
       videoUrl?: string
     })[]
     if (!Array.isArray(parsed)) return defaultRecordsNormalized()
-    return parsed.map((record) => {
+    const mapped = parsed.map((record) => {
       const legacyTournamentUrls = Array.isArray(record.videoUrls) ? [...record.videoUrls] : []
       const legacySingle =
         typeof record.videoUrl === "string" ? record.videoUrl.trim() : ""
@@ -171,6 +173,7 @@ function loadInitialRecords() {
 
       return { ...rest, matches } as TournamentRecord
     })
+    return sortStaffRecordsNewestFirst(mapped)
   } catch {
     return defaultRecordsNormalized()
   }
@@ -182,6 +185,8 @@ export function StaffResultsManager() {
   const [authError, setAuthError] = useState("")
 
   const [records, setRecords] = useState<TournamentRecord[]>(loadInitialRecords)
+
+  const recordsOrdered = useMemo(() => sortStaffRecordsNewestFirst(records), [records])
 
   const [newTournament, setNewTournament] = useState({
     year: "",
@@ -203,17 +208,8 @@ export function StaffResultsManager() {
 
   useEffect(() => {
     if (!isUnlocked) return
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
-  }, [isUnlocked, records])
-
-  useEffect(() => {
-    if (!isUnlocked) return
-    setNewMatch((prev) => {
-      if (prev.tournamentId === "") return prev
-      if (records.some((r) => r.id === prev.tournamentId)) return prev
-      return { ...prev, tournamentId: records[0]?.id ?? "" }
-    })
-  }, [isUnlocked, records])
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(recordsOrdered))
+  }, [isUnlocked, recordsOrdered])
 
   const canAddTournament =
     newTournament.year.trim() !== "" && newTournament.name.trim() !== ""
@@ -338,7 +334,14 @@ export function StaffResultsManager() {
   const removeTournament = (tournamentId: string) => {
     const confirmed = window.confirm("この大会情報を削除します。よろしいですか？")
     if (!confirmed) return
-    setRecords((prev) => prev.filter((tournament) => tournament.id !== tournamentId))
+    setRecords((prev) => {
+      const next = prev.filter((tournament) => tournament.id !== tournamentId)
+      setNewMatch((nm) => {
+        if (nm.tournamentId !== tournamentId) return nm
+        return { ...nm, tournamentId: sortStaffRecordsNewestFirst(next)[0]?.id ?? "" }
+      })
+      return next
+    })
   }
 
   const removeMatch = (tournamentId: string, matchId: string) => {
@@ -571,7 +574,7 @@ export function StaffResultsManager() {
                   className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <option value="">大会を選択</option>
-                  {records.map((record) => (
+                  {recordsOrdered.map((record) => (
                     <option key={record.id} value={record.id}>
                       {record.year} / {record.name}
                     </option>
@@ -658,7 +661,7 @@ export function StaffResultsManager() {
       </div>
 
       <div className="space-y-6">
-        {records.map((record) => (
+        {recordsOrdered.map((record) => (
           <Card key={record.id} className="border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-xl">大会情報（編集可）</CardTitle>

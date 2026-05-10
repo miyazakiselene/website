@@ -1,9 +1,16 @@
 "use client"
 
-import { Calendar, MapPin } from "lucide-react"
+import { Calendar, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { AnimatedSection } from "@/components/animated-section"
+import {
+  publicTournamentCalendarYear,
+  sortMatchesNewestFirst,
+  sortSlashDateStringsDesc,
+  sortTournamentsNewestFirst,
+} from "@/lib/activity-records-sort"
 
 export type Match = {
   id: string
@@ -103,6 +110,11 @@ const tournaments: Tournament[] = [
   },
 ]
 
+const displayTournaments: Tournament[] = sortTournamentsNewestFirst(tournaments).map((t) => ({
+  ...t,
+  matches: sortMatchesNewestFirst(t.matches, { id: t.id, period: t.period }),
+}))
+
 function BasketballIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 100 100" className={className} fill="currentColor">
@@ -115,23 +127,22 @@ function BasketballIcon({ className }: { className?: string }) {
   )
 }
 
-function MatchRow({ match, index }: { match: Match; index: number }) {
-  return (
-    <AnimatedSection animation="fadeInUp" delay={index * 100}>
-      <div
-        className="flex items-center justify-between p-5 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/50 hover:bg-secondary/50 transition-all duration-300 group"
-      >
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="text-xs md:text-sm px-3 py-1 border-primary/30 text-primary">
-            {match.date}
-          </Badge>
-          <span className="text-base md:text-xl text-foreground font-semibold group-hover:text-primary transition-colors">
-            {match.opponent}
-          </span>
-        </div>
-      </div>
-    </AnimatedSection>
-  )
+function groupMatchesByDate(
+  matches: Match[],
+  tournament: { id: string; period: string },
+): { date: string; matches: Match[] }[] {
+  const year = publicTournamentCalendarYear(tournament)
+  const order: string[] = []
+  const map = new Map<string, Match[]>()
+  for (const m of matches) {
+    if (!map.has(m.date)) {
+      order.push(m.date)
+      map.set(m.date, [])
+    }
+    map.get(m.date)!.push(m)
+  }
+  const datesDesc = sortSlashDateStringsDesc(order, year)
+  return datesDesc.map((date) => ({ date, matches: map.get(date)! }))
 }
 
 export function Results() {
@@ -161,7 +172,7 @@ export function Results() {
 
         {/* Tournament Results */}
         <div className="max-w-4xl mx-auto space-y-8">
-          {tournaments.map((tournament) => (
+          {displayTournaments.map((tournament) => (
             <AnimatedSection key={tournament.id} animation="scaleIn" delay={100}>
               <Card className="bg-card border-border overflow-hidden hover:border-primary/30 transition-all duration-300">
                 <CardContent className="p-0">
@@ -191,14 +202,44 @@ export function Results() {
                     </div>
                   </div>
 
-                  {/* Match Records */}
+                  {/* Match Records — 日付ごとにアコーディオン */}
                   <div className="p-6 md:p-8">
-                    <div className="grid gap-4">
-                      {tournament.matches.map((match, index) => (
-                        <MatchRow key={match.id} match={match} index={index} />
+                    <div className="grid gap-3">
+                      {groupMatchesByDate(tournament.matches, {
+                        id: tournament.id,
+                        period: tournament.period,
+                      }).map(({ date, matches }) => (
+                        <Collapsible key={`${tournament.id}-${date}`} className="group rounded-xl border border-border/50 bg-secondary/20 overflow-hidden">
+                          <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 p-4 md:p-5 text-left outline-none transition-colors hover:bg-secondary/40 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 text-xs md:text-sm px-3 py-1 border-primary/30 text-primary"
+                              >
+                                {date}
+                              </Badge>
+                              <span className="text-sm text-muted-foreground">
+                                対戦 {matches.length}件
+                                <span className="sr-only">。展開すると対戦相手を表示します</span>
+                              </span>
+                            </div>
+                            <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <ul className="space-y-2 border-t border-border/40 px-4 pb-4 pt-3 md:px-5 md:pb-5">
+                              {matches.map((match) => (
+                                <li
+                                  key={match.id}
+                                  className="rounded-lg bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground md:text-lg"
+                                >
+                                  {match.opponent}
+                                </li>
+                              ))}
+                            </ul>
+                          </CollapsibleContent>
+                        </Collapsible>
                       ))}
                     </div>
-
                   </div>
                 </CardContent>
               </Card>
