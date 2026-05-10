@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Heart, Target, Award, Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
@@ -67,29 +66,7 @@ const photoGallerySource: GalleryPhoto[] = [
   },
 ]
 
-function shuffleGallery<T>(items: T[]): T[] {
-  const copy = [...items]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const tmp = copy[i]!
-    copy[i] = copy[j]!
-    copy[j] = tmp
-  }
-  return copy
-}
-
 export function TeamAbout() {
-  const [shuffledGallery, setShuffledGallery] = useState<GalleryPhoto[]>(() =>
-    [...photoGallerySource].sort((a, b) => a.id.localeCompare(b.id)),
-  )
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      setShuffledGallery(shuffleGallery([...photoGallerySource]))
-    })
-    return () => cancelAnimationFrame(id)
-  }, [])
-
   return (
     <section id="about" className="py-24 md:py-32 bg-card overflow-hidden">
       <div className="container mx-auto px-4">
@@ -108,18 +85,13 @@ export function TeamAbout() {
           </p>
         </AnimatedSection>
 
-        {/* Photo Gallery - Scrolling */}
+        {/* Photo Gallery */}
         <AnimatedSection className="mb-20" animation="fadeIn" delay={200}>
-          <div className="relative -mx-4 px-4 md:mx-0 md:px-0">
-            <div
-              className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:pb-4 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
-              role="list"
-              aria-label="チーム写真ギャラリー（横にスワイプできます）"
-            >
-              {[...shuffledGallery, ...shuffledGallery].map((photo, index) => (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {photoGallerySource.map((photo) => (
                 <div
-                  key={`${photo.id}-${index}`}
-                  className="relative w-[min(100vw-3rem,20rem)] shrink-0 snap-center aspect-[320/224] rounded-2xl overflow-hidden group md:w-80 md:h-56 md:aspect-auto"
+                  key={photo.id}
+                  className="relative aspect-[320/224] rounded-2xl overflow-hidden group"
                 >
                   <Image
                     src={photo.src}
@@ -132,8 +104,7 @@ export function TeamAbout() {
                     {photo.alt}
                   </div>
                 </div>
-              ))}
-            </div>
+            ))}
           </div>
         </AnimatedSection>
 
