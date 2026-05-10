@@ -176,71 +176,65 @@ export function Results() {
             <AnimatedSection key={tournament.id} animation="scaleIn" delay={100}>
               <Card className="bg-card border-border overflow-hidden hover:border-primary/30 transition-all duration-300">
                 <CardContent className="p-0">
-                  {/* Tournament Header */}
-                  <div className="bg-secondary/50 p-8 border-b border-border">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div className="flex items-start gap-5">
-                        <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 animate-pulse">
-                          <Calendar className="h-8 w-8 text-primary" />
+                  <Collapsible className="group" defaultOpen={false}>
+                    <CollapsibleTrigger className="flex w-full items-center gap-4 border-b border-border bg-secondary/50 p-6 text-left outline-none transition-colors hover:bg-secondary/65 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 md:gap-5 md:p-8">
+                      <div className="flex min-w-0 flex-1 items-start gap-4 md:gap-5">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/20 animate-pulse md:h-16 md:w-16">
+                          <Calendar className="h-7 w-7 text-primary md:h-8 md:w-8" />
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2 text-base text-muted-foreground mb-2">
-                            <Calendar className="h-5 w-5" />
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-2 flex items-center gap-2 text-base text-muted-foreground">
+                            <Calendar className="h-5 w-5 shrink-0" />
                             {tournament.period}
                           </div>
-                          <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                          <h3 className="text-xl font-bold text-foreground md:text-2xl lg:text-3xl">
                             {tournament.name}
                           </h3>
                           {tournament.venue ? (
-                            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                              <MapPin className="h-4 w-4" />
+                            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                              <MapPin className="h-4 w-4 shrink-0" />
                               {tournament.venue}
                             </div>
                           ) : null}
+                          <p className="sr-only">タップまたは Enter で試合の対戦相手一覧を開きます</p>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                      <ChevronDown className="h-6 w-6 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    </CollapsibleTrigger>
 
-                  {/* Match Records — 日付ごとにアコーディオン */}
-                  <div className="p-6 md:p-8">
-                    <div className="grid gap-3">
-                      {groupMatchesByDate(tournament.matches, {
-                        id: tournament.id,
-                        period: tournament.period,
-                      }).map(({ date, matches }) => (
-                        <Collapsible key={`${tournament.id}-${date}`} className="group rounded-xl border border-border/50 bg-secondary/20 overflow-hidden">
-                          <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 p-4 md:p-5 text-left outline-none transition-colors hover:bg-secondary/40 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-                            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
-                              <Badge
-                                variant="outline"
-                                className="shrink-0 text-xs md:text-sm px-3 py-1 border-primary/30 text-primary"
-                              >
-                                {date}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                対戦 {matches.length}件
-                                <span className="sr-only">。展開すると対戦相手を表示します</span>
-                              </span>
-                            </div>
-                            <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <ul className="space-y-2 border-t border-border/40 px-4 pb-4 pt-3 md:px-5 md:pb-5">
-                              {matches.map((match) => (
-                                <li
-                                  key={match.id}
-                                  className="rounded-lg bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground md:text-lg"
+                    <CollapsibleContent>
+                      <div className="p-6 md:p-8">
+                        <div className="space-y-8">
+                          {groupMatchesByDate(tournament.matches, {
+                            id: tournament.id,
+                            period: tournament.period,
+                          }).map(({ date, matches }) => (
+                            <div key={`${tournament.id}-${date}`}>
+                              <div className="mb-3 flex flex-wrap items-center gap-3">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs md:text-sm px-3 py-1 border-primary/30 text-primary"
                                 >
-                                  {match.opponent}
-                                </li>
-                              ))}
-                            </ul>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      ))}
-                    </div>
-                  </div>
+                                  {date}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">対戦 {matches.length}件</span>
+                              </div>
+                              <ul className="grid gap-2 md:gap-3">
+                                {matches.map((match) => (
+                                  <li
+                                    key={match.id}
+                                    className="rounded-xl border border-border/50 bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground md:text-lg"
+                                  >
+                                    {match.opponent}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </CardContent>
               </Card>
             </AnimatedSection>
