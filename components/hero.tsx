@@ -105,14 +105,14 @@ export function Hero() {
           <div 
             className={`flex justify-center mb-10 transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
           >
-            <div className="relative">
+            <div className="relative h-[200px] w-[200px] transition-transform duration-300 hover:scale-105">
               <div className="absolute inset-0 bg-primary/30 rounded-full blur-xl animate-pulse" />
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
                 alt="宮崎 SELENE ロゴ"
-                width={200}
-                height={200}
-                className="rounded-full shadow-2xl shadow-primary/30 relative z-10 hover:scale-105 transition-transform duration-300"
+                fill
+                sizes="200px"
+                className="z-10 rounded-full object-cover shadow-2xl shadow-primary/30"
               />
             </div>
           </div>

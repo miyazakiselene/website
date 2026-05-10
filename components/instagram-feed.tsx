@@ -110,13 +110,13 @@ export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
               <div className="rounded-3xl border border-border bg-card/60 p-8 md:p-10">
                 <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10">
                   <div className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-0.5">
-                    <div className="w-full h-full rounded-2xl overflow-hidden bg-card">
+                    <div className="relative h-full w-full rounded-2xl overflow-hidden bg-card">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
                         alt="宮崎 SELENE"
-                        width={112}
-                        height={112}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="112px"
+                        className="object-cover"
                       />
                     </div>
                   </div>

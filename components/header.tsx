@@ -66,14 +66,14 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative h-12 w-12 transition-transform group-hover:scale-105">
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 transition-opacity group-hover:opacity-100" />
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
                 alt="宮崎 SELENE ロゴ"
-                width={48}
-                height={48}
-                className="rounded-full relative z-10 group-hover:scale-105 transition-transform"
+                fill
+                sizes="48px"
+                className="z-10 rounded-full object-cover"
               />
             </div>
             <div className="flex flex-col">
@@ -122,14 +122,16 @@ export function Header() {
                   各セクションへのリンク一覧です。
                 </SheetDescription>
               </SheetHeader>
-              <div className="flex items-center gap-3 mb-8 mt-4">
-                <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                  alt="宮崎 SELENE ロゴ"
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
+              <div className="mb-8 mt-4 flex items-center gap-3">
+                <div className="relative h-10 w-10 shrink-0">
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
+                    alt="宮崎 SELENE ロゴ"
+                    fill
+                    sizes="40px"
+                    className="rounded-full object-cover"
+                  />
+                </div>
                 <span className="text-lg font-bold text-foreground">宮崎 SELENE</span>
               </div>
               <nav className="flex flex-col gap-2">

@@ -39,14 +39,14 @@ export function Footer() {
           {/* Logo & Description */}
           <AnimatedSection animation="fadeInUp" delay={100}>
             <Link href="/" className="flex items-center gap-4 mb-5 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative h-14 w-14 shrink-0">
+                <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 transition-opacity group-hover:opacity-100" />
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
                   alt="宮崎 SELENE ロゴ"
-                  width={56}
-                  height={56}
-                  className="rounded-full relative z-10"
+                  fill
+                  sizes="56px"
+                  className="z-10 rounded-full object-cover"
                 />
               </div>
               <div className="flex flex-col">
