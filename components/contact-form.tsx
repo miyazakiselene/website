@@ -1,6 +1,6 @@
 "use client"
 
-import { Instagram, Mail, MessageCircle } from "lucide-react"
+import { Instagram, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedSection } from "@/components/animated-section"
@@ -70,15 +70,6 @@ export function ContactForm() {
                 </AnimatedSection>
 
                 <AnimatedSection animation="fadeInUp" delay={460}>
-                  <Button asChild variant="outline" className="w-full h-13 text-base">
-                    <a href="mailto:info@miyazaki-selene.example.com">
-                      <Mail className="h-5 w-5 mr-2" />
-                      メールで問い合わせる
-                    </a>
-                  </Button>
-                </AnimatedSection>
-
-                <AnimatedSection animation="fadeInUp" delay={520}>
                   <div className="text-center text-base text-muted-foreground flex items-center justify-center gap-2">
                     <MessageCircle className="h-4 w-4" />
                     なるべく早急に対応いたしますが、返信が遅れる場合はご了承ください
