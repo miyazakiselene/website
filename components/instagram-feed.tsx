@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import Script from "next/script"
 import { AnimatedSection } from "./animated-section"
 import { Button } from "@/components/ui/button"
@@ -11,19 +11,9 @@ import Link from "next/link"
 const INSTAGRAM_URL = "https://www.instagram.com/2026.selene/"
 const INSTAGRAM_REELS_URL = "https://www.instagram.com/2026.selene/reels/"
 
-/** 公式 embed.js が扱える投稿・リール・TV の permalink のみ（プロフィールURLは除外） */
-function isInstagramPostEmbedUrl(url: string): boolean {
-  return /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\//i.test(url)
-}
-
-/** 公式埋め込み用。公開投稿のURLをカンマ区切りで指定（例: NEXT_PUBLIC_INSTAGRAM_EMBED_URLS=https://www.instagram.com/p/xxxxx/,...） */
-function parseEmbedPostUrls(): string[] {
-  const raw = process.env.NEXT_PUBLIC_INSTAGRAM_EMBED_URLS ?? ""
-  return raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.startsWith("http"))
-    .filter(isInstagramPostEmbedUrl)
+type InstagramFeedProps = {
+  /** サーバー（app/page）で環境変数から解決した投稿・リールの permalink 一覧 */
+  embedPostUrls: string[]
 }
 
 function processInstagramEmbeds() {
@@ -34,8 +24,7 @@ function processInstagramEmbeds() {
   instgrm?.Embeds?.process()
 }
 
-export function InstagramFeed() {
-  const embedPostUrls = useMemo(() => parseEmbedPostUrls(), [])
+export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
   const hasEmbeds = embedPostUrls.length > 0
   const embedTimersRef = useRef<number[]>([])
 
