@@ -11,13 +11,19 @@ import Link from "next/link"
 const INSTAGRAM_URL = "https://www.instagram.com/2026.selene/"
 const INSTAGRAM_REELS_URL = "https://www.instagram.com/2026.selene/reels/"
 
-/** 公式埋め込み用。公開投稿のURLをカンマ区切りで指定（例: .env に NEXT_PUBLIC_INSTAGRAM_EMBED_URLS=https://www.instagram.com/p/xxxxx/,...） */
+/** 公式 embed.js が扱える投稿・リール・TV の permalink のみ（プロフィールURLは除外） */
+function isInstagramPostEmbedUrl(url: string): boolean {
+  return /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\//i.test(url)
+}
+
+/** 公式埋め込み用。公開投稿のURLをカンマ区切りで指定（例: NEXT_PUBLIC_INSTAGRAM_EMBED_URLS=https://www.instagram.com/p/xxxxx/,...） */
 function parseEmbedPostUrls(): string[] {
   const raw = process.env.NEXT_PUBLIC_INSTAGRAM_EMBED_URLS ?? ""
   return raw
     .split(",")
     .map((s) => s.trim())
     .filter((s) => s.startsWith("http"))
+    .filter(isInstagramPostEmbedUrl)
 }
 
 function processInstagramEmbeds() {
@@ -112,11 +118,6 @@ export function InstagramFeed() {
                   </div>
                   <div className="flex-1 text-center md:text-left space-y-3">
                     <h3 className="text-2xl md:text-3xl font-bold text-foreground">@2026.selene</h3>
-                    <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                      埋め込みウィジェットの代わりに、Instagram公式ページからご覧ください。
-                      <br />
-                      よく使う画面へのリンクを用意しています。
-                    </p>
                   </div>
                 </div>
 

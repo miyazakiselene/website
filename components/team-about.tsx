@@ -131,9 +131,6 @@ export function TeamAbout() {
               ))}
             </div>
           </div>
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            ※ 写真の表示順は、ページを開くたびにランダムです。
-          </p>
         </AnimatedSection>
 
         {/* Mission */}
