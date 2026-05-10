@@ -67,7 +67,7 @@ const photoGallerySource: GalleryPhoto[] = [
   {
     id: "team-06",
     src: "/images/team-gallery/team-06-scrimmage-group.png",
-    alt: "練習試合後の集合写真",
+    alt: "先輩との最後の集合写真",
   },
   {
     id: "team-07",
@@ -77,7 +77,7 @@ const photoGallerySource: GalleryPhoto[] = [
   {
     id: "team-08",
     src: "/images/team-gallery/team-08-jumpball.png",
-    alt: "ゴール下で競り合う場面",
+    alt: "ジャンプボールの写真",
   },
   {
     id: "team-09",
