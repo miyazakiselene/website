@@ -4,12 +4,11 @@ import { useCallback, useEffect, useRef } from "react"
 import Script from "next/script"
 import { AnimatedSection } from "./animated-section"
 import { Button } from "@/components/ui/button"
-import { Instagram, ExternalLink, Images, Clapperboard } from "lucide-react"
+import { Instagram, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
 const INSTAGRAM_URL = "https://www.instagram.com/2026.selene/"
-const INSTAGRAM_REELS_URL = "https://www.instagram.com/2026.selene/reels/"
 
 type InstagramFeedProps = {
   /** サーバー（app/page）で環境変数から解決した投稿・リールの permalink 一覧 */
@@ -125,36 +124,16 @@ export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
                   </div>
                 </div>
 
-                <div className="mt-10 grid sm:grid-cols-3 gap-4">
+                <div className="mt-10 flex justify-center">
                   <Link
                     href={INSTAGRAM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
-                  >
-                    <Images className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-semibold text-foreground">投稿を見る</span>
-                    <span className="text-xs text-muted-foreground">プロフィールの投稿一覧</span>
-                  </Link>
-                  <Link
-                    href={INSTAGRAM_REELS_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
-                  >
-                    <Clapperboard className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-semibold text-foreground">リールを見る</span>
-                    <span className="text-xs text-muted-foreground">短い動画のまとめ</span>
-                  </Link>
-                  <Link
-                    href={INSTAGRAM_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
+                    className="group flex w-full max-w-sm flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
                   >
                     <Instagram className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-semibold text-foreground">アプリで開く</span>
-                    <span className="text-xs text-muted-foreground">スマホからInstagramへ</span>
+                    <span className="font-semibold text-foreground">Instagramを見る</span>
+                    <span className="text-xs text-muted-foreground">投稿・リール・アプリ表示をまとめて確認</span>
                   </Link>
                 </div>
 
