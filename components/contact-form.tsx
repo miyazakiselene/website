@@ -43,7 +43,7 @@ export function ContactForm() {
                 <AnimatedSection animation="fadeInUp" delay={300}>
                   <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 md:p-6">
                     <p className="text-base md:text-lg text-foreground leading-relaxed">
-                      今年度の募集は行なっておりません。
+                      本年度のクラブ生の募集は終了しました。
                       <span className="block mt-1">
                         練習試合のお申し込み・その他のご相談は、
                       </span>

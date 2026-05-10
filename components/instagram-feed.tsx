@@ -61,7 +61,7 @@ export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
             <span>Instagram</span>
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6">
-            チームの日常
+            コートからの最新レポート
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             練習風景や試合の様子をInstagramで発信中！
