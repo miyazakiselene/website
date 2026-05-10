@@ -106,7 +106,7 @@ export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
         ) : (
           <AnimatedSection animation="fadeInUp" delay={200}>
             <div className="max-w-4xl mx-auto mb-14">
-              <div className="rounded-3xl border border-border bg-card/60 p-8 md:p-10">
+              <div className="rounded-3xl border border-border/70 bg-card/50 p-8 md:p-10 backdrop-blur-sm">
                 <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10">
                   <div className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-0.5">
                     <div className="relative h-full w-full rounded-2xl overflow-hidden bg-card">
@@ -129,21 +129,13 @@ export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
                     href={INSTAGRAM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex w-full max-w-sm flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
+                    className="group inline-flex items-center gap-3 rounded-full border border-primary/30 bg-primary/10 px-6 py-3 text-sm font-semibold text-foreground transition-all hover:border-primary/60 hover:bg-primary/15 hover:shadow-md"
                   >
-                    <Instagram className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
-                    <span className="font-semibold text-foreground">Instagramを見る</span>
-                    <span className="text-xs text-muted-foreground">投稿・リール・アプリ表示をまとめて確認</span>
+                    <Instagram className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                    <span>Instagramを見る</span>
+                    <ExternalLink className="h-4 w-4 text-primary/80" />
                   </Link>
                 </div>
-
-                <p className="mt-8 text-center text-xs text-muted-foreground leading-relaxed">
-                  投稿をこのページ内に直接表示したい場合は、公開中の投稿URLを
-                  <code className="mx-1 rounded bg-muted px-1.5 py-0.5 text-[11px]">
-                    NEXT_PUBLIC_INSTAGRAM_EMBED_URLS
-                  </code>
-                  にカンマ区切りで設定してください（公式埋め込み）。
-                </p>
               </div>
             </div>
           </AnimatedSection>
