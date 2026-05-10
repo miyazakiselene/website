@@ -1,17 +1,44 @@
 "use client"
 
+import { useEffect, useMemo } from "react"
+import Script from "next/script"
 import { AnimatedSection } from "./animated-section"
 import { Button } from "@/components/ui/button"
-import { Instagram, ExternalLink } from "lucide-react"
+import { Instagram, ExternalLink, Images, Clapperboard } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
 const INSTAGRAM_URL = "https://www.instagram.com/2026.selene/"
+const INSTAGRAM_REELS_URL = "https://www.instagram.com/2026.selene/reels/"
+
+/** 公式埋め込み用。公開投稿のURLをカンマ区切りで指定（例: .env に NEXT_PUBLIC_INSTAGRAM_EMBED_URLS=https://www.instagram.com/p/xxxxx/,...） */
+function parseEmbedPostUrls(): string[] {
+  const raw = process.env.NEXT_PUBLIC_INSTAGRAM_EMBED_URLS ?? ""
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.startsWith("http"))
+}
+
+function processInstagramEmbeds() {
+  if (typeof window === "undefined") return
+  const instgrm = (
+    window as unknown as { instgrm?: { Embeds?: { process: () => void } } }
+  ).instgrm
+  instgrm?.Embeds?.process()
+}
 
 export function InstagramFeed() {
+  const embedPostUrls = useMemo(() => parseEmbedPostUrls(), [])
+  const hasEmbeds = embedPostUrls.length > 0
+
+  useEffect(() => {
+    if (!hasEmbeds) return
+    processInstagramEmbeds()
+  }, [hasEmbeds, embedPostUrls])
+
   return (
     <section id="instagram" className="py-24 md:py-32 relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-10 w-40 h-40 rounded-full border-4 border-primary" />
         <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full border-4 border-primary" />
@@ -33,67 +60,111 @@ export function InstagramFeed() {
           </p>
         </AnimatedSection>
 
-        {/* LightWidget埋め込みエリア */}
-        <AnimatedSection animation="fadeInUp" delay={200}>
-          <div className="max-w-4xl mx-auto mb-14">
-            {/* 
-              =====================================================
-              LightWidgetの埋め込みコードをここに貼り付けてください
-              =====================================================
-              
-              手順:
-              1. https://lightwidget.com/ にアクセス
-              2. 「Create Your Free Widget」をクリック
-              3. @2026.selene でInstagramにログイン・認証
-              4. デザインを選択（推奨: グリッド形式、2行3列）
-              5. 生成された<script>タグを含むコードをコピー
-              6. 下の<div>内にペーストしてください
-            */}
-            <div 
-              className="bg-card/50 rounded-3xl border border-border p-10 min-h-[400px] flex flex-col items-center justify-center"
-            >
-              {/* LightWidgetコードをここに貼り付け - START */}
-              
-              {/* 現在はプレースホルダーを表示 */}
-              <div className="text-center space-y-6">
-                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-2xl flex items-center justify-center">
-                  <Instagram className="w-12 h-12 text-white" />
+        {hasEmbeds ? (
+          <>
+            <Script
+              src="https://www.instagram.com/embed.js"
+              strategy="lazyOnload"
+              onLoad={() => processInstagramEmbeds()}
+            />
+            <AnimatedSection animation="fadeInUp" delay={200}>
+              <div className="max-w-5xl mx-auto mb-14 space-y-6">
+                <p className="text-center text-sm text-muted-foreground">
+                  下の投稿は公式の埋め込み表示です（サイト側でLightwidgetは使いません）。
+                </p>
+                <div className="flex flex-col items-center gap-8">
+                  {embedPostUrls.map((url) => (
+                    <blockquote
+                      key={url}
+                      className="instagram-media"
+                      data-instgrm-permalink={url}
+                      data-instgrm-version="14"
+                      style={{
+                        background: "#fff",
+                        border: 0,
+                        borderRadius: "12px",
+                        margin: "0 auto",
+                        maxWidth: "540px",
+                        minWidth: "280px",
+                        width: "100%",
+                      }}
+                    />
+                  ))}
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl md:text-3xl font-bold text-foreground">Instagram フィード</h3>
-                  <p className="text-base md:text-lg text-muted-foreground max-w-md leading-relaxed">
-                    LightWidgetの埋め込みコードを取得後、
-                    <br />
-                    このエリアに最新の投稿が自動表示されます。
-                  </p>
-                </div>
-                
-                {/* プロフィールプレビュー */}
-                <div className="mt-10 inline-flex items-center gap-4 bg-card rounded-full px-5 py-3 border border-border">
-                  <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-0.5">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-card">
+              </div>
+            </AnimatedSection>
+          </>
+        ) : (
+          <AnimatedSection animation="fadeInUp" delay={200}>
+            <div className="max-w-4xl mx-auto mb-14">
+              <div className="rounded-3xl border border-border bg-card/60 p-8 md:p-10">
+                <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10">
+                  <div className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-0.5">
+                    <div className="w-full h-full rounded-2xl overflow-hidden bg-card">
                       <Image
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
                         alt="宮崎 SELENE"
-                        width={56}
-                        height={56}
+                        width={112}
+                        height={112}
                         className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
-                  <div className="text-left">
-                    <div className="font-bold text-foreground text-lg">@2026.selene</div>
-                    <div className="text-base text-muted-foreground">宮崎 SELENE</div>
+                  <div className="flex-1 text-center md:text-left space-y-3">
+                    <h3 className="text-2xl md:text-3xl font-bold text-foreground">@2026.selene</h3>
+                    <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                      埋め込みウィジェットの代わりに、Instagram公式ページからご覧ください。
+                      <br />
+                      よく使う画面へのリンクを用意しています。
+                    </p>
                   </div>
                 </div>
-              </div>
-              
-              {/* LightWidgetコードをここに貼り付け - END */}
-            </div>
-          </div>
-        </AnimatedSection>
 
-        {/* Follow Button */}
+                <div className="mt-10 grid sm:grid-cols-3 gap-4">
+                  <Link
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
+                  >
+                    <Images className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-foreground">投稿を見る</span>
+                    <span className="text-xs text-muted-foreground">プロフィールの投稿一覧</span>
+                  </Link>
+                  <Link
+                    href={INSTAGRAM_REELS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
+                  >
+                    <Clapperboard className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-foreground">リールを見る</span>
+                    <span className="text-xs text-muted-foreground">短い動画のまとめ</span>
+                  </Link>
+                  <Link
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-background/80 p-6 text-center transition-all hover:border-primary/50 hover:shadow-md"
+                  >
+                    <Instagram className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-foreground">アプリで開く</span>
+                    <span className="text-xs text-muted-foreground">スマホからInstagramへ</span>
+                  </Link>
+                </div>
+
+                <p className="mt-8 text-center text-xs text-muted-foreground leading-relaxed">
+                  投稿をこのページ内に直接表示したい場合は、公開中の投稿URLを
+                  <code className="mx-1 rounded bg-muted px-1.5 py-0.5 text-[11px]">
+                    NEXT_PUBLIC_INSTAGRAM_EMBED_URLS
+                  </code>
+                  にカンマ区切りで設定してください（公式埋め込み）。
+                </p>
+              </div>
+            </div>
+          </AnimatedSection>
+        )}
+
         <AnimatedSection animation="fadeInUp" delay={400} className="text-center">
           <Link href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
             <Button
