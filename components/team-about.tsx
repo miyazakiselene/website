@@ -64,6 +64,31 @@ const photoGallerySource: GalleryPhoto[] = [
     src: "/images/team-gallery/team-05-group.png",
     alt: "チーム集合写真",
   },
+  {
+    id: "team-06",
+    src: "/images/team-gallery/team-06-scrimmage-group.png",
+    alt: "練習試合後の集合写真",
+  },
+  {
+    id: "team-07",
+    src: "/images/team-gallery/team-07-dribble.png",
+    alt: "ドリブルで切り込むプレー",
+  },
+  {
+    id: "team-08",
+    src: "/images/team-gallery/team-08-jumpball.png",
+    alt: "ゴール下で競り合う場面",
+  },
+  {
+    id: "team-09",
+    src: "/images/team-gallery/team-09-drive.png",
+    alt: "ディフェンスを抜くドライブ",
+  },
+  {
+    id: "team-10",
+    src: "/images/team-gallery/team-10-lineup.png",
+    alt: "コートで並ぶ選手たち",
+  },
 ]
 
 export function TeamAbout() {
@@ -87,11 +112,16 @@ export function TeamAbout() {
 
         {/* Photo Gallery */}
         <AnimatedSection className="mb-20" animation="fadeIn" delay={200}>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="relative -mx-4 px-4 md:mx-0 md:px-0">
+            <div
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:grid md:grid-cols-2 md:overflow-visible md:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
+              role="list"
+              aria-label="チーム写真ギャラリー（スマホは横にスワイプできます）"
+            >
             {photoGallerySource.map((photo) => (
                 <div
                   key={photo.id}
-                  className="relative aspect-[320/224] rounded-2xl overflow-hidden group"
+                  className="relative w-[min(100vw-3rem,20rem)] shrink-0 snap-center aspect-[320/224] rounded-2xl overflow-hidden group md:w-full"
                 >
                   <Image
                     src={photo.src}
@@ -105,6 +135,7 @@ export function TeamAbout() {
                   </div>
                 </div>
             ))}
+            </div>
           </div>
         </AnimatedSection>
 
