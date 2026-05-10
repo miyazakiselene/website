@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { sortStaffRecordsNewestFirst } from "@/lib/activity-records-sort"
-import { ExternalLink, Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
+import { Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -332,7 +332,7 @@ export function StaffResultsManager() {
   }
 
   const removeTournament = (tournamentId: string) => {
-    const confirmed = window.confirm("この大会情報を削除します。よろしいですか？")
+    const confirmed = window.confirm("この試合情報を削除します。よろしいですか？")
     if (!confirmed) return
     setRecords((prev) => {
       const next = prev.filter((tournament) => tournament.id !== tournamentId)
@@ -435,22 +435,6 @@ export function StaffResultsManager() {
     })
   }
 
-  const openVideo = (record: TournamentRecord) => {
-    for (const match of record.matches) {
-      const url =
-        (match.videoUrls ?? []).map((item) => item.trim()).find((item) => item !== "") ?? ""
-      if (url !== "") {
-        window.open(url, "_blank", "noopener,noreferrer")
-        return
-      }
-    }
-    const firstMatch = record.matches[0]
-    const input = firstMatch
-      ? (document.getElementById(`video-url-${firstMatch.id}-0`) as HTMLInputElement | null)
-      : null
-    input?.focus()
-  }
-
   const openMatchVideoUrl = (match: MatchRecord, index: number) => {
     const url = (match.videoUrls?.[index] ?? "").trim()
     if (url !== "") {
@@ -505,7 +489,7 @@ export function StaffResultsManager() {
           <div className="flex items-center gap-3 text-foreground">
             <ShieldCheck className="h-5 w-5 text-primary" />
             <p>
-              関係者専用ページです。大会情報と試合記録をこのページから追加できます。
+              関係者専用ページです。試合情報をこのページから追加・編集できます。
             </p>
           </div>
         </CardContent>
@@ -664,28 +648,17 @@ export function StaffResultsManager() {
         {recordsOrdered.map((record) => (
           <Card key={record.id} className="border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-xl">大会情報（編集可）</CardTitle>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openVideo(record)}
-                >
-                  <ExternalLink className="h-4 w-4 mr-1" />
-                  試合動画
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => removeTournament(record.id)}
-                  className="text-red-500 hover:text-red-400"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  削除
-                </Button>
-              </div>
+              <CardTitle className="text-xl">試合情報</CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => removeTournament(record.id)}
+                className="text-red-500 hover:text-red-400"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                削除
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-3">

@@ -5,7 +5,7 @@ import { StaffResultsManager } from "@/components/staff-results-manager"
 
 export const metadata: Metadata = {
   title: "関係者専用 | 宮崎 SELENE",
-  description: "チーム関係者向けの大会・戦績管理ページです。",
+  description: "チーム関係者向けの試合・戦績管理ページです。",
   robots: {
     index: false,
     follow: false,
@@ -29,7 +29,7 @@ export default function StaffPage() {
             チーム関係者専用ページ
           </h1>
           <p className="text-muted-foreground leading-relaxed">
-            このページでは大会情報・対戦相手・点数の管理ができます。
+            このページでは試合情報・対戦相手・点数の管理ができます。
             <br />
             公開ページには掲載しない内部情報の更新にご利用ください。
           </p>
