@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import Script from "next/script"
 import { AnimatedSection } from "./animated-section"
 import { Button } from "@/components/ui/button"
@@ -37,11 +37,26 @@ function processInstagramEmbeds() {
 export function InstagramFeed() {
   const embedPostUrls = useMemo(() => parseEmbedPostUrls(), [])
   const hasEmbeds = embedPostUrls.length > 0
+  const embedTimersRef = useRef<number[]>([])
+
+  const clearEmbedTimers = useCallback(() => {
+    embedTimersRef.current.forEach((t) => window.clearTimeout(t))
+    embedTimersRef.current = []
+  }, [])
+
+  const scheduleEmbedProcessing = useCallback(() => {
+    clearEmbedTimers()
+    const delays = [0, 80, 200, 500, 1200, 2500, 5000]
+    embedTimersRef.current = delays.map((ms) =>
+      window.setTimeout(() => processInstagramEmbeds(), ms),
+    )
+  }, [clearEmbedTimers])
 
   useEffect(() => {
     if (!hasEmbeds) return
-    processInstagramEmbeds()
-  }, [hasEmbeds, embedPostUrls])
+    scheduleEmbedProcessing()
+    return () => clearEmbedTimers()
+  }, [hasEmbeds, embedPostUrls, scheduleEmbedProcessing, clearEmbedTimers])
 
   return (
     <section id="instagram" className="py-24 md:py-32 relative overflow-hidden">
@@ -70,8 +85,8 @@ export function InstagramFeed() {
           <>
             <Script
               src="https://www.instagram.com/embed.js"
-              strategy="lazyOnload"
-              onLoad={() => processInstagramEmbeds()}
+              strategy="afterInteractive"
+              onLoad={() => scheduleEmbedProcessing()}
             />
             <AnimatedSection animation="fadeInUp" delay={200}>
               <div className="max-w-5xl mx-auto mb-14 space-y-6">

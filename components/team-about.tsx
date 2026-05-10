@@ -110,12 +110,16 @@ export function TeamAbout() {
 
         {/* Photo Gallery - Scrolling */}
         <AnimatedSection className="mb-20" animation="fadeIn" delay={200}>
-          <div className="relative overflow-hidden">
-            <div className="flex gap-4 animate-scroll">
+          <div className="relative -mx-4 px-4 md:mx-0 md:px-0">
+            <div
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:pb-4 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
+              role="list"
+              aria-label="チーム写真ギャラリー（横にスワイプできます）"
+            >
               {[...shuffledGallery, ...shuffledGallery].map((photo, index) => (
                 <div
                   key={`${photo.id}-${index}`}
-                  className="relative flex-shrink-0 w-80 h-56 rounded-2xl overflow-hidden group"
+                  className="relative w-[min(100vw-3rem,20rem)] shrink-0 snap-center aspect-[320/224] rounded-2xl overflow-hidden group md:w-80 md:h-56 md:aspect-auto"
                 >
                   <Image
                     src={photo.src}
