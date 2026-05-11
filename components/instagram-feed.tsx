@@ -77,28 +77,42 @@ export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
               onLoad={() => scheduleEmbedProcessing()}
             />
             <AnimatedSection animation="fadeInUp" delay={200}>
-              <div className="max-w-5xl mx-auto mb-14 space-y-6">
-                <p className="text-center text-sm text-muted-foreground">
-                  下の投稿は公式の埋め込み表示です（サイト側でLightwidgetは使いません）。
-                </p>
-                <div className="flex flex-col items-center gap-8">
-                  {embedPostUrls.map((url) => (
-                    <blockquote
-                      key={url}
-                      className="instagram-media"
-                      data-instgrm-permalink={url}
-                      data-instgrm-version="14"
-                      style={{
-                        background: "#fff",
-                        border: 0,
-                        borderRadius: "12px",
-                        margin: "0 auto",
-                        maxWidth: "540px",
-                        minWidth: "280px",
-                        width: "100%",
-                      }}
-                    />
-                  ))}
+              <div className="max-w-5xl mx-auto mb-14">
+                <div className="rounded-3xl border border-border/70 bg-card/50 p-6 md:p-10 backdrop-blur-sm space-y-8">
+                  <p className="text-center text-sm text-muted-foreground">
+                    下の投稿は公式の埋め込み表示です（サイト側でLightwidgetは使いません）。
+                  </p>
+                  <div className="flex flex-col items-center gap-8">
+                    {embedPostUrls.map((url) => (
+                      <blockquote
+                        key={url}
+                        className="instagram-media"
+                        data-instgrm-permalink={url}
+                        data-instgrm-version="14"
+                        style={{
+                          background: "#fff",
+                          border: 0,
+                          borderRadius: "12px",
+                          margin: "0 auto",
+                          maxWidth: "540px",
+                          minWidth: "280px",
+                          width: "100%",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex justify-center pt-2">
+                    <Link href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+                      <Button
+                        size="lg"
+                        className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 text-white border-0 gap-3 px-10 py-7 text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      >
+                        <Instagram className="w-6 h-6" />
+                        @2026.selene をフォロー
+                        <ExternalLink className="w-5 h-5" />
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </AnimatedSection>
@@ -125,34 +139,21 @@ export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
                 </div>
 
                 <div className="mt-10 flex justify-center">
-                  <Link
-                    href={INSTAGRAM_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-3 rounded-full border border-primary/30 bg-primary/10 px-6 py-3 text-sm font-semibold text-foreground transition-all hover:border-primary/60 hover:bg-primary/15 hover:shadow-md"
-                  >
-                    <Instagram className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                    <span>Instagramを見る</span>
-                    <ExternalLink className="h-4 w-4 text-primary/80" />
+                  <Link href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 text-white border-0 gap-3 px-10 py-7 text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
+                      <Instagram className="w-6 h-6" />
+                      @2026.selene をフォロー
+                      <ExternalLink className="w-5 h-5" />
+                    </Button>
                   </Link>
                 </div>
               </div>
             </div>
           </AnimatedSection>
         )}
-
-        <AnimatedSection animation="fadeInUp" delay={400} className="text-center">
-          <Link href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 text-white border-0 gap-3 px-10 py-7 text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            >
-              <Instagram className="w-6 h-6" />
-              @2026.selene をフォロー
-              <ExternalLink className="w-5 h-5" />
-            </Button>
-          </Link>
-        </AnimatedSection>
       </div>
     </section>
   )

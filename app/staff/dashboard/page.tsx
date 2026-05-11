@@ -1,6 +1,4 @@
 import type { Metadata } from "next"
-import { StaffAnalyticsCallout } from "@/components/staff-analytics-callout"
-import { StaffAnalyticsPdfEmbed } from "@/components/staff-analytics-pdf-embed"
 import { StaffAnalyticsReports } from "@/components/staff-analytics-reports"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { StaffSessionGuard } from "@/components/staff-session-guard"
@@ -18,12 +16,9 @@ export default function StaffDashboardPage() {
       <header className="mb-8">
         <h1 className="text-2xl md:text-3xl font-black text-foreground mb-2">ダッシュボード</h1>
         <p className="text-muted-foreground text-sm leading-relaxed">
-          本サイトの訪問状況を Vercel Web Analytics で確認するためのページです。
-          試合結果・動画URLの編集は「試合結果」から行ってください。
+          本サイトへのアクセスを、PDF から読み取った数字をもとに表で確認できます。試合結果の編集は「試合結果」から行ってください。
         </p>
       </header>
-      <StaffAnalyticsCallout className="mb-10" />
-      <StaffAnalyticsPdfEmbed />
       <StaffAnalyticsReports />
     </StaffSessionGuard>
   )
