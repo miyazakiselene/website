@@ -7,7 +7,7 @@
 
 ## 2026-05-11
 
-- `UPDATE_LOG.md` を新設し、以降の更新記録をここに残す運用を開始。関係者向けに `/staff/update-log` から閲覧できるようにした（本項目）
+- `UPDATE_LOG.md` を新設し、以降の更新記録をここに残す運用を開始。関係者向けに `/staff/update-log` から閲覧できるようにし、ナビ・認証後メニューから辿れるようにした（`6147a89`）
 - 関係者ダッシュボードに Vercel Analytics の PDF（`website – Analytics – Vercel`）を `public/reports` に同梱し、iframe 表示・ダウンロード導線を追加（`3060eb2`）
 - 同ダッシュボードに、PDF と併せて編集可能な JSON サマリー枠を追加（`271e25d`）
 - Vercel Speed Insights を導入（`94ded01`）
