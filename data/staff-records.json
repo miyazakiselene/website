@@ -340,10 +340,10 @@
         "ourScore": 49,
         "theirScore": 48,
         "videoUrls": [
-          "",
-          "",
-          "",
-          ""
+          "https://www.youtube.com/watch?v=eIHmpeqeADQ",
+          "https://youtu.be/rp2YkmzBxZ0",
+          "https://youtu.be/I-LeuR86ajQ",
+          "https://youtu.be/sqNlNkGcwgM"
         ]
       },
       {
@@ -354,10 +354,10 @@
         "ourScore": 45,
         "theirScore": 30,
         "videoUrls": [
-          "",
-          "",
-          "",
-          ""
+          "https://youtu.be/ekqVSPBONEo",
+          "https://youtu.be/cF30aUAkoTs",
+          "https://youtu.be/Ro7SVwMZ-LE",
+          "https://youtu.be/sv5xeasue4w"
         ]
       },
       {
@@ -368,10 +368,10 @@
         "ourScore": 49,
         "theirScore": 32,
         "videoUrls": [
-          "",
-          "",
-          "",
-          ""
+          "https://youtu.be/sv5xeasue4w",
+          "https://youtu.be/GFo-gB4DSmE",
+          "https://youtu.be/oEs-a4PVCVs",
+          "https://youtu.be/Y4TmTjS_QJs"
         ]
       }
     ]

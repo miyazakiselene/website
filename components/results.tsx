@@ -50,10 +50,40 @@ const fallbackTournaments: Tournament[] = [
     name: "日の出ホルモンスプリングカップ",
     venue: "生目中学校",
     matches: [
-      { id: "2026-04-04-1", date: "4/4", opponent: "本郷中学校" },
-      { id: "2026-04-04-2", date: "4/4", opponent: "東海中学校" },
+      {
+        id: "2026-04-04-1",
+        date: "4/4",
+        opponent: "本郷中学校",
+        videoUrls: [
+          "https://youtu.be/ekqVSPBONEo",
+          "https://youtu.be/cF30aUAkoTs",
+          "https://youtu.be/Ro7SVwMZ-LE",
+          "https://youtu.be/sv5xeasue4w",
+        ],
+      },
+      {
+        id: "2026-04-04-2",
+        date: "4/4",
+        opponent: "東海中学校",
+        videoUrls: [
+          "https://youtu.be/sv5xeasue4w",
+          "https://youtu.be/GFo-gB4DSmE",
+          "https://youtu.be/oEs-a4PVCVs",
+          "https://youtu.be/Y4TmTjS_QJs",
+        ],
+      },
       { id: "2026-04-05-1", date: "4/5", opponent: "EPSIRON" },
-      { id: "2026-04-05-2", date: "4/5", opponent: "赤江東中学校" },
+      {
+        id: "2026-04-05-2",
+        date: "4/5",
+        opponent: "赤江東中学校",
+        videoUrls: [
+          "https://www.youtube.com/watch?v=eIHmpeqeADQ",
+          "https://youtu.be/rp2YkmzBxZ0",
+          "https://youtu.be/I-LeuR86ajQ",
+          "https://youtu.be/sqNlNkGcwgM",
+        ],
+      },
     ],
   },
   {
