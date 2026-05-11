@@ -1,0 +1,19 @@
+{
+  "reports": [
+    {
+      "snapshotDate": "2026-05-11",
+      "dataPeriodLabel": "（PDF の「対象期間」表記に合わせて記入）",
+      "documentTitle": "website – Analytics – Vercel",
+      "kpis": [
+        { "label": "Visitors", "value": "—" },
+        { "label": "Page Views", "value": "—" },
+        { "label": "Bounce rate", "value": "—" }
+      ],
+      "topPages": [],
+      "notes": [
+        "このファイル（data/vercel-analytics-reports.json）を、PDF「website – Analytics – Vercel」と同じ数値・並びに更新してください。",
+        "新しい PDF を取ったら `snapshotDate` をその日付にし、配列の先頭に新しいオブジェクトを追加すると一覧の上に表示されます。"
+      ]
+    }
+  ]
+}

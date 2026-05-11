@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { StaffAnalyticsCallout } from "@/components/staff-analytics-callout"
+import { StaffAnalyticsReports } from "@/components/staff-analytics-reports"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { StaffSessionGuard } from "@/components/staff-session-guard"
 
@@ -20,7 +21,8 @@ export default function StaffDashboardPage() {
           試合結果・動画URLの編集は「試合結果」から行ってください。
         </p>
       </header>
-      <StaffAnalyticsCallout className="mb-0" />
+      <StaffAnalyticsCallout className="mb-10" />
+      <StaffAnalyticsReports />
     </StaffSessionGuard>
   )
 }
