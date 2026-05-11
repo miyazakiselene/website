@@ -9,7 +9,7 @@ import {
   STAFF_RECORDS_STORAGE_KEY,
   type TournamentRecord,
 } from "@/lib/staff-records"
-import { Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
+import { Lock, Plus, Save, Search, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -222,6 +222,8 @@ export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffR
   const [records, setRecords] = useState<TournamentRecord[]>(() => loadInitialRecords(initialRecords))
 
   const recordsOrdered = useMemo(() => sortStaffRecordsNewestFirst(records), [records])
+  const [searchQuery, setSearchQuery] = useState("")
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase()
 
   const [newTournament, setNewTournament] = useState({
     year: "",
@@ -298,6 +300,33 @@ export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffR
     () => records.reduce((sum, tournament) => sum + tournament.matches.length, 0),
     [records],
   )
+  const filteredRecordsOrdered = useMemo(() => {
+    if (normalizedSearchQuery === "") return recordsOrdered
+
+    return recordsOrdered.flatMap((record) => {
+      const tournamentSearchText = [record.year, record.name, record.venue].join(" ").toLowerCase()
+      if (tournamentSearchText.includes(normalizedSearchQuery)) {
+        return [record]
+      }
+
+      const filteredMatches = record.matches.filter((match) =>
+        [
+          match.date,
+          match.opponent,
+          String(match.quarter),
+          String(match.ourScore),
+          String(match.theirScore),
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedSearchQuery),
+      )
+
+      if (filteredMatches.length === 0) return []
+
+      return [{ ...record, matches: filteredMatches }]
+    })
+  }, [normalizedSearchQuery, recordsOrdered])
 
   const unlock = () => {
     if (codeInput.trim() === expectedCode) {
@@ -497,6 +526,18 @@ export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffR
 
   return (
     <div className="space-y-8">
+      <div className="flex justify-end">
+        <div className="relative w-full max-w-sm">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="大会名・会場・日付・対戦相手で検索"
+            className="pl-9"
+          />
+        </div>
+      </div>
+
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="pt-6">
           <div className="flex items-center gap-3 text-foreground">
@@ -658,7 +699,15 @@ export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffR
       </div>
 
       <div className="space-y-6">
-        {recordsOrdered.map((record) => (
+        {filteredRecordsOrdered.length === 0 ? (
+          <Card className="border-dashed border-border">
+            <CardContent className="py-10 text-center text-sm text-muted-foreground">
+              条件に一致する試合情報はありません。
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {filteredRecordsOrdered.map((record) => (
           <Card key={record.id} className="border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-xl">試合情報</CardTitle>
