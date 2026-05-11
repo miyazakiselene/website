@@ -9,6 +9,7 @@ const links = [
   { href: "/staff", label: "メニュー" },
   { href: "/staff/results", label: "試合結果" },
   { href: "/staff/dashboard", label: "ダッシュボード" },
+  { href: "/staff/update-log", label: "更新ログ" },
 ] as const
 
 export function StaffAreaNav() {

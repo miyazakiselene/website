@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { BarChart3, ClipboardList } from "lucide-react"
+import { BarChart3, ClipboardList, ScrollText } from "lucide-react"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -48,6 +48,16 @@ export function StaffHub() {
             </Button>
           </CardContent>
         </Card>
+
+        <p className="text-center text-sm text-muted-foreground">
+          <Link
+            href="/staff/update-log"
+            className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
+          >
+            <ScrollText className="h-4 w-4" />
+            サイトの更新ログを見る
+          </Link>
+        </p>
       </div>
     </div>
   )
