@@ -105,12 +105,9 @@ export function News() {
 
           <AnimatedSection animation="fadeInUp" delay={100 + currentNews.length * 100}>
             <Collapsible className="rounded-2xl border border-border bg-background">
-              <CollapsibleTrigger className="group flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+              <CollapsibleTrigger className="group flex w-full items-center justify-center gap-4 px-6 py-5 text-center">
                 <div>
                   <p className="text-lg font-bold text-foreground">過去のお知らせを見る</p>
-                  <p className="text-sm text-muted-foreground">
-                    終了した予定や、掲載を終えたお知らせをここに移動します。
-                  </p>
                 </div>
                 <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CollapsibleTrigger>
