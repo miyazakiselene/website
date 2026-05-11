@@ -12,27 +12,46 @@ type StaffAnalyticsCalloutProps = {
 }
 
 export function StaffAnalyticsCallout({ className }: StaffAnalyticsCalloutProps) {
+  const hasUrl = analyticsUrl !== ""
+
   return (
-    <Card className={cn("mb-8 border-border bg-card", className)}>
+    <Card
+      className={cn(
+        "mb-8 border-border bg-card",
+        hasUrl && "border-primary/25 bg-primary/[0.03]",
+        className,
+      )}
+    >
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <BarChart3 className="h-5 w-5 text-primary" />
           サイトのアクセス状況（Vercel Analytics）
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+      <CardContent className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <p>
-          訪問数・ページビューなどは Vercel の Web Analytics 画面で確認できます。
-          グラフの中身をこのページ内にそのまま埋め込む公式機能はないため、
-          関係者には Vercel チームへの招待、または下のリンクから開いてもらう形になります。
+          訪問数・ページビュー・参照ページなどは、Vercel の Web Analytics で確認します。
+          このサイト内にグラフを埋め込む公式機能はないため、下のボタンから管理画面を開いてください。
         </p>
-        {analyticsUrl !== "" ? (
-          <Button asChild variant="outline" className="w-full sm:w-auto gap-2">
-            <Link href={analyticsUrl} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-4 w-4" />
-              Vercel Analytics を開く
-            </Link>
-          </Button>
+        {hasUrl ? (
+          <div className="space-y-3">
+            <p className="text-xs font-mono text-foreground/80 break-all rounded-md border border-border bg-muted/40 px-3 py-2">
+              {analyticsUrl}
+            </p>
+            <Button
+              asChild
+              className="w-full gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 sm:w-auto"
+            >
+              <Link href={analyticsUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4" />
+                Vercel Analytics を開く（別タブ）
+              </Link>
+            </Button>
+            <ul className="list-disc space-y-1 pl-5 text-xs">
+              <li>Vercel にログインし、当プロジェクトを見られる権限がある必要があります。</li>
+              <li>閲覧できない関係者には、チーム招待または画面共有をご検討ください。</li>
+            </ul>
+          </div>
         ) : (
           <p className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-xs">
             管理者向け: 本番の環境変数に{" "}
@@ -40,12 +59,9 @@ export function StaffAnalyticsCallout({ className }: StaffAnalyticsCalloutProps)
               NEXT_PUBLIC_VERCEL_ANALYTICS_URL
             </code>{" "}
             を設定すると、ここにボタンが表示されます（Vercel プロジェクトの Analytics
-            ページの URL）。
+            ページの URL）。設定後は再デプロイが必要です。
           </p>
         )}
-        <p className="text-xs">
-          ※ 表示には Vercel のプロジェクトへのアクセス権（チーム招待）が必要です。
-        </p>
       </CardContent>
     </Card>
   )
