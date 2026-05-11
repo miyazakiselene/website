@@ -5,6 +5,7 @@ import { News } from "@/components/news"
 import { Results } from "@/components/results"
 import { InstagramFeed } from "@/components/instagram-feed"
 import { ContactForm } from "@/components/contact-form"
+import { ClientOnly } from "@/components/client-only"
 import { Sponsors } from "@/components/sponsors"
 import { Footer } from "@/components/footer"
 import { parseInstagramEmbedPostUrlsFromEnv } from "@/lib/instagram-embed"
@@ -29,13 +30,17 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      <Header />
+      <ClientOnly>
+        <Header />
+      </ClientOnly>
       <Hero />
       <News />
       <TeamAbout />
       <Results />
       <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
-      <ContactForm />
+      <ClientOnly>
+        <ContactForm />
+      </ClientOnly>
       <Sponsors />
       <Footer />
     </main>
