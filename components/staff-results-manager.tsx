@@ -44,7 +44,7 @@ const defaultRecords: TournamentRecord[] = [
         ourScore: 49,
         theirScore: 32,
         videoUrls: [
-          "https://youtu.be/sv5xeasue4w",
+          "https://www.youtube.com/watch?v=FCg6L-o9624",
           "https://youtu.be/GFo-gB4DSmE",
           "https://youtu.be/oEs-a4PVCVs",
           "https://youtu.be/Y4TmTjS_QJs",
@@ -202,7 +202,7 @@ function loadInitialRecords(initialRecords?: TournamentRecord[]) {
 
       return { ...rest, matches } as TournamentRecord
     })
-    return sortStaffRecordsNewestFirst(mapped)
+    return sortStaffRecordsNewestFirst(mergeStaffRecordsFromServerAndLocal(baseRecords, mapped))
   } catch {
     return baseRecords
   }
