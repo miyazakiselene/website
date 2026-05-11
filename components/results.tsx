@@ -292,7 +292,6 @@ export function Results() {
                                 >
                                   {date}
                                 </Badge>
-                                <span className="text-sm text-muted-foreground">対戦 {matches.length}件</span>
                               </div>
                               <ul className="grid gap-2 md:gap-3">
                                 {matches.map((match) => (
