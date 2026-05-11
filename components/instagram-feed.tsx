@@ -1,5 +1,6 @@
 "use client"
 
+import { useCallback, useEffect, useRef } from "react"
 import Script from "next/script"
 import { AnimatedSection } from "./animated-section"
 import { Button } from "@/components/ui/button"
@@ -8,10 +9,41 @@ import Image from "next/image"
 import Link from "next/link"
 
 const INSTAGRAM_URL = "https://www.instagram.com/2026.selene/"
-const LIGHTWIDGET_WIDGET_URL =
-  "https://lightwidget.com/widgets/2609db9226d45b76b14b4c5005c3b270.html"
 
-export function InstagramFeed() {
+type InstagramFeedProps = {
+  embedPostUrls: string[]
+}
+
+function processInstagramEmbeds() {
+  if (typeof window === "undefined") return
+  const instgrm = (
+    window as unknown as { instgrm?: { Embeds?: { process: () => void } } }
+  ).instgrm
+  instgrm?.Embeds?.process()
+}
+
+export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
+  const hasEmbeds = embedPostUrls.length > 0
+  const embedTimersRef = useRef<number[]>([])
+
+  const clearEmbedTimers = useCallback(() => {
+    embedTimersRef.current.forEach((t) => window.clearTimeout(t))
+    embedTimersRef.current = []
+  }, [])
+
+  const scheduleEmbedProcessing = useCallback(() => {
+    clearEmbedTimers()
+    const delays = [0, 80, 200, 500, 1200, 2500, 5000]
+    embedTimersRef.current = delays.map((ms) =>
+      window.setTimeout(() => processInstagramEmbeds(), ms),
+    )
+  }, [clearEmbedTimers])
+
+  useEffect(() => {
+    if (!hasEmbeds) return
+    scheduleEmbedProcessing()
+    return () => clearEmbedTimers()
+  }, [hasEmbeds, embedPostUrls, scheduleEmbedProcessing, clearEmbedTimers])
 
   return (
     <section id="instagram" className="py-24 md:py-32 relative overflow-hidden">
@@ -36,7 +68,13 @@ export function InstagramFeed() {
           </p>
         </AnimatedSection>
 
-        <Script src="https://cdn.lightwidget.com/widgets/lightwidget.js" strategy="afterInteractive" />
+        {hasEmbeds ? (
+          <Script
+            src="https://www.instagram.com/embed.js"
+            strategy="afterInteractive"
+            onLoad={() => scheduleEmbedProcessing()}
+          />
+        ) : null}
 
         <AnimatedSection animation="fadeInUp" delay={200}>
           <div className="max-w-6xl mx-auto mb-14">
@@ -61,25 +99,6 @@ export function InstagramFeed() {
                       SNS GALLERY
                     </div>
                     <h3 className="text-2xl md:text-3xl font-bold text-foreground">@2026.selene</h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      練習風景、試合の空気感、日々のチームの表情を
-                      Instagram でまとめてチェックできます。
-                    </p>
-                  </div>
-
-                  <div className="grid w-full grid-cols-3 gap-3 text-center">
-                    <div className="rounded-2xl border border-border/60 bg-background/70 px-3 py-4">
-                      <p className="text-lg font-black text-foreground">Game</p>
-                      <p className="text-xs text-muted-foreground">試合動画</p>
-                    </div>
-                    <div className="rounded-2xl border border-border/60 bg-background/70 px-3 py-4">
-                      <p className="text-lg font-black text-foreground">Team</p>
-                      <p className="text-xs text-muted-foreground">活動記録</p>
-                    </div>
-                    <div className="rounded-2xl border border-border/60 bg-background/70 px-3 py-4">
-                      <p className="text-lg font-black text-foreground">Daily</p>
-                      <p className="text-xs text-muted-foreground">日常の様子</p>
-                    </div>
                   </div>
 
                   <Link href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="w-full">
@@ -96,15 +115,50 @@ export function InstagramFeed() {
               </div>
 
               <div className="rounded-3xl border border-border/70 bg-card/70 p-3 md:p-4 backdrop-blur-sm shadow-[0_20px_80px_-30px_rgba(0,0,0,0.25)]">
-                <div className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-background">
-                  <iframe
-                    src={LIGHTWIDGET_WIDGET_URL}
-                    title="宮崎 SELENE Instagram gallery"
-                    scrolling="no"
-                    allowTransparency={true}
-                    className="lightwidget-widget min-h-[420px] w-full border-0 overflow-hidden md:min-h-[560px]"
-                  />
-                </div>
+                {hasEmbeds ? (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {embedPostUrls.map((url) => (
+                      <div
+                        key={url}
+                        className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-background px-2 pt-2 shadow-sm"
+                      >
+                        <blockquote
+                          className="instagram-media !m-0 !min-w-0 !max-w-none"
+                          data-instgrm-permalink={url}
+                          data-instgrm-version="14"
+                          style={{
+                            background: "#fff",
+                            border: 0,
+                            borderRadius: "16px",
+                            margin: 0,
+                            maxWidth: "100%",
+                            minWidth: "0",
+                            width: "100%",
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-border/70 bg-background/70 px-6 py-10 text-center md:min-h-[560px]">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
+                      <Instagram className="h-4 w-4" />
+                      Instagram 埋め込み準備OK
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground">投稿URLを入れるとここに表示されます</h3>
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                      公式埋め込みでは、Instagram のプロフィール全体ではなく
+                      投稿またはリールのURLが必要です。
+                      <code className="mx-1 rounded bg-muted px-1.5 py-0.5 text-xs">
+                        NEXT_PUBLIC_INSTAGRAM_EMBED_URLS
+                      </code>
+                      にカンマ区切りで入れると反映されます。
+                    </p>
+                    <div className="mt-6 rounded-2xl border border-border/60 bg-card px-4 py-3 text-left font-mono text-xs text-muted-foreground">
+                      https://www.instagram.com/p/xxxx/ , https://www.instagram.com/reel/yyyy/
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

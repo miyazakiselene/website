@@ -36,49 +36,58 @@ export function ContactForm() {
         </AnimatedSection>
 
         {/* Contact Actions */}
-        <AnimatedSection className="max-w-2xl mx-auto" animation="fadeInUp" delay={200}>
-          <Card className="bg-background border-border hover:border-primary/30 transition-colors duration-300">
-            <CardContent className="p-8 md:p-10">
-              <div className="space-y-6">
-                <AnimatedSection animation="fadeInUp" delay={300}>
-                  <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 md:p-6">
-                    <p className="text-base md:text-lg text-foreground leading-relaxed">
-                      本年度のクラブ生の募集は終了しました。
-                      <span className="block mt-1">
-                        練習試合のお申し込み・その他のご相談は、
-                      </span>
-                      <span className="block">Instagram のDMをご利用ください。</span>
-                    </p>
-                  </div>
-                </AnimatedSection>
+        <div className="max-w-2xl mx-auto space-y-6">
+          <AnimatedSection animation="fadeInUp" delay={200}>
+            <Card className="bg-background border-primary/30">
+              <CardContent className="p-6 md:p-7">
+                <p className="text-base md:text-lg text-foreground leading-relaxed">
+                  本年度のクラブ生の募集は終了しました。
+                </p>
+              </CardContent>
+            </Card>
+          </AnimatedSection>
 
-                <AnimatedSection animation="fadeInUp" delay={380}>
-                  <Button
-                    asChild
-                    className="w-full group hover:scale-[1.02] transition-all duration-300 text-lg h-14"
-                    size="lg"
-                  >
-                    <a
-                      href="https://www.instagram.com/2026.selene/"
-                      target="_blank"
-                      rel="noopener noreferrer"
+          <AnimatedSection animation="fadeInUp" delay={260}>
+            <Card className="bg-background border-border hover:border-primary/30 transition-colors duration-300">
+              <CardContent className="p-8 md:p-10">
+                <div className="space-y-6">
+                  <AnimatedSection animation="fadeInUp" delay={320}>
+                    <div className="rounded-xl border border-border bg-card/60 p-5 md:p-6">
+                      <p className="text-base md:text-lg text-foreground leading-relaxed">
+                        練習試合・合同練習・大会のお誘い等々、その他のご相談は、
+                        <span className="block mt-1">Instagram のDMをご利用ください。</span>
+                      </p>
+                    </div>
+                  </AnimatedSection>
+
+                  <AnimatedSection animation="fadeInUp" delay={360}>
+                    <Button
+                      asChild
+                      className="w-full group hover:scale-[1.02] transition-all duration-300 text-lg h-14"
+                      size="lg"
                     >
-                      <Instagram className="h-5 w-5 mr-2" />
-                      @2026.selene にDMする
-                    </a>
-                  </Button>
-                </AnimatedSection>
+                      <a
+                        href="https://www.instagram.com/2026.selene/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Instagram className="h-5 w-5 mr-2" />
+                        @2026.selene にDMする
+                      </a>
+                    </Button>
+                  </AnimatedSection>
 
-                <AnimatedSection animation="fadeInUp" delay={460}>
-                  <div className="text-center text-base text-muted-foreground flex items-center justify-center gap-2">
-                    <MessageCircle className="h-4 w-4" />
-                    なるべく早急に対応いたしますが、返信が遅れる場合はご了承ください
-                  </div>
-                </AnimatedSection>
-              </div>
-            </CardContent>
-          </Card>
-        </AnimatedSection>
+                  <AnimatedSection animation="fadeInUp" delay={420}>
+                    <div className="text-center text-base text-muted-foreground flex items-center justify-center gap-2">
+                      <MessageCircle className="h-4 w-4" />
+                      なるべく早急に対応いたしますが、返信が遅れる場合はご了承ください
+                    </div>
+                  </AnimatedSection>
+                </div>
+              </CardContent>
+            </Card>
+          </AnimatedSection>
+        </div>
       </div>
     </section>
   )
