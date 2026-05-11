@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { CalendarDays, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedSection } from "@/components/animated-section"
@@ -113,6 +114,16 @@ export function News() {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="border-t border-border px-4 py-4 md:px-5">
+                  <p className="px-2 pb-4 text-sm text-muted-foreground">
+                    <Link
+                      href="https://www.instagram.com/2026.selene/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      練習試合・合同練習・大会のお誘いはこちらにDMを下さい
+                    </Link>
+                  </p>
                   {pastNews.length > 0 ? (
                     <div className="grid gap-4">
                       {pastNews.map((item) => (
