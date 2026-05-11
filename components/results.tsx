@@ -314,6 +314,12 @@ export function Results() {
             </AnimatedSection>
           ))}
         </div>
+
+        <AnimatedSection className="mx-auto mt-12 max-w-4xl text-center" animation="fadeInUp" delay={180}>
+          <p className="text-sm md:text-base leading-relaxed text-muted-foreground">
+            対戦していただいたチームの皆様、ありがとうございました。今後ともよろしくお願いいたします。
+          </p>
+        </AnimatedSection>
       </div>
     </section>
   )
