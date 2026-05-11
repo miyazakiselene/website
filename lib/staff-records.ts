@@ -16,7 +16,7 @@ export type TournamentRecord = {
   matches: MatchRecord[]
 }
 
-export const STAFF_RECORDS_STORAGE_KEY = "selene-staff-results-v4"
+export const STAFF_RECORDS_STORAGE_KEY = "selene-staff-results-v5"
 
 export function normalizeMatchVideoUrls(match: MatchRecord): MatchRecord {
   const q = Math.max(0, match.quarter)
