@@ -7,6 +7,7 @@
 
 ## 2026-05-11
 
+- Analytics JSON を複数スナップショット対応にし、前回比・累積 PV・ページ別伸びを表と Recharts グラフで表示（`stats` 推奨）（`ac34766`）
 - 関係者ダッシュボードを PDF から読み取った数値の日本語表に刷新し、外部サイト案内・PDF 埋め込みを削除。Instagram は「フォロー」ボタンをプロフィールと同じボックス内に集約
 - `UPDATE_LOG.md` を新設し、以降の更新記録をここに残す運用を開始。関係者向けに `/staff/update-log` から閲覧できるようにし、ナビ・認証後メニューから辿れるようにした（`6147a89`）
 - 関係者ダッシュボードに Vercel Analytics の PDF（`website – Analytics – Vercel`）を `public/reports` に同梱し、iframe 表示・ダウンロード導線を追加（`3060eb2`）

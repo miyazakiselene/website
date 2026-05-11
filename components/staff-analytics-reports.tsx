@@ -2,7 +2,9 @@ import { BarChart3 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatReportDateJp } from "@/lib/format-report-date"
+import type { AnalyticsReportJson } from "@/lib/analytics-series"
 import reportsJson from "@/data/vercel-analytics-reports.json"
+import { StaffAnalyticsSeriesInsights } from "@/components/staff-analytics-series-insights"
 
 type MetricRow = {
   title: string
@@ -24,6 +26,11 @@ type AnalyticsReport = {
   analysisPeriod: string
   deployment: string
   targetSite: string
+  stats?: {
+    uniqueVisitors: number
+    bouncePercent: number
+    pageViewsEstimate: number
+  }
   metrics: MetricRow[]
   pageTable: TableSection & {
     rows: Array<{ label: string; path: string; count: string }>
@@ -36,7 +43,7 @@ type AnalyticsReport = {
 }
 
 function parseReports(): AnalyticsReport[] {
-  const raw = reportsJson as { reports?: AnalyticsReport[] }
+  const raw = reportsJson as unknown as { reports?: AnalyticsReport[] }
   if (!Array.isArray(raw.reports)) return []
   return raw.reports
 }
@@ -106,6 +113,8 @@ export function StaffAnalyticsReports() {
           次の表は、PDF に載っていた数字をそのまま日本語の見出しで整理したものです。用語に迷ったときは、各カード下の小さな説明文を読んでください。
         </p>
       </div>
+
+      <StaffAnalyticsSeriesInsights reports={reports as AnalyticsReportJson[]} />
 
       {reports.map((report, index) => (
         <Card key={`${report.snapshotDate}-${index}`} className="border-border overflow-hidden">
