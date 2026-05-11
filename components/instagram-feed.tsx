@@ -11,7 +11,7 @@ import Link from "next/link"
 const INSTAGRAM_URL = "https://www.instagram.com/2026.selene/"
 
 type InstagramFeedProps = {
-  embedPostUrls: string[]
+  embedPostUrls?: string[]
 }
 
 function processInstagramEmbeds() {
@@ -22,7 +22,7 @@ function processInstagramEmbeds() {
   instgrm?.Embeds?.process()
 }
 
-export function InstagramFeed({ embedPostUrls }: InstagramFeedProps) {
+export function InstagramFeed({ embedPostUrls = [] }: InstagramFeedProps) {
   const hasEmbeds = embedPostUrls.length > 0
   const embedTimersRef = useRef<number[]>([])
 
