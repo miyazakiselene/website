@@ -6,16 +6,14 @@ import {
   type MatchRecord,
   mergeStaffRecordsFromServerAndLocal,
   normalizeMatchVideoUrls,
-  normalizeTournamentRecords,
   STAFF_RECORDS_STORAGE_KEY,
   type TournamentRecord,
 } from "@/lib/staff-records"
-import { ClipboardCopy, Download, Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
+import { Lock, Plus, Save, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 
 const defaultRecords: TournamentRecord[] = [
   {
@@ -227,11 +225,7 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
     ourScore: "",
     theirScore: "",
   })
-  const [videoDrafts, setVideoDrafts] = useState<Record<string, string[]>>({})
   const [syncStatus, setSyncStatus] = useState<"idle" | "ok" | "error">("idle")
-  const [backupFeedback, setBackupFeedback] = useState("")
-  const [importJsonText, setImportJsonText] = useState("")
-  const [importError, setImportError] = useState("")
 
   const expectedCode = process.env.NEXT_PUBLIC_STAFF_ACCESS_CODE ?? "123456"
 
@@ -292,8 +286,6 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
     () => records.reduce((sum, tournament) => sum + tournament.matches.length, 0),
     [records],
   )
-
-  const exportRecordsJsonStr = useMemo(() => JSON.stringify(recordsOrdered, null, 2), [recordsOrdered])
 
   const unlock = () => {
     if (codeInput.trim() === expectedCode) {
@@ -426,31 +418,10 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
             },
       ),
     )
-    setVideoDrafts((prev) => {
-      const next = { ...prev }
-      delete next[matchId]
-      return next
-    })
   }
 
-  const getMatchVideoDraftValue = (matchId: string, index: number, saved: string) =>
-    videoDrafts[matchId]?.[index] ?? saved
-
-  const setMatchVideoDraftValue = (matchId: string, index: number, value: string) => {
-    setVideoDrafts((prev) => {
-      const next = { ...prev }
-      const current = [...(next[matchId] ?? [])]
-      if (index >= current.length) {
-        current.push(...Array(index - current.length + 1).fill(""))
-      }
-      current[index] = value
-      next[matchId] = current
-      return next
-    })
-  }
-
-  const saveMatchVideoUrl = (tournamentId: string, matchId: string, index: number) => {
-    const draft = (videoDrafts[matchId]?.[index] ?? "").trim()
+  const updateMatchVideoUrl = (tournamentId: string, matchId: string, index: number, value: string) => {
+    const nextValue = value.trim()
     setRecords((prev) =>
       prev.map((tournament) => {
         if (tournament.id !== tournamentId) return tournament
@@ -460,95 +431,12 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
             if (match.id !== matchId) return match
             const urls = [...(match.videoUrls ?? [])]
             while (urls.length <= index) urls.push("")
-            urls[index] = draft
+            urls[index] = nextValue
             return normalizeMatchVideoUrls({ ...match, videoUrls: urls })
           }),
         }
       }),
     )
-    setVideoDrafts((prev) => {
-      const next = { ...prev }
-      const current = [...(next[matchId] ?? [])]
-      while (current.length <= index) current.push("")
-      current[index] = draft
-      next[matchId] = current
-      return next
-    })
-  }
-
-  const clearMatchVideoUrlSlot = (tournamentId: string, matchId: string, index: number) => {
-    const confirmed = window.confirm("この試合動画URLを削除します。よろしいですか？")
-    if (!confirmed) return
-    setRecords((prev) =>
-      prev.map((tournament) => {
-        if (tournament.id !== tournamentId) return tournament
-        return {
-          ...tournament,
-          matches: tournament.matches.map((match) => {
-            if (match.id !== matchId) return match
-            const urls = [...(match.videoUrls ?? [])]
-            while (urls.length <= index) urls.push("")
-            urls[index] = ""
-            return normalizeMatchVideoUrls({ ...match, videoUrls: urls })
-          }),
-        }
-      }),
-    )
-    setVideoDrafts((prev) => {
-      const next = { ...prev }
-      const current = [...(next[matchId] ?? [])]
-      while (current.length <= index) current.push("")
-      current[index] = ""
-      next[matchId] = current
-      return next
-    })
-  }
-
-  const showBackupMessage = (message: string) => {
-    setBackupFeedback(message)
-    window.setTimeout(() => setBackupFeedback(""), 8000)
-  }
-
-  const copyRecordsToClipboard = async () => {
-    const text = exportRecordsJsonStr
-    try {
-      await navigator.clipboard.writeText(text)
-      showBackupMessage("クリップボードにコピーしました。メモアプリやメールに貼り付けて共有できます。")
-    } catch {
-      showBackupMessage("自動コピーに失敗しました。下の「エクスポート用JSON」欄から手動でコピーしてください。")
-    }
-  }
-
-  const downloadRecordsJson = () => {
-    const text = exportRecordsJsonStr
-    const blob = new Blob([text], { type: "application/json;charset=utf-8" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "staff-records.json"
-    a.rel = "noopener"
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    URL.revokeObjectURL(url)
-    showBackupMessage("staff-records.json のダウンロードを開始しました（ファイルアプリに保存できます）。")
-  }
-
-  const applyImportedRecords = () => {
-    setImportError("")
-    try {
-      const raw: unknown = JSON.parse(importJsonText)
-      const arr = Array.isArray(raw) ? raw : (raw as { records?: unknown }).records
-      if (!Array.isArray(arr)) {
-        setImportError("JSON は大会の配列か、{ \"records\": [...] } の形にしてください。")
-        return
-      }
-      const normalized = normalizeTournamentRecords(arr as TournamentRecord[])
-      setRecords(sortStaffRecordsNewestFirst(normalized))
-      showBackupMessage("取り込みました。内容を確認してください。")
-    } catch {
-      setImportError("JSON が壊れているか、形式が合いません。")
-    }
   }
 
   const openMatchVideoUrl = (match: MatchRecord, index: number) => {
@@ -607,67 +495,6 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
             <p>
               関係者専用ページです。試合情報をこのページから追加・編集できます。
             </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-border">
-        <CardHeader>
-          <CardTitle className="text-xl">全員に反映する（バックアップ・取り込み）</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-          <p>
-            試合動画の URL は、まずこの端末のブラウザ（Safari など）に保存されます。公開サイトの「活動記録」に同じリンクを出すには、リポジトリの{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs text-foreground">data/staff-records.json</code>{" "}
-            としてデプロイに含める必要があります（本番サーバーだけへの保存は環境によっては永続しません）。
-          </p>
-          <p className="text-foreground font-medium">手順の例（iPhone で入力済みの場合）</p>
-          <ol className="list-decimal space-y-1.5 pl-5">
-            <li>下の「JSONをコピー」またはファイル保存で、この端末のデータを取り出す。</li>
-            <li>
-              開発用 PC で{" "}
-              <code className="rounded bg-muted px-1 text-xs">data/staff-records.json</code>{" "}
-              を作成または差し替え、Git にコミットしてデプロイする。
-            </li>
-            <li>デプロイ後、全員のトップページの活動記録から動画リンクが開けることを確認する。</li>
-          </ol>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={() => void copyRecordsToClipboard()}>
-              <ClipboardCopy className="h-4 w-4 mr-2" />
-              JSONをコピー
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={downloadRecordsJson}>
-              <Download className="h-4 w-4 mr-2" />
-              JSONファイルを保存
-            </Button>
-          </div>
-          {backupFeedback !== "" ? (
-            <p className="text-sm text-primary font-medium">{backupFeedback}</p>
-          ) : null}
-          <div className="space-y-2">
-            <Label htmlFor="export-json-readonly">エクスポート用JSON（コピーしづいときはここから全選択）</Label>
-            <Textarea
-              id="export-json-readonly"
-              readOnly
-              rows={6}
-              className="font-mono text-xs"
-              value={exportRecordsJsonStr}
-            />
-          </div>
-          <div className="space-y-2 border-t border-border pt-4">
-            <Label htmlFor="import-json">別端末から持ってきた JSON を貼り付け（上書き取り込み）</Label>
-            <Textarea
-              id="import-json"
-              rows={5}
-              className="font-mono text-xs"
-              placeholder='[ { "id": "...", "year": "...", ... } ] または { "records": [ ... ] }'
-              value={importJsonText}
-              onChange={(e) => setImportJsonText(e.target.value)}
-            />
-            {importError !== "" ? <p className="text-sm text-red-400">{importError}</p> : null}
-            <Button type="button" variant="secondary" size="sm" onClick={applyImportedRecords}>
-              取り込む
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -966,9 +793,7 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
                       </div>
                     </div>
                     <div className="space-y-2 border-t border-border pt-3">
-                      <Label className="text-sm text-muted-foreground">
-                        試合動画URL（Qの数だけ）
-                      </Label>
+                      <Label className="text-sm text-muted-foreground">試合動画URL</Label>
                       {Array.from({ length: Math.max(0, match.quarter) }).map((_, vIndex) => (
                         <div
                           key={`${match.id}-video-${vIndex}`}
@@ -977,13 +802,9 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
                           <Input
                             id={`video-url-${match.id}-${vIndex}`}
                             className="min-w-0 flex-1 basis-[min(100%,18rem)]"
-                            value={getMatchVideoDraftValue(
-                              match.id,
-                              vIndex,
-                              match.videoUrls?.[vIndex] ?? "",
-                            )}
+                            value={match.videoUrls?.[vIndex] ?? ""}
                             onChange={(e) =>
-                              setMatchVideoDraftValue(match.id, vIndex, e.target.value)
+                              updateMatchVideoUrl(record.id, match.id, vIndex, e.target.value)
                             }
                             placeholder={`試合動画URL ${vIndex + 1}`}
                           />
@@ -992,32 +813,9 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
                             variant="outline"
                             size="sm"
                             className="shrink-0"
-                            onClick={() =>
-                              saveMatchVideoUrl(record.id, match.id, vIndex)
-                            }
-                          >
-                            保存
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="shrink-0"
                             onClick={() => openMatchVideoUrl(match, vIndex)}
                           >
                             開く
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="text-red-500 hover:text-red-400 shrink-0"
-                            onClick={() =>
-                              clearMatchVideoUrlSlot(record.id, match.id, vIndex)
-                            }
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            削除
                           </Button>
                         </div>
                       ))}
