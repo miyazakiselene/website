@@ -1,0 +1,379 @@
+[
+  {
+    "id": "practice-2026-05-09",
+    "year": "R8年度",
+    "name": "練習試合（5/9）",
+    "venue": "生目台中学校",
+    "matches": [
+      {
+        "id": "2026-05-09-1",
+        "date": "5/9",
+        "opponent": "清武中学校",
+        "quarter": 4,
+        "ourScore": 81,
+        "theirScore": 18,
+        "videoUrls": [
+          "https://youtu.be/hV1PtE3L7U8",
+          "https://youtu.be/_Rrz2wXsxJE",
+          "https://youtu.be/RqgmcDwnuco",
+          "https://youtu.be/BgmZ2cxNtvc"
+        ]
+      },
+      {
+        "id": "2026-05-09-2",
+        "date": "5/9",
+        "opponent": "生目台中学校",
+        "quarter": 4,
+        "ourScore": 61,
+        "theirScore": 51,
+        "videoUrls": [
+          "https://youtu.be/Id7OqYK9QMQ",
+          "https://youtu.be/mmVk3-CBung",
+          "https://youtu.be/F5GDcMeH4ak",
+          "https://youtu.be/WxTuNoPGRaw"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "practice-2026-05-06",
+    "year": "R8年度",
+    "name": "練習試合（5/6）",
+    "venue": "宮崎市総合体育館",
+    "matches": [
+      {
+        "id": "2026-05-06-1",
+        "date": "5/6",
+        "opponent": "CRISIS",
+        "quarter": 6,
+        "ourScore": 101,
+        "theirScore": 43,
+        "videoUrls": [
+          "https://youtu.be/7x8wA8CfloM",
+          "https://youtu.be/h7LT3Q_GWvU",
+          "https://youtu.be/BXp0vx5Kr9A",
+          "https://youtu.be/n5-5U2I2ccI",
+          "https://youtu.be/ZChoIP9mygc",
+          "https://youtu.be/Q89iyt7XapQ"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "practice-2026-05-04",
+    "year": "R8年度",
+    "name": "練習試合（5/4）",
+    "venue": "祝吉中学校",
+    "matches": [
+      {
+        "id": "2026-05-04-1",
+        "date": "5/4",
+        "opponent": "EPSIRON",
+        "quarter": 4,
+        "ourScore": 51,
+        "theirScore": 44,
+        "videoUrls": [
+          "https://youtu.be/_2hjGy30Rvo",
+          "https://youtu.be/XSbDl-0ffbM",
+          "https://youtu.be/21U8WIfqlts",
+          "https://youtu.be/OQiZDI6E5is"
+        ]
+      },
+      {
+        "id": "2026-05-04-2",
+        "date": "5/4",
+        "opponent": "REDSUNS",
+        "quarter": 4,
+        "ourScore": 42,
+        "theirScore": 35,
+        "videoUrls": [
+          "https://youtu.be/0-Z9AI4u8gk",
+          "https://youtu.be/RRe4uw8ZKJE",
+          "https://youtu.be/xM9QzWLeSTA",
+          "https://youtu.be/nCfeAU2JZMM"
+        ]
+      },
+      {
+        "id": "2026-05-04-3",
+        "date": "5/4",
+        "opponent": "祝吉中学校",
+        "quarter": 2,
+        "ourScore": 56,
+        "theirScore": 22,
+        "videoUrls": [
+          "https://youtu.be/pNHfFGJcj5Y",
+          "https://youtu.be/Ig6-9ZW4Kn4"
+        ]
+      },
+      {
+        "id": "2026-05-04-4",
+        "date": "5/4",
+        "opponent": "ELPIS",
+        "quarter": 2,
+        "ourScore": 21,
+        "theirScore": 24,
+        "videoUrls": [
+          "https://youtu.be/y3ehCg9mu8Y",
+          "https://youtu.be/k0ZlAan5-4M"
+        ]
+      },
+      {
+        "id": "2026-05-04-5",
+        "date": "5/4",
+        "opponent": "苅田中学校",
+        "quarter": 2,
+        "ourScore": 32,
+        "theirScore": 12,
+        "videoUrls": [
+          "https://youtu.be/ed17gRSfZHg",
+          "https://youtu.be/mnif9xQRaxw"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "practice-2026-05-02",
+    "year": "R8年度",
+    "name": "練習試合（5/2）",
+    "venue": "宮商高校",
+    "matches": [
+      {
+        "id": "2026-05-02-1",
+        "date": "5/2",
+        "opponent": "宮商高校",
+        "quarter": 9,
+        "ourScore": 50,
+        "theirScore": 171,
+        "videoUrls": [
+          "https://youtu.be/3aEFLgigPzQ",
+          "https://youtu.be/6_r-jGpBhvM",
+          "https://youtu.be/MTIO4E0I7TE",
+          "https://youtu.be/pTobt5yvu90",
+          "https://youtu.be/XiIeagacTyo",
+          "https://youtu.be/sz7pzGvr_Z0",
+          "https://youtu.be/2vyJ42py1OI",
+          "https://youtu.be/H24oRJ-ksXM",
+          "https://youtu.be/shefiicybAQ"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "practice-2026-04-29",
+    "year": "R8年度",
+    "name": "練習試合（4/29）",
+    "venue": "国光春中学校",
+    "matches": [
+      {
+        "id": "2026-04-29-1",
+        "date": "4/29",
+        "opponent": "宮附中学校",
+        "quarter": 2,
+        "ourScore": 48,
+        "theirScore": 1,
+        "videoUrls": [
+          "https://youtu.be/mYJcEUrL7oE",
+          "https://youtu.be/iz-LLfyBw-U"
+        ]
+      },
+      {
+        "id": "2026-04-29-2",
+        "date": "4/29",
+        "opponent": "国光春中学校",
+        "quarter": 2,
+        "ourScore": 36,
+        "theirScore": 13,
+        "videoUrls": [
+          "https://youtu.be/ykpZ-EtQolM",
+          "https://youtu.be/zRwi43M1cVk"
+        ]
+      },
+      {
+        "id": "2026-04-29-3",
+        "date": "4/29",
+        "opponent": "南郷中学校",
+        "quarter": 2,
+        "ourScore": 60,
+        "theirScore": 2,
+        "videoUrls": [
+          "https://youtu.be/lMKw7IFCIwI",
+          "https://youtu.be/Njh2-7Mgl_o"
+        ]
+      },
+      {
+        "id": "2026-04-29-4",
+        "date": "4/29",
+        "opponent": "都農中学校",
+        "quarter": 2,
+        "ourScore": 37,
+        "theirScore": 10,
+        "videoUrls": [
+          "https://youtu.be/Ki9ZUnkpvaw",
+          "https://youtu.be/c9-1fzireuU"
+        ]
+      },
+      {
+        "id": "2026-04-29-5",
+        "date": "4/29",
+        "opponent": "日向中学校",
+        "quarter": 2,
+        "ourScore": 27,
+        "theirScore": 37,
+        "videoUrls": [
+          "https://youtu.be/RSHXwWY1XVM",
+          "https://youtu.be/T-5wTrE6v0M"
+        ]
+      },
+      {
+        "id": "2026-04-29-6",
+        "date": "4/29",
+        "opponent": "富田・高鍋東中学校",
+        "quarter": 2,
+        "ourScore": 40,
+        "theirScore": 7,
+        "videoUrls": [
+          "https://youtu.be/0FqZOx8A1R4",
+          "https://youtu.be/0FqZOx8A1R4"
+        ]
+      },
+      {
+        "id": "2026-04-29-7",
+        "date": "4/29",
+        "opponent": "野尻・飯野中学校",
+        "quarter": 2,
+        "ourScore": 39,
+        "theirScore": 10,
+        "videoUrls": [
+          "https://youtu.be/CKUuRz1sRrc",
+          "https://youtu.be/hXntOMInXiE"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "practice-2026-04-25",
+    "year": "R8年度",
+    "name": "練習試合（4/25）",
+    "venue": "日向学院高校",
+    "matches": [
+      {
+        "id": "2026-04-25-1",
+        "date": "4/25",
+        "opponent": "日向学院高校",
+        "quarter": 4,
+        "ourScore": 63,
+        "theirScore": 34,
+        "videoUrls": [
+          "https://youtu.be/iUw_1DzqHZo",
+          "https://youtu.be/qv5yE5mjYLE",
+          "https://youtu.be/8J6w0iX0-jQ",
+          "https://youtu.be/-57mqE9WeiU"
+        ]
+      },
+      {
+        "id": "2026-04-25-2",
+        "date": "4/25",
+        "opponent": "タートル（社会人）",
+        "quarter": 4,
+        "ourScore": 37,
+        "theirScore": 86,
+        "videoUrls": [
+          "https://youtu.be/XzkNlwuXFfM",
+          "https://youtu.be/dBgUCLx6_Mg",
+          "https://youtu.be/LE_U7sei4og",
+          "https://youtu.be/SD5xyrAx8P0"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "practice-2026-04-18",
+    "year": "R8年度",
+    "name": "練習試合（4/18）",
+    "venue": "木花中学校",
+    "matches": [
+      {
+        "id": "2026-04-18-1",
+        "date": "4/18",
+        "opponent": "木花中学校",
+        "quarter": 8,
+        "ourScore": 117,
+        "theirScore": 87,
+        "videoUrls": [
+          "https://youtu.be/eq8CLun1MY0",
+          "https://youtu.be/AtoNg9-e3e4",
+          "https://youtu.be/ExGd7C0XYws",
+          "https://youtu.be/xT8Y3TQriPc",
+          "https://youtu.be/txcm0Sl06xk",
+          "https://youtu.be/p2tQoLPTL2M",
+          "https://youtu.be/LrM1hgZdI30",
+          "https://youtu.be/NNHj-PyInaQ"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "spring-cup-r8-2026",
+    "year": "R8年度",
+    "name": "日の出ホルモンスプリングカップ",
+    "venue": "生目中学校",
+    "matches": [
+      {
+        "id": "2026-04-05-1",
+        "date": "4/5",
+        "opponent": "EPSIRON",
+        "quarter": 4,
+        "ourScore": 42,
+        "theirScore": 58,
+        "videoUrls": [
+          "https://youtu.be/x-KdSLhQ8Dc",
+          "https://youtu.be/yNXvCS5ct6E",
+          "https://youtu.be/kEnQTipx08A",
+          "https://youtu.be/vLEDDNbTkDY"
+        ]
+      },
+      {
+        "id": "2026-04-05-2",
+        "date": "4/5",
+        "opponent": "赤江東中学校",
+        "quarter": 4,
+        "ourScore": 49,
+        "theirScore": 48,
+        "videoUrls": [
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "id": "2026-04-04-1",
+        "date": "4/4",
+        "opponent": "本郷中学校",
+        "quarter": 4,
+        "ourScore": 45,
+        "theirScore": 30,
+        "videoUrls": [
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "id": "2026-04-04-2",
+        "date": "4/4",
+        "opponent": "東海中学校",
+        "quarter": 4,
+        "ourScore": 49,
+        "theirScore": 32,
+        "videoUrls": [
+          "",
+          "",
+          "",
+          ""
+        ]
+      }
+    ]
+  }
+]
