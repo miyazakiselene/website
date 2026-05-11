@@ -105,39 +105,42 @@ export function News() {
           ))}
 
           <AnimatedSection animation="fadeInUp" delay={100 + currentNews.length * 100}>
-            <Collapsible className="rounded-2xl border border-border bg-background">
-              <CollapsibleTrigger className="group flex w-full items-center justify-center gap-4 px-6 py-5 text-center">
-                <div>
-                  <p className="text-lg font-bold text-foreground">過去のお知らせを見る</p>
-                </div>
-                <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="border-t border-border px-4 py-4 md:px-5">
-                  <p className="px-2 pb-4 text-sm text-muted-foreground">
-                    <Link
-                      href="https://www.instagram.com/2026.selene/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-primary underline-offset-4 hover:underline"
-                    >
-                      練習試合・合同練習・大会のお誘いはこちらにDMを下さい
-                    </Link>
-                  </p>
-                  {pastNews.length > 0 ? (
-                    <div className="grid gap-4">
-                      {pastNews.map((item) => (
-                        <NewsCard key={item.id} item={item} />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="px-2 py-3 text-sm text-muted-foreground">
-                      まだ過去のお知らせはありません。終了したらこの中へ移します。
-                    </p>
-                  )}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
+            <div className="space-y-4">
+              <Collapsible className="rounded-2xl border border-border bg-background">
+                <CollapsibleTrigger className="group flex w-full items-center justify-center gap-4 px-6 py-5 text-center">
+                  <div>
+                    <p className="text-lg font-bold text-foreground">過去のお知らせを見る</p>
+                  </div>
+                  <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="border-t border-border px-4 py-4 md:px-5">
+                    {pastNews.length > 0 ? (
+                      <div className="grid gap-4">
+                        {pastNews.map((item) => (
+                          <NewsCard key={item.id} item={item} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="px-2 py-3 text-sm text-muted-foreground">
+                        まだ過去のお知らせはありません。終了したらこの中へ移します。
+                      </p>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              <p className="px-2 text-sm text-muted-foreground">
+                <Link
+                  href="https://www.instagram.com/2026.selene/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  練習試合・合同練習・大会のお誘いはこちらにDMを下さい
+                </Link>
+              </p>
+            </div>
           </AnimatedSection>
         </div>
       </div>
