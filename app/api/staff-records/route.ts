@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import { NextResponse } from "next/server"
-import { normalizeMatchVideoUrls, type TournamentRecord } from "@/lib/staff-records"
+import { normalizeTournamentRecords, type TournamentRecord } from "@/lib/staff-records"
 
 export const runtime = "nodejs"
 
@@ -9,11 +9,7 @@ const DATA_DIR = path.join(process.cwd(), "data")
 const DATA_FILE = path.join(DATA_DIR, "staff-records.json")
 
 function normalizeRecords(records: TournamentRecord[]): TournamentRecord[] {
-  return records.map((record) => ({
-    ...record,
-    venue: record.venue ?? "",
-    matches: (record.matches ?? []).map((match) => normalizeMatchVideoUrls(match)),
-  }))
+  return normalizeTournamentRecords(records)
 }
 
 async function readRecordsFile(): Promise<TournamentRecord[]> {
