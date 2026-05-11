@@ -156,17 +156,28 @@ function defaultRecordsNormalized(): TournamentRecord[] {
   return sortStaffRecordsNewestFirst(normalized)
 }
 
-function loadInitialRecords() {
-  if (typeof window === "undefined") return defaultRecordsNormalized()
+function normalizeBaseRecords(records?: TournamentRecord[]): TournamentRecord[] {
+  if (!Array.isArray(records) || records.length === 0) return defaultRecordsNormalized()
+  return sortStaffRecordsNewestFirst(
+    records.map((record) => ({
+      ...record,
+      matches: record.matches.map((match) => normalizeMatchVideoUrls({ ...match })),
+    })),
+  )
+}
+
+function loadInitialRecords(initialRecords?: TournamentRecord[]) {
+  const baseRecords = normalizeBaseRecords(initialRecords)
+  if (typeof window === "undefined") return baseRecords
   const raw = window.localStorage.getItem(STAFF_RECORDS_STORAGE_KEY)
-  if (!raw) return defaultRecordsNormalized()
+  if (!raw) return baseRecords
   try {
     const parsed = JSON.parse(raw) as (TournamentRecord & {
       videoUrls?: string[]
       videoRowCount?: number
       videoUrl?: string
     })[]
-    if (!Array.isArray(parsed)) return defaultRecordsNormalized()
+    if (!Array.isArray(parsed)) return baseRecords
     const mapped = parsed.map((record) => {
       const legacyTournamentUrls = Array.isArray(record.videoUrls) ? [...record.videoUrls] : []
       const legacySingle =
@@ -193,21 +204,22 @@ function loadInitialRecords() {
     })
     return sortStaffRecordsNewestFirst(mapped)
   } catch {
-    return defaultRecordsNormalized()
+    return baseRecords
   }
 }
 
 type StaffResultsManagerProps = {
   /** 認証済みルート（/staff/results）では true。認証 UI を出さない */
   skipAuth?: boolean
+  initialRecords?: TournamentRecord[]
 }
 
-export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerProps) {
+export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffResultsManagerProps) {
   const [isUnlocked, setIsUnlocked] = useState(() => skipAuth === true)
   const [codeInput, setCodeInput] = useState("")
   const [authError, setAuthError] = useState("")
 
-  const [records, setRecords] = useState<TournamentRecord[]>(loadInitialRecords)
+  const [records, setRecords] = useState<TournamentRecord[]>(() => loadInitialRecords(initialRecords))
 
   const recordsOrdered = useMemo(() => sortStaffRecordsNewestFirst(records), [records])
 

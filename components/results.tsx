@@ -18,7 +18,6 @@ export type Match = {
   id: string
   date: string
   opponent: string
-  videoUrls?: string[]
 }
 
 export type Tournament = {
@@ -39,7 +38,6 @@ type StaffRecord = {
     id: string
     date: string
     opponent: string
-    videoUrls?: string[]
   }[]
 }
 
@@ -54,35 +52,17 @@ const fallbackTournaments: Tournament[] = [
         id: "2026-04-04-1",
         date: "4/4",
         opponent: "本郷中学校",
-        videoUrls: [
-          "https://youtu.be/ekqVSPBONEo",
-          "https://youtu.be/cF30aUAkoTs",
-          "https://youtu.be/Ro7SVwMZ-LE",
-          "https://youtu.be/sv5xeasue4w",
-        ],
       },
       {
         id: "2026-04-04-2",
         date: "4/4",
         opponent: "東海中学校",
-        videoUrls: [
-          "https://youtu.be/sv5xeasue4w",
-          "https://youtu.be/GFo-gB4DSmE",
-          "https://youtu.be/oEs-a4PVCVs",
-          "https://youtu.be/Y4TmTjS_QJs",
-        ],
       },
       { id: "2026-04-05-1", date: "4/5", opponent: "EPSIRON" },
       {
         id: "2026-04-05-2",
         date: "4/5",
         opponent: "赤江東中学校",
-        videoUrls: [
-          "https://www.youtube.com/watch?v=eIHmpeqeADQ",
-          "https://youtu.be/rp2YkmzBxZ0",
-          "https://youtu.be/I-LeuR86ajQ",
-          "https://youtu.be/sqNlNkGcwgM",
-        ],
       },
     ],
   },
@@ -157,11 +137,6 @@ const fallbackTournaments: Tournament[] = [
   },
 ]
 
-function normalizeVideoUrls(urls?: string[]): string[] {
-  if (!Array.isArray(urls)) return []
-  return urls.map((url) => (typeof url === "string" ? url.trim() : "")).filter((url) => url !== "")
-}
-
 function mapStaffRecords(records: StaffRecord[]): Tournament[] {
   return records.map((record) => ({
     id: record.id,
@@ -174,7 +149,6 @@ function mapStaffRecords(records: StaffRecord[]): Tournament[] {
           id: match.id,
           date: match.date,
           opponent: match.opponent,
-          videoUrls: normalizeVideoUrls(match.videoUrls),
         }))
       : [],
   }))
@@ -327,21 +301,6 @@ export function Results() {
                                     className="rounded-xl border border-border/50 bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground md:text-lg"
                                   >
                                     <p>{match.opponent}</p>
-                                    {match.videoUrls && match.videoUrls.length > 0 ? (
-                                      <div className="mt-2 flex flex-wrap gap-2">
-                                        {match.videoUrls.map((url, idx) => (
-                                          <a
-                                            key={`${match.id}-video-${idx}`}
-                                            href={url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center rounded-md border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary hover:border-primary/60 hover:bg-primary/10"
-                                          >
-                                            動画 {idx + 1}
-                                          </a>
-                                        ))}
-                                      </div>
-                                    ) : null}
                                   </li>
                                 ))}
                               </ul>

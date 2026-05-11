@@ -23,9 +23,16 @@ async function readRecordsFile(): Promise<TournamentRecord[]> {
   }
 }
 
+function stripVideoUrls(records: TournamentRecord[]): TournamentRecord[] {
+  return records.map((record) => ({
+    ...record,
+    matches: record.matches.map(({ videoUrls: _drop, ...match }) => match),
+  }))
+}
+
 export async function GET() {
   const records = await readRecordsFile()
-  return NextResponse.json({ records })
+  return NextResponse.json({ records: stripVideoUrls(records) })
 }
 
 export async function PUT(request: Request) {
