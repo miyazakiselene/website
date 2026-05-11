@@ -490,10 +490,6 @@ export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffR
           <Button className="w-full" onClick={unlock}>
             認証して入室
           </Button>
-          <p className="text-xs text-muted-foreground">
-            ※ 本番では `.env.production.local` または本番環境変数の
-            `NEXT_PUBLIC_STAFF_ACCESS_CODE` を必ず変更してください。
-          </p>
         </CardContent>
       </Card>
     )
