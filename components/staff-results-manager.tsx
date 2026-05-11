@@ -157,8 +157,13 @@ function loadInitialRecords() {
   }
 }
 
-export function StaffResultsManager() {
-  const [isUnlocked, setIsUnlocked] = useState(false)
+type StaffResultsManagerProps = {
+  /** 認証済みルート（/staff/results）では true。認証 UI を出さない */
+  skipAuth?: boolean
+}
+
+export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerProps) {
+  const [isUnlocked, setIsUnlocked] = useState(() => skipAuth === true)
   const [codeInput, setCodeInput] = useState("")
   const [authError, setAuthError] = useState("")
 
@@ -460,7 +465,7 @@ export function StaffResultsManager() {
     input?.focus()
   }
 
-  if (!isUnlocked) {
+  if (!isUnlocked && !skipAuth) {
     return (
       <Card className="max-w-lg mx-auto border-border bg-card">
         <CardHeader>

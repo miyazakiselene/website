@@ -3,11 +3,17 @@ import { BarChart3, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
+import { cn } from "@/lib/utils"
+
 const analyticsUrl = process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_URL?.trim() ?? ""
 
-export function StaffAnalyticsCallout() {
+type StaffAnalyticsCalloutProps = {
+  className?: string
+}
+
+export function StaffAnalyticsCallout({ className }: StaffAnalyticsCalloutProps) {
   return (
-    <Card className="mb-8 border-border bg-card">
+    <Card className={cn("mb-8 border-border bg-card", className)}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <BarChart3 className="h-5 w-5 text-primary" />

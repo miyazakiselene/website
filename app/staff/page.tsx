@@ -1,8 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-import { StaffAnalyticsCallout } from "@/components/staff-analytics-callout"
-import { StaffResultsManager } from "@/components/staff-results-manager"
+import { StaffEntry } from "@/components/staff-entry"
 
 export const metadata: Metadata = {
   title: "関係者専用 | 宮崎 SELENE",
@@ -15,31 +14,25 @@ export const metadata: Metadata = {
 
 export default function StaffPage() {
   return (
-    <main className="min-h-screen bg-background py-12">
-      <div className="container mx-auto px-4 max-w-5xl">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          トップページに戻る
-        </Link>
+    <>
+      <Link
+        href="/"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        トップページに戻る
+      </Link>
 
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3">
-            チーム関係者専用ページ
-          </h1>
-          <p className="text-muted-foreground leading-relaxed">
-            このページでは試合情報・対戦相手・点数の管理ができます。
-            <br />
-            公開ページには掲載しない内部情報の更新にご利用ください。
-          </p>
-        </header>
+      <header className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3">
+          チーム関係者専用ページ
+        </h1>
+        <p className="text-muted-foreground leading-relaxed">
+          アクセスコード認証後、試合結果の管理とアクセス分析用のダッシュボードをそれぞれ別ページから開けます。
+        </p>
+      </header>
 
-        <StaffAnalyticsCallout />
-
-        <StaffResultsManager />
-      </div>
-    </main>
+      <StaffEntry />
+    </>
   )
 }
