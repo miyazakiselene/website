@@ -237,7 +237,7 @@ export function Results() {
             Activity
           </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mt-3 mb-6">
-            大会参加・活動記録
+            活動記録
           </h2>
         </AnimatedSection>
 

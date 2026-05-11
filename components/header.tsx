@@ -20,7 +20,7 @@ const navItems = [
   { label: "ホーム", href: "#hero" },
   { label: "お知らせ", href: "#news" },
   { label: "チーム紹介", href: "#about" },
-  { label: "大会参加・活動記録", href: "#results" },
+  { label: "活動記録", href: "#results" },
   { label: "Instagram", href: "#instagram" },
   { label: "お問い合わせ", href: "#contact" },
   { label: "関係者専用", href: "/staff" },

@@ -578,7 +578,7 @@ export function StaffResultsManager({ skipAuth = false }: StaffResultsManagerPro
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-muted-foreground leading-relaxed">
           <p>
-            試合動画の URL は、まずこの端末のブラウザ（Safari など）に保存されます。公開サイトの「大会参加・活動記録」に同じリンクを出すには、リポジトリの{" "}
+            試合動画の URL は、まずこの端末のブラウザ（Safari など）に保存されます。公開サイトの「活動記録」に同じリンクを出すには、リポジトリの{" "}
             <code className="rounded bg-muted px-1 py-0.5 text-xs text-foreground">data/staff-records.json</code>{" "}
             としてデプロイに含める必要があります（本番サーバーだけへの保存は環境によっては永続しません）。
           </p>
