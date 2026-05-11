@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { StaffAnalyticsCallout } from "@/components/staff-analytics-callout"
+import { StaffAnalyticsPdfEmbed } from "@/components/staff-analytics-pdf-embed"
 import { StaffAnalyticsReports } from "@/components/staff-analytics-reports"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { StaffSessionGuard } from "@/components/staff-session-guard"
@@ -22,6 +23,7 @@ export default function StaffDashboardPage() {
         </p>
       </header>
       <StaffAnalyticsCallout className="mb-10" />
+      <StaffAnalyticsPdfEmbed />
       <StaffAnalyticsReports />
     </StaffSessionGuard>
   )

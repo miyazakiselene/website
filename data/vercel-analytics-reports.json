@@ -2,17 +2,18 @@
   "reports": [
     {
       "snapshotDate": "2026-05-11",
-      "dataPeriodLabel": "（PDF の「対象期間」表記に合わせて記入）",
+      "dataPeriodLabel": "PDF「website – Analytics – Vercel」に記載の分析期間と同じ",
       "documentTitle": "website – Analytics – Vercel",
       "kpis": [
-        { "label": "Visitors", "value": "—" },
-        { "label": "Page Views", "value": "—" },
-        { "label": "Bounce rate", "value": "—" }
+        { "label": "Visitors", "value": "※ PDF参照" },
+        { "label": "Page Views", "value": "※ PDF参照" },
+        { "label": "Bounce rate", "value": "※ PDF参照" }
       ],
       "topPages": [],
       "notes": [
-        "このファイル（data/vercel-analytics-reports.json）を、PDF「website – Analytics – Vercel」と同じ数値・並びに更新してください。",
-        "新しい PDF を取ったら `snapshotDate` をその日付にし、配列の先頭に新しいオブジェクトを追加すると一覧の上に表示されます。"
+        "上記 PDF は画像中心のため自動で数値を読み取れません。主要指標・ページ一覧は PDF 内の表示を正としてください。",
+        "テキストで残したい場合は、この JSON の値を PDF に合わせて手入力してください。",
+        "元ファイルは `public/reports/website-analytics-vercel.pdf` にあります（更新時は差し替えてデプロイ）。"
       ]
     }
   ]
