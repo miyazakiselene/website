@@ -1,10 +1,10 @@
 "use client"
 
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Script from "next/script"
 import { AnimatedSection } from "./animated-section"
 import { Button } from "@/components/ui/button"
-import { Instagram, ExternalLink, Sparkles } from "lucide-react"
+import { ChevronUp, ExternalLink, Instagram, Layers, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -23,7 +23,126 @@ function processInstagramEmbeds() {
   instgrm?.Embeds?.process()
 }
 
+function InstagramEmbedCell({ url }: { url: string }) {
+  return (
+    <div className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-background px-2 pt-2 shadow-sm">
+      <blockquote
+        className="instagram-media !m-0 !min-w-0 !max-w-none"
+        data-instgrm-permalink={url}
+        data-instgrm-version="14"
+        style={{
+          background: "#fff",
+          border: 0,
+          borderRadius: "16px",
+          margin: 0,
+          maxWidth: "100%",
+          minWidth: "0",
+          width: "100%",
+        }}
+      />
+    </div>
+  )
+}
+
+function MobileInstagramEmbedDeck({
+  urls,
+  expanded,
+  onExpand,
+  onCollapse,
+}: {
+  urls: string[]
+  expanded: boolean
+  onExpand: () => void
+  onCollapse: () => void
+}) {
+  const count = urls.length
+  if (count === 0) return null
+
+  const stackHeight = Math.min(380, 112 + Math.max(0, count - 1) * 26)
+
+  if (expanded) {
+    return (
+      <div className="space-y-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 motion-reduce:animate-none">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/80 bg-secondary/40 px-4 py-3">
+          <p className="text-sm font-semibold text-foreground">一覧表示</p>
+          <button
+            type="button"
+            onClick={onCollapse}
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted motion-reduce:transition-none"
+          >
+            <Layers className="h-4 w-4" aria-hidden />
+            カード表示に戻す
+          </button>
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          {urls.map((url, index) => (
+            <div
+              key={url}
+              className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-reduce:animate-none"
+              style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
+            >
+              <InstagramEmbedCell url={url} />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-md">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onExpand}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            onExpand()
+          }
+        }}
+        aria-expanded={false}
+        aria-label="Instagramの投稿を縦の一覧で表示する"
+        className="group relative w-full touch-manipulation rounded-2xl text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
+        style={{ height: stackHeight }}
+      >
+        {urls.map((url, index) => {
+          const depth = index
+          const z = 50 - depth
+          const top = 6 + depth * 13
+          const left = 5 + depth * 9
+          const rotate = -4.5 + depth * 2
+          return (
+            <div
+              key={url}
+              className="pointer-events-none absolute w-[calc(100%-10px)] max-w-[calc(100%-10px)] origin-top-left shadow-lg transition-[transform,box-shadow] duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:shadow-xl"
+              style={{
+                top,
+                left,
+                zIndex: z,
+                transform: `rotate(${rotate}deg)`,
+              }}
+            >
+              <InstagramEmbedCell url={url} />
+            </div>
+          )
+        })}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[60] flex justify-center rounded-b-2xl bg-gradient-to-t from-card via-card/90 to-transparent pb-3 pt-10"
+          aria-hidden
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-pink-500/35 bg-card/95 px-4 py-2 text-xs font-bold text-pink-600 shadow-sm backdrop-blur-sm dark:text-pink-400">
+            <ChevronUp className="h-4 w-4 motion-safe:animate-bounce motion-reduce:animate-none" />
+            タップで一覧表示
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function InstagramFeed({ embedPostUrls = [] }: InstagramFeedProps) {
+  const [mobileDeckExpanded, setMobileDeckExpanded] = useState(false)
   const visibleEmbedPostUrls = embedPostUrls.slice(0, MAX_VISIBLE_INSTAGRAM_POSTS)
   const hasEmbeds = visibleEmbedPostUrls.length > 0
   const embedTimersRef = useRef<number[]>([])
@@ -45,7 +164,7 @@ export function InstagramFeed({ embedPostUrls = [] }: InstagramFeedProps) {
     if (!hasEmbeds) return
     scheduleEmbedProcessing()
     return () => clearEmbedTimers()
-  }, [clearEmbedTimers, hasEmbeds, scheduleEmbedProcessing, visibleEmbedPostUrls])
+  }, [clearEmbedTimers, hasEmbeds, mobileDeckExpanded, scheduleEmbedProcessing, visibleEmbedPostUrls])
 
   return (
     <section id="instagram" className="py-24 md:py-32 relative overflow-hidden">
@@ -100,7 +219,11 @@ export function InstagramFeed({ embedPostUrls = [] }: InstagramFeedProps) {
                   </div>
                   <h3 className="text-2xl font-bold text-foreground">@2026.selene</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    最新の9件だけをグリッド表示しています。
+                    最新の9件だけを表示しています。
+                    <span className="mt-1 block md:hidden">
+                      スマホでは投稿をカードのように重ね、タップで縦の一覧に切り替わります。
+                    </span>
+                    <span className="mt-1 hidden md:inline"> PC ではグリッド表示です。</span>
                   </p>
                 </div>
               </div>
@@ -118,29 +241,21 @@ export function InstagramFeed({ embedPostUrls = [] }: InstagramFeedProps) {
             </div>
 
             {hasEmbeds ? (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {visibleEmbedPostUrls.map((url) => (
-                  <div
-                    key={url}
-                    className="overflow-hidden rounded-[1.5rem] border border-border/60 bg-background px-2 pt-2 shadow-sm"
-                  >
-                    <blockquote
-                      className="instagram-media !m-0 !min-w-0 !max-w-none"
-                      data-instgrm-permalink={url}
-                      data-instgrm-version="14"
-                      style={{
-                        background: "#fff",
-                        border: 0,
-                        borderRadius: "16px",
-                        margin: 0,
-                        maxWidth: "100%",
-                        minWidth: "0",
-                        width: "100%",
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
+              <>
+                <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-3">
+                  {visibleEmbedPostUrls.map((url) => (
+                    <InstagramEmbedCell key={url} url={url} />
+                  ))}
+                </div>
+                <div className="md:hidden">
+                  <MobileInstagramEmbedDeck
+                    urls={visibleEmbedPostUrls}
+                    expanded={mobileDeckExpanded}
+                    onExpand={() => setMobileDeckExpanded(true)}
+                    onCollapse={() => setMobileDeckExpanded(false)}
+                  />
+                </div>
+              </>
             ) : (
               <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-border/70 bg-background/70 px-6 py-10 text-center md:min-h-[560px]">
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
