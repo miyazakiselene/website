@@ -15,39 +15,41 @@ export function StaffHub() {
       </p>
 
       <div className="flex flex-col gap-10 md:gap-12">
-        <Card className="border-border bg-card overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
-              <ClipboardList className="h-6 w-6 text-primary" />
-              試合結果
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              大会・試合の記録、得点、試合動画URLの登録・編集を行います。
-            </p>
-            <Button asChild className="w-full sm:w-auto">
-              <Link href="/staff/results">試合結果のページへ</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-6">
+          <Card className="border-border bg-card overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                <ClipboardList className="h-6 w-6 text-primary" />
+                試合結果
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                大会・試合の記録、得点、試合動画URLの登録・編集を行います。
+              </p>
+              <Button asChild className="w-full sm:w-auto">
+                <Link href="/staff/results">試合結果のページへ</Link>
+              </Button>
+            </CardContent>
+          </Card>
 
-        <Card className="border-border bg-card overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
-              <Images className="h-6 w-6 text-primary" />
-              チーム紹介画像
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              チーム紹介セクションに表示する写真のアップロードと削除を行います。
-            </p>
-            <Button asChild variant="secondary" className="w-full sm:w-auto">
-              <Link href="/admin/team-images">画像管理ページへ</Link>
-            </Button>
-          </CardContent>
-        </Card>
+          <Card className="border-border bg-card overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                <Images className="h-6 w-6 text-primary" />
+                チーム紹介画像
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                チーム紹介セクションに表示する写真のアップロードと削除を行います。
+              </p>
+              <Button asChild variant="secondary" className="w-full sm:w-auto">
+                <Link href="/admin/team-images">画像管理ページへ</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
 
         <Card className="border-border bg-card overflow-hidden">
           <CardHeader className="pb-2">
