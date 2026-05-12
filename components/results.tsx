@@ -1,18 +1,12 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { Calendar, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { AnimatedSection } from "@/components/animated-section"
-import {
-  inferCalendarYearFromYearLabel,
-  publicTournamentCalendarYear,
-  sortMatchesNewestFirst,
-  sortSlashDateStringsDesc,
-  sortTournamentsNewestFirst,
-} from "@/lib/activity-records-sort"
+import { sortMatchesNewestFirst, sortTournamentsNewestFirst } from "@/lib/activity-records-sort"
 
 export type Match = {
   id: string
@@ -29,17 +23,8 @@ export type Tournament = {
   matches: Match[]
 }
 
-type StaffRecord = {
-  id: string
-  year: string
-  name: string
-  venue?: string
-  matches: {
-    id: string
-    date: string
-    opponent: string
-  }[]
-}
+const MAX_VISIBLE_RESULTS = 6
+const MAX_VISIBLE_MATCHES_PER_CARD = 6
 
 const fallbackTournaments: Tournament[] = [
   {
@@ -137,23 +122,6 @@ const fallbackTournaments: Tournament[] = [
   },
 ]
 
-function mapStaffRecords(records: StaffRecord[]): Tournament[] {
-  return records.map((record) => ({
-    id: record.id,
-    period: record.year,
-    year: record.year,
-    name: record.name,
-    venue: record.venue ?? "",
-    matches: Array.isArray(record.matches)
-      ? record.matches.map((match) => ({
-          id: match.id,
-          date: match.date,
-          opponent: match.opponent,
-        }))
-      : [],
-  }))
-}
-
 function BasketballIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 100 100" className={className} fill="currentColor">
@@ -166,60 +134,88 @@ function BasketballIcon({ className }: { className?: string }) {
   )
 }
 
-function groupMatchesByDate(
-  matches: Match[],
-  tournament: { id: string; period: string; year?: string },
-): { date: string; matches: Match[] }[] {
-  const year =
-    (tournament.year ? inferCalendarYearFromYearLabel(tournament.year) : null) ??
-    publicTournamentCalendarYear(tournament)
-  const order: string[] = []
-  const map = new Map<string, Match[]>()
-  for (const m of matches) {
-    if (!map.has(m.date)) {
-      order.push(m.date)
-      map.set(m.date, [])
-    }
-    map.get(m.date)!.push(m)
-  }
-  const datesDesc = sortSlashDateStringsDesc(order, year)
-  return datesDesc.map((date) => ({ date, matches: map.get(date)! }))
+function ResultsCard({ tournament }: { tournament: Tournament }) {
+  const visibleMatches = tournament.matches.slice(0, MAX_VISIBLE_MATCHES_PER_CARD)
+  const hiddenMatchesCount = Math.max(0, tournament.matches.length - visibleMatches.length)
+
+  return (
+    <Card className="h-full border-border bg-card transition-all duration-300 hover:border-primary/30">
+      <CardContent className="flex h-full min-h-[340px] flex-col p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15">
+            <Calendar className="h-6 w-6 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4 shrink-0" />
+              <span>{tournament.period}</span>
+            </div>
+            <h3 className="line-clamp-2 text-lg font-bold text-foreground md:text-xl">{tournament.name}</h3>
+            {tournament.venue ? (
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4 shrink-0" />
+                <span className="line-clamp-1">{tournament.venue}</span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-1 flex-col">
+          <p className="mb-3 text-sm font-semibold text-foreground">対戦相手</p>
+          {visibleMatches.length > 0 ? (
+            <ul className="grid gap-2">
+              {visibleMatches.map((match) => (
+                <li
+                  key={match.id}
+                  className="flex items-start gap-3 rounded-xl border border-border/60 bg-secondary/30 px-3 py-2"
+                >
+                  <Badge variant="outline" className="shrink-0 border-primary/30 text-primary">
+                    {match.date}
+                  </Badge>
+                  <p className="min-w-0 text-sm font-medium text-foreground md:text-base">
+                    {match.opponent}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="rounded-xl border border-dashed border-border/70 px-4 py-5 text-sm text-muted-foreground">
+              対戦情報を準備中です。
+            </div>
+          )}
+
+          {hiddenMatchesCount > 0 ? (
+            <p className="mt-auto pt-4 text-sm text-muted-foreground">
+              ほか {hiddenMatchesCount} 試合は活動記録内に含まれています。
+            </p>
+          ) : null}
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
-export function Results() {
-  const [tournaments, setTournaments] = useState<Tournament[]>(fallbackTournaments)
+type ResultsProps = {
+  initialTournaments?: Tournament[]
+}
 
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const res = await fetch("/api/staff-records", { cache: "no-store" })
-        if (!res.ok) return
-        const data = (await res.json()) as { records?: StaffRecord[] }
-        if (cancelled) return
-        if (Array.isArray(data.records) && data.records.length > 0) {
-          setTournaments(mapStaffRecords(data.records))
-        }
-      } catch {
-        // APIが使えない場合はfallbackTournamentsを表示
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+export function Results({ initialTournaments }: ResultsProps) {
+  const displayTournaments: Tournament[] = useMemo(() => {
+    const source =
+      initialTournaments != null && initialTournaments.length > 0 ? initialTournaments : fallbackTournaments
 
-  const displayTournaments: Tournament[] = useMemo(
-    () =>
-      sortTournamentsNewestFirst(tournaments).map((t) => ({
-        ...t,
-        matches: sortMatchesNewestFirst(
-          t.matches,
-          t.year ? { id: t.id, year: t.year } : { id: t.id, period: t.period },
-        ),
-      })),
-    [tournaments],
-  )
+    return sortTournamentsNewestFirst(source).map((tournament) => ({
+      ...tournament,
+      matches: sortMatchesNewestFirst(
+        tournament.matches,
+        tournament.year
+          ? { id: tournament.id, year: tournament.year }
+          : { id: tournament.id, period: tournament.period },
+      ),
+    }))
+  }, [initialTournaments])
+  const visibleTournaments = displayTournaments.slice(0, MAX_VISIBLE_RESULTS)
+  const archivedTournaments = displayTournaments.slice(MAX_VISIBLE_RESULTS)
 
   return (
     <section id="results" className="py-24 md:py-32 bg-background relative overflow-hidden">
@@ -251,74 +247,36 @@ export function Results() {
           </p>
         </AnimatedSection>
 
-        {/* Tournament Results */}
-        <div className="max-w-4xl mx-auto space-y-8">
-          {displayTournaments.map((tournament) => (
-            <AnimatedSection key={tournament.id} animation="scaleIn" delay={100}>
-              <Card className="bg-card border-border overflow-hidden hover:border-primary/30 transition-all duration-300">
-                <CardContent className="p-0">
-                  <Collapsible className="group" defaultOpen={false}>
-                    <CollapsibleTrigger className="flex w-full items-center gap-4 border-b border-border bg-secondary/50 p-6 text-left outline-none transition-colors hover:bg-secondary/65 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 md:gap-5 md:p-8">
-                      <div className="flex min-w-0 flex-1 items-start gap-4 md:gap-5">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/20 animate-pulse md:h-16 md:w-16">
-                          <Calendar className="h-7 w-7 text-primary md:h-8 md:w-8" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-2 flex items-center gap-2 text-base text-muted-foreground">
-                            <Calendar className="h-5 w-5 shrink-0" />
-                            {tournament.period}
-                          </div>
-                          <h3 className="text-xl font-bold text-foreground md:text-2xl lg:text-3xl">
-                            {tournament.name}
-                          </h3>
-                          {tournament.venue ? (
-                            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                              <MapPin className="h-4 w-4 shrink-0" />
-                              {tournament.venue}
-                            </div>
-                          ) : null}
-                          <p className="sr-only">タップまたは Enter で試合の対戦相手一覧を開きます</p>
-                        </div>
-                      </div>
-                      <ChevronDown className="h-6 w-6 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                    </CollapsibleTrigger>
+        <div className="mx-auto max-w-6xl space-y-8">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {visibleTournaments.map((tournament, index) => (
+              <AnimatedSection key={tournament.id} animation="scaleIn" delay={100 + index * 50}>
+                <ResultsCard tournament={tournament} />
+              </AnimatedSection>
+            ))}
+          </div>
 
-                    <CollapsibleContent>
-                      <div className="p-6 md:p-8">
-                        <div className="space-y-8">
-                          {groupMatchesByDate(tournament.matches, {
-                            id: tournament.id,
-                            period: tournament.period,
-                          }).map(({ date, matches }) => (
-                            <div key={`${tournament.id}-${date}`}>
-                              <div className="mb-3 flex flex-wrap items-center gap-3">
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs md:text-sm px-3 py-1 border-primary/30 text-primary"
-                                >
-                                  {date}
-                                </Badge>
-                              </div>
-                              <ul className="grid gap-2 md:gap-3">
-                                {matches.map((match) => (
-                                  <li
-                                    key={match.id}
-                                    className="rounded-xl border border-border/50 bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground md:text-lg"
-                                  >
-                                    <p>{match.opponent}</p>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                </CardContent>
-              </Card>
+          {archivedTournaments.length > 0 ? (
+            <AnimatedSection animation="fadeInUp" delay={180}>
+              <Collapsible className="rounded-2xl border border-border bg-card">
+                <CollapsibleTrigger className="group flex w-full items-center justify-center gap-4 px-6 py-5 text-center">
+                  <p className="text-lg font-bold text-foreground">過去の活動記録を見る</p>
+                  <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="border-t border-border px-4 py-5 md:px-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                      {archivedTournaments.map((tournament, index) => (
+                        <AnimatedSection key={tournament.id} animation="fadeInUp" delay={80 + index * 40}>
+                          <ResultsCard tournament={tournament} />
+                        </AnimatedSection>
+                      ))}
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </AnimatedSection>
-          ))}
+          ) : null}
         </div>
       </div>
     </section>
