@@ -11,6 +11,7 @@ import {
 import {
   deleteManagedTeamImage,
   uploadManagedTeamImages,
+  updateManagedTeamImageDescription,
 } from "@/lib/team-images"
 
 function buildRedirectUrl(params: Record<string, string | undefined>): string {
@@ -89,4 +90,28 @@ export async function deleteTeamImageAction(formData: FormData): Promise<void> {
   revalidatePath("/")
   revalidatePath("/admin/team-images")
   redirectWithState({ message: "画像を削除しました。" })
+}
+
+export async function updateTeamImageDescriptionAction(formData: FormData): Promise<void> {
+  if (!(await isAdminSessionAuthenticated())) {
+    redirectWithState({ error: "再度ログインしてください。" })
+  }
+
+  const imageId = String(formData.get("imageId") ?? "").trim()
+  const description = String(formData.get("description") ?? "")
+
+  if (imageId.length === 0) {
+    redirectWithState({ error: "更新対象の画像IDが不正です。" })
+  }
+
+  try {
+    await updateManagedTeamImageDescription(imageId, description)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "画像説明の更新に失敗しました。"
+    redirectWithState({ error: message })
+  }
+
+  revalidatePath("/")
+  revalidatePath("/admin/team-images")
+  redirectWithState({ message: "画像説明を更新しました。" })
 }

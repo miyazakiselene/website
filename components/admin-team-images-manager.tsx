@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
   Images,
   LogOut,
+  Save,
   Trash2,
   Upload,
 } from "lucide-react"
@@ -15,6 +16,7 @@ import {
   deleteTeamImageAction,
   logoutAdminAction,
   uploadTeamImagesAction,
+  updateTeamImageDescriptionAction,
 } from "@/app/admin/team-images/actions"
 import type { ManagedTeamImage } from "@/lib/team-images"
 import type { TeamGalleryPhoto } from "@/lib/team-gallery-defaults"
@@ -51,16 +53,18 @@ function FormSubmitButton({
   pendingLabel,
   variant,
   disabled,
+  size,
 }: {
   children: React.ReactNode
   pendingLabel: string
   variant?: "default" | "outline" | "secondary" | "destructive"
   disabled?: boolean
+  size?: "default" | "sm" | "lg" | "icon"
 }) {
   const { pending } = useFormStatus()
 
   return (
-    <Button type="submit" variant={variant} disabled={disabled || pending}>
+    <Button type="submit" variant={variant} size={size} disabled={disabled || pending}>
       {pending ? pendingLabel : children}
     </Button>
   )
@@ -249,11 +253,27 @@ export function AdminTeamImagesManager({
                   </div>
                   <div className="space-y-4 p-4">
                     <div>
-                      <p className="text-sm font-semibold text-foreground">{image.description}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {new Date(image.uploadedAt).toLocaleString("ja-JP")}
                       </p>
                     </div>
+                    <form action={updateTeamImageDescriptionAction} className="space-y-2">
+                      <input type="hidden" name="imageId" value={image.id} />
+                      <Label htmlFor={`team-image-description-${image.id}`}>画像説明</Label>
+                      <Input
+                        id={`team-image-description-${image.id}`}
+                        name="description"
+                        defaultValue={image.description}
+                        maxLength={120}
+                      />
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        公開ページの画像説明として使われます。
+                      </p>
+                      <FormSubmitButton pendingLabel="保存中…" variant="secondary" size="sm">
+                        <Save className="h-4 w-4" />
+                        説明を保存
+                      </FormSubmitButton>
+                    </form>
                     <DeleteImageDialog imageId={image.id} description={image.description} />
                   </div>
                 </div>

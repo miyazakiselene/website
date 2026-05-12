@@ -285,6 +285,35 @@ export async function uploadManagedTeamImages(files: File[], rawDescriptions: st
   }
 }
 
+export async function updateManagedTeamImageDescription(
+  imageId: string,
+  rawDescription: string,
+): Promise<void> {
+  const description = rawDescription.trim()
+  if (description.length === 0) {
+    throw new Error("画像説明を入力してください。")
+  }
+
+  const state = await readManagedTeamImages()
+  const target = state.images.find((image) => image.id === imageId)
+
+  if (target == null) {
+    throw new Error("更新対象の画像が見つかりませんでした。")
+  }
+
+  await writeManifest(
+    state.images.map((image) =>
+      image.id === imageId
+        ? {
+            ...image,
+            description,
+          }
+        : image,
+    ),
+    state.hiddenDefaultImageIds,
+  )
+}
+
 export async function deleteManagedTeamImage(imageId: string): Promise<void> {
   const token = getBlobReadWriteToken()
 
