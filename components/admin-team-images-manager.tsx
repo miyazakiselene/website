@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom"
 import {
   AlertTriangle,
   ImagePlus,
+  Image as ImageIcon,
   Images,
   LogOut,
   Trash2,
@@ -40,6 +41,7 @@ type AdminTeamImagesManagerProps = {
   error?: string
   storageReady: boolean
   usingFallbackGallery: boolean
+  showingManagedGallery: boolean
 }
 
 function FormSubmitButton({
@@ -101,6 +103,7 @@ export function AdminTeamImagesManager({
   error,
   storageReady,
   usingFallbackGallery,
+  showingManagedGallery,
 }: AdminTeamImagesManagerProps) {
   return (
     <div className="space-y-8">
@@ -155,6 +158,16 @@ export function AdminTeamImagesManager({
         </Alert>
       ) : null}
 
+      {showingManagedGallery ? (
+        <Alert>
+          <ImageIcon />
+          <AlertTitle>現在は管理画像を表示中です</AlertTitle>
+          <AlertDescription>
+            公開ページのチーム紹介セクションでは、アップロード済みの管理画像を表示しています。
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
@@ -163,7 +176,7 @@ export function AdminTeamImagesManager({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={uploadTeamImagesAction} className="space-y-5">
+          <form action={uploadTeamImagesAction} className="space-y-5" encType="multipart/form-data">
             <div className="space-y-2">
               <Label htmlFor="team-images-upload">画像ファイル</Label>
               <Input

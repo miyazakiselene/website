@@ -25,8 +25,9 @@ type TeamImageManifest = {
   images: ManagedTeamImage[]
 }
 
-type ManagedTeamImageState = {
-  configured: boolean
+export type ManagedTeamImageState = {
+  storageReady: boolean
+  hasManagedImages: boolean
   images: ManagedTeamImage[]
 }
 
@@ -34,8 +35,9 @@ export function isTeamImageStorageConfigured(): boolean {
   return (process.env.BLOB_READ_WRITE_TOKEN ?? "").trim().length > 0
 }
 
-function ensureBlobStorageConfigured(): void {
-  if (isTeamImageStorageConfigured()) return
+function getBlobReadWriteToken(): string {
+  const token = (process.env.BLOB_READ_WRITE_TOKEN ?? "").trim()
+  if (token.length > 0) return token
   throw new Error("BLOB_READ_WRITE_TOKEN が未設定です。Vercel Blob の読み書きトークンを設定してください。")
 }
 
@@ -108,31 +110,36 @@ function buildDescriptions(files: File[], rawInput: string): string[] {
 }
 
 async function writeManifest(images: ManagedTeamImage[]): Promise<void> {
-  ensureBlobStorageConfigured()
+  const token = getBlobReadWriteToken()
 
   await put(TEAM_IMAGE_MANIFEST_PATH, JSON.stringify(buildManifest(images), null, 2), {
     access: "public",
     addRandomSuffix: false,
     contentType: "application/json; charset=utf-8",
+    token,
   })
 }
 
 export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
   if (!isTeamImageStorageConfigured()) {
-    return { configured: false, images: [] }
+    return { storageReady: false, hasManagedImages: false, images: [] }
   }
 
   try {
-    const { blobs } = await list({ prefix: TEAM_IMAGE_MANIFEST_PATH, limit: 10 })
+    const { blobs } = await list({
+      prefix: TEAM_IMAGE_MANIFEST_PATH,
+      limit: 10,
+      token: getBlobReadWriteToken(),
+    })
     const manifestBlob = blobs.find((blob) => blob.pathname === TEAM_IMAGE_MANIFEST_PATH)
 
     if (manifestBlob == null) {
-      return { configured: false, images: [] }
+      return { storageReady: true, hasManagedImages: false, images: [] }
     }
 
     const response = await fetch(manifestBlob.url, { cache: "no-store" })
     if (!response.ok) {
-      return { configured: false, images: [] }
+      return { storageReady: true, hasManagedImages: false, images: [] }
     }
 
     const parsed = (await response.json()) as Partial<TeamImageManifest>
@@ -142,9 +149,9 @@ export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
           .filter((value): value is ManagedTeamImage => value !== null)
       : []
 
-    return { configured: true, images }
+    return { storageReady: true, hasManagedImages: images.length > 0, images }
   } catch {
-    return { configured: false, images: [] }
+    return { storageReady: true, hasManagedImages: false, images: [] }
   }
 }
 
@@ -154,7 +161,7 @@ export async function getPublicTeamGallery(): Promise<{
 }> {
   const state = await readManagedTeamImages()
 
-  if (state.images.length > 0) {
+  if (state.hasManagedImages) {
     return {
       photos: state.images.map((image) => ({
         id: image.id,
@@ -165,21 +172,14 @@ export async function getPublicTeamGallery(): Promise<{
     }
   }
 
-  if (!state.configured) {
-    return {
-      photos: DEFAULT_TEAM_GALLERY_PHOTOS,
-      usingFallbackGallery: true,
-    }
-  }
-
   return {
-    photos: [],
-    usingFallbackGallery: false,
+    photos: DEFAULT_TEAM_GALLERY_PHOTOS,
+    usingFallbackGallery: true,
   }
 }
 
 export async function uploadManagedTeamImages(files: File[], rawDescriptions: string): Promise<number> {
-  ensureBlobStorageConfigured()
+  const token = getBlobReadWriteToken()
 
   if (files.length === 0) {
     throw new Error("アップロードする画像を1枚以上選択してください。")
@@ -206,6 +206,7 @@ export async function uploadManagedTeamImages(files: File[], rawDescriptions: st
           access: "public",
           addRandomSuffix: true,
           contentType: file.type,
+          token,
         },
       )
 
@@ -222,14 +223,14 @@ export async function uploadManagedTeamImages(files: File[], rawDescriptions: st
     return uploadedImages.length
   } catch (error) {
     if (uploadedImages.length > 0) {
-      await Promise.allSettled(uploadedImages.map((image) => del(image.url)))
+      await Promise.allSettled(uploadedImages.map((image) => del(image.url, { token })))
     }
     throw error
   }
 }
 
 export async function deleteManagedTeamImage(imageId: string): Promise<void> {
-  ensureBlobStorageConfigured()
+  const token = getBlobReadWriteToken()
 
   const state = await readManagedTeamImages()
   const target = state.images.find((image) => image.id === imageId)
@@ -238,6 +239,6 @@ export async function deleteManagedTeamImage(imageId: string): Promise<void> {
     throw new Error("削除対象の画像が見つかりませんでした。")
   }
 
-  await del(target.url)
+  await del(target.url, { token })
   await writeManifest(state.images.filter((image) => image.id !== imageId))
 }
