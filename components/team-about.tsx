@@ -72,14 +72,16 @@ export function TeamAbout({ galleryPhotos }: TeamAboutProps) {
                 {galleryPhotos.map((photo) => (
                   <div
                     key={photo.id}
-                    className="relative w-[min(100vw-3rem,20rem)] shrink-0 snap-center aspect-[320/224] overflow-hidden rounded-2xl group md:w-full"
+                    className="relative w-[min(100vw-3rem,20rem)] shrink-0 snap-center aspect-[320/224] overflow-hidden rounded-2xl border border-border/60 bg-background group md:w-full"
                   >
-                    <Image
-                      src={photo.src}
-                      alt={photo.alt}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+                    <div className="absolute inset-3">
+                      <Image
+                        src={photo.src}
+                        alt={photo.alt}
+                        fill
+                        className="object-contain transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     <div className="absolute bottom-4 left-4 max-w-[90%] text-sm font-semibold text-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:text-base">
                       {photo.alt}

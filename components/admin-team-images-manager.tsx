@@ -253,12 +253,14 @@ export function AdminTeamImagesManager({
                         className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm"
                       >
                         <div className="relative aspect-[4/3] bg-muted/40">
-                          <Image
-                            src={image.src}
-                            alt={image.alt}
-                            fill
-                            className="object-cover"
-                          />
+                          <div className="absolute inset-3">
+                            <Image
+                              src={image.src}
+                              alt={image.alt}
+                              fill
+                              className="object-contain"
+                            />
+                          </div>
                         </div>
                         <div className="space-y-3 p-4">
                           <div>
@@ -296,12 +298,14 @@ export function AdminTeamImagesManager({
                         className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm"
                       >
                         <div className="relative aspect-[4/3] bg-muted/40">
-                          <Image
-                            src={image.url}
-                            alt={image.description}
-                            fill
-                            className="object-cover"
-                          />
+                          <div className="absolute inset-3">
+                            <Image
+                              src={image.url}
+                              alt={image.description}
+                              fill
+                              className="object-contain"
+                            />
+                          </div>
                         </div>
                         <div className="space-y-4 p-4">
                           <div>
