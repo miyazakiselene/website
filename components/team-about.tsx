@@ -4,6 +4,7 @@ import { Heart, Target, Award, Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 import { AnimatedSection } from "@/components/animated-section"
+import type { TeamGalleryPhoto } from "@/lib/team-gallery-defaults"
 
 const goals = [
   {
@@ -36,62 +37,11 @@ const staff = [
   },
 ]
 
-type GalleryPhoto = { id: string; src: string; alt: string }
+type TeamAboutProps = {
+  galleryPhotos: TeamGalleryPhoto[]
+}
 
-const photoGallerySource: GalleryPhoto[] = [
-  {
-    id: "team-01",
-    src: "/images/team-gallery/team-01-timeout.png",
-    alt: "タイムアウト中のミーティング",
-  },
-  {
-    id: "team-02",
-    src: "/images/team-gallery/team-02-practice.png",
-    alt: "練習の様子",
-  },
-  {
-    id: "team-03",
-    src: "/images/team-gallery/team-03-ceremony.png",
-    alt: "式典・会場の様子",
-  },
-  {
-    id: "team-04",
-    src: "/images/team-gallery/team-04-lunch.png",
-    alt: "チームでの昼食の時間",
-  },
-  {
-    id: "team-05",
-    src: "/images/team-gallery/team-05-group.png",
-    alt: "チーム集合写真",
-  },
-  {
-    id: "team-06",
-    src: "/images/team-gallery/team-06-scrimmage-group.png",
-    alt: "先輩との最後の集合写真",
-  },
-  {
-    id: "team-07",
-    src: "/images/team-gallery/team-07-dribble.png",
-    alt: "ドリブルで切り込むプレー",
-  },
-  {
-    id: "team-08",
-    src: "/images/team-gallery/team-08-jumpball.png",
-    alt: "ジャンプボールの写真",
-  },
-  {
-    id: "team-09",
-    src: "/images/team-gallery/team-09-drive.png",
-    alt: "ディフェンスを抜くドライブ",
-  },
-  {
-    id: "team-10",
-    src: "/images/team-gallery/team-10-lineup.png",
-    alt: "コートで並ぶ選手たち",
-  },
-]
-
-export function TeamAbout() {
+export function TeamAbout({ galleryPhotos }: TeamAboutProps) {
   return (
     <section id="about" className="py-24 md:py-32 bg-card overflow-hidden">
       <div className="container mx-auto px-4">
@@ -112,31 +62,49 @@ export function TeamAbout() {
 
         {/* Photo Gallery */}
         <AnimatedSection className="mb-20" animation="fadeIn" delay={200}>
-          <div className="relative -mx-4 px-4 md:mx-0 md:px-0">
-            <div
-              className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:grid md:grid-cols-2 md:overflow-visible md:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
-              role="list"
-              aria-label="チーム写真ギャラリー（スマホは横にスワイプできます）"
-            >
-            {photoGallerySource.map((photo) => (
+          {galleryPhotos.length > 0 ? (
+            <div className="relative -mx-4 px-4 md:mx-0 md:px-0">
+              <div
+                className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 touch-pan-x [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:grid md:grid-cols-2 md:overflow-visible md:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
+                role="list"
+                aria-label="チーム写真ギャラリー（スマホは横にスワイプできます）"
+              >
+                {galleryPhotos.map((photo) => (
+                  <div
+                    key={photo.id}
+                    className="relative w-[min(100vw-3rem,20rem)] shrink-0 snap-center aspect-[320/224] overflow-hidden rounded-2xl group md:w-full"
+                  >
+                    <Image
+                      src={photo.src}
+                      alt={photo.alt}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute bottom-4 left-4 max-w-[90%] text-sm font-semibold text-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:text-base">
+                      {photo.alt}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, index) => (
                 <div
-                  key={photo.id}
-                  className="relative w-[min(100vw-3rem,20rem)] shrink-0 snap-center aspect-[320/224] rounded-2xl overflow-hidden group md:w-full"
+                  key={`team-gallery-placeholder-${index}`}
+                  className="flex aspect-[320/224] items-center justify-center rounded-2xl border border-dashed border-border bg-muted/20 p-6 text-center"
                 >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-4 left-4 max-w-[90%] text-sm font-semibold text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:text-base">
-                    {photo.alt}
+                  <div>
+                    <p className="font-semibold text-foreground">チーム紹介画像を準備中です</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      管理画面からアップロードするとここに表示されます。
+                    </p>
                   </div>
                 </div>
-            ))}
+              ))}
             </div>
-          </div>
+          )}
         </AnimatedSection>
 
         {/* Mission */}

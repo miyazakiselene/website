@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { BarChart3, ClipboardList, ScrollText } from "lucide-react"
+import { BarChart3, ClipboardList, Images, ScrollText } from "lucide-react"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -28,6 +28,23 @@ export function StaffHub() {
             </p>
             <Button asChild className="w-full sm:w-auto">
               <Link href="/staff/results">試合結果のページへ</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border bg-card overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+              <Images className="h-6 w-6 text-primary" />
+              チーム紹介画像
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              チーム紹介セクションに表示する写真のアップロードと削除を行います。
+            </p>
+            <Button asChild variant="secondary" className="w-full sm:w-auto">
+              <Link href="/admin/team-images">画像管理ページへ</Link>
             </Button>
           </CardContent>
         </Card>

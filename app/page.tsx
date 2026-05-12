@@ -12,6 +12,7 @@ import { ClientOnly } from "@/components/client-only"
 import { Sponsors } from "@/components/sponsors"
 import { Footer } from "@/components/footer"
 import { parseInstagramEmbedPostUrlsFromEnv } from "@/lib/instagram-embed"
+import { getPublicTeamGallery } from "@/lib/team-images"
 
 /** 本番で環境変数を更新しても反映されやすいよう、リクエスト時に読む */
 export const dynamic = "force-dynamic"
@@ -75,6 +76,7 @@ export default async function HomePage() {
       MAX_VISIBLE_INSTAGRAM_POSTS,
     )
   const initialPublicResults = await readInitialPublicResults()
+  const { photos: teamGalleryPhotos } = await getPublicTeamGallery()
 
   return (
     <main className="min-h-screen">
@@ -83,7 +85,7 @@ export default async function HomePage() {
       </ClientOnly>
       <Hero />
       <News />
-      <TeamAbout />
+      <TeamAbout galleryPhotos={teamGalleryPhotos} />
       <Results initialTournaments={initialPublicResults} />
       <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
       <RelatedLinks />
