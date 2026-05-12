@@ -139,6 +139,7 @@ async function writeManifest(
   await put(TEAM_IMAGE_MANIFEST_PATH, JSON.stringify(buildManifest(images, hiddenDefaultImageIds), null, 2), {
     access: "public",
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: "application/json; charset=utf-8",
     token,
   })

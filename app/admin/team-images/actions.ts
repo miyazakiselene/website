@@ -55,15 +55,18 @@ export async function uploadTeamImagesAction(formData: FormData): Promise<void> 
     .filter((value): value is File => value instanceof File && value.size > 0)
   const descriptions = String(formData.get("descriptions") ?? "")
 
+  let uploadedCount: number
+
   try {
-    const uploadedCount = await uploadManagedTeamImages(images, descriptions)
-    revalidatePath("/")
-    revalidatePath("/admin/team-images")
-    redirectWithState({ message: `${uploadedCount}枚の画像をアップロードしました。` })
+    uploadedCount = await uploadManagedTeamImages(images, descriptions)
   } catch (error) {
     const message = error instanceof Error ? error.message : "画像のアップロードに失敗しました。"
     redirectWithState({ error: message })
   }
+
+  revalidatePath("/")
+  revalidatePath("/admin/team-images")
+  redirectWithState({ message: `${uploadedCount}枚の画像をアップロードしました。` })
 }
 
 export async function deleteTeamImageAction(formData: FormData): Promise<void> {
@@ -78,11 +81,12 @@ export async function deleteTeamImageAction(formData: FormData): Promise<void> {
 
   try {
     await deleteManagedTeamImage(imageId)
-    revalidatePath("/")
-    revalidatePath("/admin/team-images")
-    redirectWithState({ message: "画像を削除しました。" })
   } catch (error) {
     const message = error instanceof Error ? error.message : "画像の削除に失敗しました。"
     redirectWithState({ error: message })
   }
+
+  revalidatePath("/")
+  revalidatePath("/admin/team-images")
+  redirectWithState({ message: "画像を削除しました。" })
 }
