@@ -17,6 +17,7 @@ import {
   uploadTeamImagesAction,
 } from "@/app/admin/team-images/actions"
 import type { ManagedTeamImage } from "@/lib/team-images"
+import type { TeamGalleryPhoto } from "@/lib/team-gallery-defaults"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   AlertDialog,
@@ -42,6 +43,7 @@ type AdminTeamImagesManagerProps = {
   storageReady: boolean
   usingFallbackGallery: boolean
   showingManagedGallery: boolean
+  fallbackImages: TeamGalleryPhoto[]
 }
 
 function FormSubmitButton({
@@ -104,6 +106,7 @@ export function AdminTeamImagesManager({
   storageReady,
   usingFallbackGallery,
   showingManagedGallery,
+  fallbackImages,
 }: AdminTeamImagesManagerProps) {
   return (
     <div className="space-y-8">
@@ -246,6 +249,35 @@ export function AdminTeamImagesManager({
                       </p>
                     </div>
                     <DeleteImageDialog image={image} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : usingFallbackGallery && fallbackImages.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {fallbackImages.map((image) => (
+                <div
+                  key={image.id}
+                  className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm"
+                >
+                  <div className="relative aspect-[4/3] bg-muted/40">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="space-y-3 p-4">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{image.alt}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        現在公開中の初期画像です
+                      </p>
+                    </div>
+                    <div className="rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                      この画像はまだ管理画像としては保存されていません。新しい画像をアップロードすると管理画像へ切り替わります。
+                    </div>
                   </div>
                 </div>
               ))}

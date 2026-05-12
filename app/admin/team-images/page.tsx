@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { isAdminSessionAuthenticated } from "@/lib/admin-session"
+import { DEFAULT_TEAM_GALLERY_PHOTOS } from "@/lib/team-gallery-defaults"
 import { readManagedTeamImages } from "@/lib/team-images"
 
 export const metadata: Metadata = {
@@ -102,6 +103,7 @@ export default async function AdminTeamImagesPage({ searchParams }: PageProps) {
           storageReady={managedImagesState?.storageReady ?? false}
           usingFallbackGallery={(managedImagesState?.storageReady ?? false) && !(managedImagesState?.hasManagedImages ?? false)}
           showingManagedGallery={managedImagesState?.hasManagedImages ?? false}
+          fallbackImages={DEFAULT_TEAM_GALLERY_PHOTOS}
         />
       )}
     </div>
