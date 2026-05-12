@@ -285,6 +285,16 @@ function MobileActivityDeck({
             </div>
           ))}
         </div>
+        <div className="flex justify-center pt-2">
+          <button
+            type="button"
+            onClick={onCollapse}
+            className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted motion-reduce:transition-none"
+          >
+            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden />
+            折りたたむ
+          </button>
+        </div>
       </div>
     )
   }

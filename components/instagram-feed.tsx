@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import Script from "next/script"
 import { AnimatedSection } from "./animated-section"
 import { Button } from "@/components/ui/button"
-import { ChevronUp, ExternalLink, Instagram, Layers, Sparkles } from "lucide-react"
+import { ChevronDown, ChevronUp, ExternalLink, Instagram, Layers, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -84,6 +84,16 @@ function MobileInstagramEmbedDeck({
               <InstagramEmbedCell url={url} />
             </div>
           ))}
+        </div>
+        <div className="flex justify-center pt-2">
+          <button
+            type="button"
+            onClick={onCollapse}
+            className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted motion-reduce:transition-none"
+          >
+            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden />
+            折りたたむ
+          </button>
         </div>
       </div>
     )
