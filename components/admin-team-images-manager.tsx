@@ -43,7 +43,7 @@ type AdminTeamImagesManagerProps = {
   message?: string
   error?: string
   storageReady: boolean
-  usingFallbackGallery: boolean
+  showingDefaultGallery: boolean
   showingManagedGallery: boolean
   fallbackImages: TeamGalleryPhoto[]
 }
@@ -114,7 +114,7 @@ export function AdminTeamImagesManager({
   message,
   error,
   storageReady,
-  usingFallbackGallery,
+  showingDefaultGallery,
   showingManagedGallery,
   fallbackImages,
 }: AdminTeamImagesManagerProps) {
@@ -161,12 +161,12 @@ export function AdminTeamImagesManager({
         </Alert>
       ) : null}
 
-      {usingFallbackGallery ? (
+      {showingDefaultGallery ? (
         <Alert>
           <ImagePlus />
-          <AlertTitle>現在は既存の初期画像を公開表示中です</AlertTitle>
+          <AlertTitle>初期画像は公開のまま残ります</AlertTitle>
           <AlertDescription>
-            最初のアップロードを行うと、チーム紹介セクションは管理画像へ切り替わります。
+            新しくアップロードした画像は、初期画像に追加される形で公開ページへ反映されます。不要な初期画像だけ個別に削除できます。
           </AlertDescription>
         </Alert>
       ) : null}
@@ -174,9 +174,9 @@ export function AdminTeamImagesManager({
       {showingManagedGallery ? (
         <Alert>
           <ImageIcon />
-          <AlertTitle>現在は管理画像を表示中です</AlertTitle>
+          <AlertTitle>追加画像も公開中です</AlertTitle>
           <AlertDescription>
-            公開ページのチーム紹介セクションでは、アップロード済みの管理画像を表示しています。
+            公開ページのチーム紹介セクションでは、初期画像に加えてアップロード済みの画像も表示しています。
           </AlertDescription>
         </Alert>
       ) : null}
@@ -236,87 +236,109 @@ export function AdminTeamImagesManager({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {images.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {images.map((image) => (
-                <div
-                  key={image.id}
-                  className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm"
-                >
-                  <div className="relative aspect-[4/3] bg-muted/40">
-                    <Image
-                      src={image.url}
-                      alt={image.description}
-                      fill
-                      className="object-cover"
-                    />
+          {images.length > 0 || fallbackImages.length > 0 ? (
+            <div className="space-y-8">
+              {fallbackImages.length > 0 ? (
+                <section className="space-y-4">
+                  <div>
+                    <h3 className="text-base font-semibold text-foreground">初期画像</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      元から表示している画像です。追加画像をアップロードしても残り続けます。
+                    </p>
                   </div>
-                  <div className="space-y-4 p-4">
-                    <div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {new Date(image.uploadedAt).toLocaleString("ja-JP")}
-                      </p>
-                    </div>
-                    <form action={updateTeamImageDescriptionAction} className="space-y-2">
-                      <input type="hidden" name="imageId" value={image.id} />
-                      <Label htmlFor={`team-image-description-${image.id}`}>画像説明</Label>
-                      <Input
-                        id={`team-image-description-${image.id}`}
-                        name="description"
-                        defaultValue={image.description}
-                        maxLength={120}
-                      />
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        公開ページの画像説明として使われます。
-                      </p>
-                      <FormSubmitButton pendingLabel="保存中…" variant="secondary" size="sm">
-                        <Save className="h-4 w-4" />
-                        説明を保存
-                      </FormSubmitButton>
-                    </form>
-                    <DeleteImageDialog imageId={image.id} description={image.description} />
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {fallbackImages.map((image) => (
+                      <div
+                        key={image.id}
+                        className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm"
+                      >
+                        <div className="relative aspect-[4/3] bg-muted/40">
+                          <Image
+                            src={image.src}
+                            alt={image.alt}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="space-y-3 p-4">
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">{image.alt}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              現在公開中の初期画像です
+                            </p>
+                          </div>
+                          <div className="rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                            不要な場合のみ削除してください。削除しない限り、追加画像と一緒に公開されます。
+                          </div>
+                          <DeleteImageDialog
+                            imageId={`default:${image.id}`}
+                            description={image.alt}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : usingFallbackGallery && fallbackImages.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {fallbackImages.map((image) => (
-                <div
-                  key={image.id}
-                  className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm"
-                >
-                  <div className="relative aspect-[4/3] bg-muted/40">
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      fill
-                      className="object-cover"
-                    />
+                </section>
+              ) : null}
+
+              {images.length > 0 ? (
+                <section className="space-y-4">
+                  <div>
+                    <h3 className="text-base font-semibold text-foreground">追加画像</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      アップロードした画像です。初期画像に追加される形で公開ページに並びます。
+                    </p>
                   </div>
-                  <div className="space-y-3 p-4">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{image.alt}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        現在公開中の初期画像です
-                      </p>
-                    </div>
-                    <div className="rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
-                      この画像はまだ管理画像としては保存されていません。新しい画像をアップロードすると管理画像へ切り替わります。
-                    </div>
-                    <DeleteImageDialog
-                      imageId={`default:${image.id}`}
-                      description={image.alt}
-                    />
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {images.map((image) => (
+                      <div
+                        key={image.id}
+                        className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm"
+                      >
+                        <div className="relative aspect-[4/3] bg-muted/40">
+                          <Image
+                            src={image.url}
+                            alt={image.description}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="space-y-4 p-4">
+                          <div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {new Date(image.uploadedAt).toLocaleString("ja-JP")}
+                            </p>
+                          </div>
+                          <form action={updateTeamImageDescriptionAction} className="space-y-2">
+                            <input type="hidden" name="imageId" value={image.id} />
+                            <Label htmlFor={`team-image-description-${image.id}`}>画像説明</Label>
+                            <Input
+                              id={`team-image-description-${image.id}`}
+                              name="description"
+                              defaultValue={image.description}
+                              maxLength={120}
+                            />
+                            <p className="text-xs leading-relaxed text-muted-foreground">
+                              公開ページの画像説明として使われます。
+                            </p>
+                            <FormSubmitButton pendingLabel="保存中…" variant="secondary" size="sm">
+                              <Save className="h-4 w-4" />
+                              説明を保存
+                            </FormSubmitButton>
+                          </form>
+                          <DeleteImageDialog imageId={image.id} description={image.description} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
+                </section>
+              ) : null}
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-border/70 bg-muted/20 px-6 py-12 text-center">
               <p className="text-base font-semibold text-foreground">まだ管理画像はありません</p>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                初回アップロード後、この一覧に画像が並び、公開ページのチーム紹介セクションにも反映されます。
+                初期画像に加えて、ここへ追加画像が並び、公開ページのチーム紹介セクションにも反映されます。
               </p>
             </div>
           )}

@@ -216,21 +216,16 @@ export async function getPublicTeamGallery(): Promise<{
   usingFallbackGallery: boolean
 }> {
   const state = await readManagedTeamImages()
-
-  if (state.hasManagedImages) {
-    return {
-      photos: state.images.map((image) => ({
-        id: image.id,
-        src: image.url,
-        alt: image.description,
-      })),
-      usingFallbackGallery: false,
-    }
-  }
+  const managedPhotos = state.images.map((image) => ({
+    id: image.id,
+    src: image.url,
+    alt: image.description,
+  }))
+  const photos = [...state.visibleDefaultPhotos, ...managedPhotos]
 
   return {
-    photos: state.visibleDefaultPhotos,
-    usingFallbackGallery: state.visibleDefaultPhotos.length > 0,
+    photos,
+    usingFallbackGallery: managedPhotos.length === 0 && state.visibleDefaultPhotos.length > 0,
   }
 }
 

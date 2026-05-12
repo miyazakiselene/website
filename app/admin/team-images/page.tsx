@@ -100,8 +100,8 @@ export default async function AdminTeamImagesPage({ searchParams }: PageProps) {
           message={message}
           error={error}
           storageReady={managedImagesState?.storageReady ?? false}
-          usingFallbackGallery={(managedImagesState?.storageReady ?? false) && !(managedImagesState?.hasManagedImages ?? false)}
-          showingManagedGallery={managedImagesState?.hasManagedImages ?? false}
+          showingDefaultGallery={(managedImagesState?.visibleDefaultPhotos.length ?? 0) > 0}
+          showingManagedGallery={(managedImagesState?.images.length ?? 0) > 0}
           fallbackImages={managedImagesState?.visibleDefaultPhotos ?? []}
         />
       )}
