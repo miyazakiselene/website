@@ -23,12 +23,15 @@ type TeamImageManifest = {
   version: 1
   updatedAt: string
   images: ManagedTeamImage[]
+  hiddenDefaultImageIds?: string[]
 }
 
 export type ManagedTeamImageState = {
   storageReady: boolean
   hasManagedImages: boolean
   images: ManagedTeamImage[]
+  hiddenDefaultImageIds: string[]
+  visibleDefaultPhotos: TeamGalleryPhoto[]
 }
 
 export function isTeamImageStorageConfigured(): boolean {
@@ -63,11 +66,29 @@ function normalizeManagedTeamImage(value: unknown): ManagedTeamImage | null {
   }
 }
 
-function buildManifest(images: ManagedTeamImage[]): TeamImageManifest {
+function normalizeHiddenDefaultImageIds(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+
+  const validIds = new Set(DEFAULT_TEAM_GALLERY_PHOTOS.map((photo) => photo.id))
+  return value
+    .filter((item): item is string => typeof item === "string" && validIds.has(item))
+    .filter((item, index, list) => list.indexOf(item) === index)
+}
+
+function visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds: string[]): TeamGalleryPhoto[] {
+  const hiddenSet = new Set(hiddenDefaultImageIds)
+  return DEFAULT_TEAM_GALLERY_PHOTOS.filter((photo) => !hiddenSet.has(photo.id))
+}
+
+function buildManifest(
+  images: ManagedTeamImage[],
+  hiddenDefaultImageIds: string[] = [],
+): TeamImageManifest {
   return {
     version: 1,
     updatedAt: new Date().toISOString(),
     images,
+    hiddenDefaultImageIds,
   }
 }
 
@@ -109,10 +130,13 @@ function buildDescriptions(files: File[], rawInput: string): string[] {
   return lines
 }
 
-async function writeManifest(images: ManagedTeamImage[]): Promise<void> {
+async function writeManifest(
+  images: ManagedTeamImage[],
+  hiddenDefaultImageIds: string[] = [],
+): Promise<void> {
   const token = getBlobReadWriteToken()
 
-  await put(TEAM_IMAGE_MANIFEST_PATH, JSON.stringify(buildManifest(images), null, 2), {
+  await put(TEAM_IMAGE_MANIFEST_PATH, JSON.stringify(buildManifest(images, hiddenDefaultImageIds), null, 2), {
     access: "public",
     addRandomSuffix: false,
     contentType: "application/json; charset=utf-8",
@@ -122,7 +146,13 @@ async function writeManifest(images: ManagedTeamImage[]): Promise<void> {
 
 export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
   if (!isTeamImageStorageConfigured()) {
-    return { storageReady: false, hasManagedImages: false, images: [] }
+    return {
+      storageReady: false,
+      hasManagedImages: false,
+      images: [],
+      hiddenDefaultImageIds: [],
+      visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
+    }
   }
 
   try {
@@ -134,12 +164,24 @@ export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
     const manifestBlob = blobs.find((blob) => blob.pathname === TEAM_IMAGE_MANIFEST_PATH)
 
     if (manifestBlob == null) {
-      return { storageReady: true, hasManagedImages: false, images: [] }
+      return {
+        storageReady: true,
+        hasManagedImages: false,
+        images: [],
+        hiddenDefaultImageIds: [],
+        visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
+      }
     }
 
     const response = await fetch(manifestBlob.url, { cache: "no-store" })
     if (!response.ok) {
-      return { storageReady: true, hasManagedImages: false, images: [] }
+      return {
+        storageReady: true,
+        hasManagedImages: false,
+        images: [],
+        hiddenDefaultImageIds: [],
+        visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
+      }
     }
 
     const parsed = (await response.json()) as Partial<TeamImageManifest>
@@ -148,10 +190,23 @@ export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
           .map((value) => normalizeManagedTeamImage(value))
           .filter((value): value is ManagedTeamImage => value !== null)
       : []
+    const hiddenDefaultImageIds = normalizeHiddenDefaultImageIds(parsed.hiddenDefaultImageIds)
 
-    return { storageReady: true, hasManagedImages: images.length > 0, images }
+    return {
+      storageReady: true,
+      hasManagedImages: images.length > 0,
+      images,
+      hiddenDefaultImageIds,
+      visibleDefaultPhotos: visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds),
+    }
   } catch {
-    return { storageReady: true, hasManagedImages: false, images: [] }
+    return {
+      storageReady: true,
+      hasManagedImages: false,
+      images: [],
+      hiddenDefaultImageIds: [],
+      visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
+    }
   }
 }
 
@@ -173,8 +228,8 @@ export async function getPublicTeamGallery(): Promise<{
   }
 
   return {
-    photos: DEFAULT_TEAM_GALLERY_PHOTOS,
-    usingFallbackGallery: true,
+    photos: state.visibleDefaultPhotos,
+    usingFallbackGallery: state.visibleDefaultPhotos.length > 0,
   }
 }
 
@@ -219,7 +274,7 @@ export async function uploadManagedTeamImages(files: File[], rawDescriptions: st
       })
     }
 
-    await writeManifest([...uploadedImages.reverse(), ...state.images])
+    await writeManifest([...uploadedImages.reverse(), ...state.images], state.hiddenDefaultImageIds)
     return uploadedImages.length
   } catch (error) {
     if (uploadedImages.length > 0) {
@@ -233,6 +288,18 @@ export async function deleteManagedTeamImage(imageId: string): Promise<void> {
   const token = getBlobReadWriteToken()
 
   const state = await readManagedTeamImages()
+  if (imageId.startsWith("default:")) {
+    const defaultImageId = imageId.slice("default:".length)
+    const targetDefault = state.visibleDefaultPhotos.find((photo) => photo.id === defaultImageId)
+
+    if (targetDefault == null) {
+      throw new Error("削除対象の初期画像が見つかりませんでした。")
+    }
+
+    await writeManifest(state.images, [...state.hiddenDefaultImageIds, defaultImageId])
+    return
+  }
+
   const target = state.images.find((image) => image.id === imageId)
 
   if (target == null) {
@@ -240,5 +307,8 @@ export async function deleteManagedTeamImage(imageId: string): Promise<void> {
   }
 
   await del(target.url, { token })
-  await writeManifest(state.images.filter((image) => image.id !== imageId))
+  await writeManifest(
+    state.images.filter((image) => image.id !== imageId),
+    state.hiddenDefaultImageIds,
+  )
 }

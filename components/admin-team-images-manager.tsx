@@ -66,7 +66,13 @@ function FormSubmitButton({
   )
 }
 
-function DeleteImageDialog({ image }: { image: ManagedTeamImage }) {
+function DeleteImageDialog({
+  imageId,
+  description,
+}: {
+  imageId: string
+  description: string
+}) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -79,16 +85,16 @@ function DeleteImageDialog({ image }: { image: ManagedTeamImage }) {
         <AlertDialogHeader>
           <AlertDialogTitle>この画像を削除しますか？</AlertDialogTitle>
           <AlertDialogDescription>
-            削除すると Vercel Blob と管理データの両方から消えます。元に戻せません。
+            公開中の画像一覧から外れます。元に戻せません。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="rounded-xl border border-border/60 bg-muted/30 p-3 text-sm text-muted-foreground">
-          {image.description}
+          {description}
         </div>
         <AlertDialogFooter>
           <AlertDialogCancel>キャンセル</AlertDialogCancel>
           <form action={deleteTeamImageAction}>
-            <input type="hidden" name="imageId" value={image.id} />
+            <input type="hidden" name="imageId" value={imageId} />
             <AlertDialogAction asChild>
               <button type="submit">削除する</button>
             </AlertDialogAction>
@@ -248,7 +254,7 @@ export function AdminTeamImagesManager({
                         {new Date(image.uploadedAt).toLocaleString("ja-JP")}
                       </p>
                     </div>
-                    <DeleteImageDialog image={image} />
+                    <DeleteImageDialog imageId={image.id} description={image.description} />
                   </div>
                 </div>
               ))}
@@ -278,6 +284,10 @@ export function AdminTeamImagesManager({
                     <div className="rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
                       この画像はまだ管理画像としては保存されていません。新しい画像をアップロードすると管理画像へ切り替わります。
                     </div>
+                    <DeleteImageDialog
+                      imageId={`default:${image.id}`}
+                      description={image.alt}
+                    />
                   </div>
                 </div>
               ))}
