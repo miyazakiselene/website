@@ -59,17 +59,17 @@ const newsItems: NewsItem[] = [
 function NewsCard({ item }: { item: NewsItem }) {
   return (
     <Card className="bg-background border-border hover:border-primary/40 transition-colors duration-300">
-      <CardContent className="p-6 md:p-7">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <CardContent className="p-4 md:p-7">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
           <div>
-            <div className="flex items-center gap-2 text-primary font-semibold mb-2">
-              <CalendarDays className="h-5 w-5" />
+            <div className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-primary md:mb-2 md:text-base">
+              <CalendarDays className="h-4 w-4 md:h-5 md:w-5" />
               <span>{item.date}</span>
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-foreground">{item.title}</h3>
+            <h3 className="text-lg font-bold leading-snug text-foreground md:text-2xl">{item.title}</h3>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <MapPin className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-sm text-muted-foreground md:text-base">
+            <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span>{item.venue}</span>
           </div>
         </div>
@@ -97,7 +97,7 @@ export function News() {
           </p>
         </AnimatedSection>
 
-        <div className="max-w-4xl mx-auto grid gap-5">
+        <div className="max-w-4xl mx-auto grid gap-4 md:gap-5">
           {currentNews.map((plan, index) => (
             <AnimatedSection key={plan.id} animation="fadeInUp" delay={100 + index * 100}>
               <NewsCard item={plan} />
@@ -107,9 +107,9 @@ export function News() {
           <AnimatedSection animation="fadeInUp" delay={100 + currentNews.length * 100}>
             <div className="space-y-4">
               <Collapsible className="rounded-2xl border border-border bg-background">
-                <CollapsibleTrigger className="group flex w-full items-center justify-center gap-4 px-6 py-5 text-center">
+                <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center md:gap-4 md:px-6 md:py-5">
                   <div>
-                    <p className="text-lg font-bold text-foreground">過去のお知らせを見る</p>
+                    <p className="text-base font-bold text-foreground md:text-lg">過去のお知らせを見る</p>
                   </div>
                   <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>

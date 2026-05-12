@@ -170,40 +170,40 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
     <Card className="h-full overflow-hidden border-border bg-card transition-all duration-300 hover:border-primary/30">
       <CardContent className="p-0">
         <Collapsible className="group" defaultOpen={false}>
-          <CollapsibleTrigger className="flex w-full items-center gap-4 border-b border-border bg-secondary/50 p-6 text-left outline-none transition-colors hover:bg-secondary/65 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40">
-            <div className="flex min-w-0 flex-1 items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15">
-                <Calendar className="h-6 w-6 text-primary" />
+          <CollapsibleTrigger className="flex w-full items-center gap-3 border-b border-border bg-secondary/50 p-4 text-left outline-none transition-colors hover:bg-secondary/65 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 md:gap-4 md:p-6">
+            <div className="flex min-w-0 flex-1 items-start gap-3 md:gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 md:h-12 md:w-12">
+                <Calendar className="h-5 w-5 text-primary md:h-6 md:w-6" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 shrink-0" />
+                <div className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground md:mb-2 md:text-sm">
+                  <Calendar className="h-3.5 w-3.5 shrink-0 md:h-4 md:w-4" />
                   <span>{tournament.period}</span>
                 </div>
-                <h3 className="line-clamp-2 text-lg font-bold text-foreground md:text-xl">
+                <h3 className="line-clamp-2 text-base font-bold leading-snug text-foreground md:text-xl">
                   {tournament.name}
                 </h3>
                 {tournament.venue ? (
-                  <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4 shrink-0" />
+                  <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground md:mt-2 md:text-sm">
+                    <MapPin className="h-3.5 w-3.5 shrink-0 md:h-4 md:w-4" />
                     <span className="line-clamp-1">{tournament.venue}</span>
                   </div>
                 ) : null}
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-1.5 text-xs text-muted-foreground md:mt-2 md:text-sm">
                   {tournament.matches.length}試合を表示
                 </p>
               </div>
             </div>
-            <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 md:h-5 md:w-5" />
           </CollapsibleTrigger>
 
           <CollapsibleContent>
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               {groupedMatches.length > 0 ? (
-                <div className="space-y-6">
+                <div className="space-y-5 md:space-y-6">
                   {groupedMatches.map(({ date, matches }) => (
                     <div key={`${tournament.id}-${date}`}>
-                      <div className="mb-3 flex flex-wrap items-center gap-3">
+                      <div className="mb-2.5 flex flex-wrap items-center gap-2.5 md:mb-3 md:gap-3">
                         <Badge
                           variant="outline"
                           className="border-primary/30 px-3 py-1 text-xs text-primary md:text-sm"
@@ -218,7 +218,7 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
                         {matches.map((match) => (
                           <li
                             key={match.id}
-                            className="rounded-xl border border-border/50 bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground"
+                            className="rounded-xl border border-border/50 bg-secondary/30 px-3 py-2.5 text-sm font-semibold text-foreground md:px-4 md:py-3 md:text-base"
                           >
                             <p>{match.opponent}</p>
                           </li>
@@ -304,8 +304,8 @@ export function Results({ initialTournaments }: ResultsProps) {
           {archivedTournaments.length > 0 ? (
             <AnimatedSection animation="fadeInUp" delay={180}>
               <Collapsible className="rounded-2xl border border-border bg-card">
-                <CollapsibleTrigger className="group flex w-full items-center justify-center gap-4 px-6 py-5 text-center">
-                  <p className="text-lg font-bold text-foreground">過去の活動記録を見る</p>
+                <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center md:gap-4 md:px-6 md:py-5">
+                  <p className="text-base font-bold text-foreground md:text-lg">過去の活動記録を見る</p>
                   <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
                 <CollapsibleContent>

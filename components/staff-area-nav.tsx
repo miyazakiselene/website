@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 const links = [
   { href: "/staff", label: "メニュー" },
   { href: "/staff/results", label: "試合結果" },
+  { href: "/admin/team-images", label: "チーム紹介画像" },
   { href: "/staff/dashboard", label: "ダッシュボード" },
   { href: "/staff/update-log", label: "更新ログ" },
 ] as const
