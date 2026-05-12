@@ -1,7 +1,7 @@
 "use client"
 
-import { useMemo } from "react"
-import { Calendar, ChevronDown, MapPin } from "lucide-react"
+import { useMemo, useState } from "react"
+import { Calendar, ChevronDown, ChevronUp, Layers, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -244,7 +244,107 @@ type ResultsProps = {
   initialTournaments?: Tournament[]
 }
 
+function MobileActivityDeck({
+  tournaments,
+  expanded,
+  onExpand,
+  onCollapse,
+}: {
+  tournaments: Tournament[]
+  expanded: boolean
+  onExpand: () => void
+  onCollapse: () => void
+}) {
+  const count = tournaments.length
+  if (count === 0) return null
+
+  const stackHeight = Math.min(320, 140 + Math.max(0, count - 1) * 28)
+
+  if (expanded) {
+    return (
+      <div className="space-y-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 motion-reduce:animate-none">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/80 bg-secondary/40 px-4 py-3">
+          <p className="text-sm font-semibold text-foreground">一覧表示</p>
+          <button
+            type="button"
+            onClick={onCollapse}
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted motion-reduce:transition-none"
+          >
+            <Layers className="h-4 w-4" aria-hidden />
+            カード表示に戻す
+          </button>
+        </div>
+        <div className="grid grid-cols-1 gap-6">
+          {tournaments.map((tournament, index) => (
+            <div
+              key={tournament.id}
+              className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-reduce:animate-none"
+              style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
+            >
+              <ResultsAccordionCard tournament={tournament} />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full max-w-md mx-auto">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onExpand}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            onExpand()
+          }
+        }}
+        aria-expanded={false}
+        aria-label="活動記録を縦の一覧で表示する"
+        className="group relative w-full touch-manipulation rounded-2xl text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
+        style={{ height: stackHeight }}
+      >
+        {tournaments.map((tournament, index) => {
+          const depth = index
+          const z = 50 - depth
+          const top = 8 + depth * 14
+          const left = 6 + depth * 10
+          const rotate = -5 + depth * 2.2
+          return (
+            <div
+              key={tournament.id}
+              className="pointer-events-none absolute w-[calc(100%-12px)] max-w-[calc(100%-12px)] origin-top-left shadow-lg transition-[transform,box-shadow] duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:shadow-xl"
+              style={{
+                top,
+                left,
+                zIndex: z,
+                transform: `rotate(${rotate}deg)`,
+              }}
+            >
+              <ResultsAccordionCard tournament={tournament} />
+            </div>
+          )
+        })}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[60] flex justify-center rounded-b-2xl bg-gradient-to-t from-background via-background/90 to-transparent pb-3 pt-10"
+          aria-hidden
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-4 py-2 text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
+            <ChevronUp className="h-4 w-4 motion-safe:animate-bounce motion-reduce:animate-none" />
+            タップで一覧表示
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function Results({ initialTournaments }: ResultsProps) {
+  const [mobileMainDeckExpanded, setMobileMainDeckExpanded] = useState(false)
+  const [mobileArchivedDeckExpanded, setMobileArchivedDeckExpanded] = useState(false)
+
   const displayTournaments: Tournament[] = useMemo(() => {
     const source =
       initialTournaments != null && initialTournaments.length > 0 ? initialTournaments : fallbackTournaments
@@ -293,12 +393,23 @@ export function Results({ initialTournaments }: ResultsProps) {
         </AnimatedSection>
 
         <div className="mx-auto max-w-6xl space-y-8">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* デスクトップ: 従来の3列グリッド */}
+          <div className="hidden md:grid md:grid-cols-3 md:gap-6">
             {visibleTournaments.map((tournament, index) => (
               <AnimatedSection key={tournament.id} animation="scaleIn" delay={100 + index * 50}>
                 <ResultsAccordionCard tournament={tournament} />
               </AnimatedSection>
             ))}
+          </div>
+
+          {/* スマホ: トランプ風の重ね → タップで縦一覧 */}
+          <div className="md:hidden">
+            <MobileActivityDeck
+              tournaments={visibleTournaments}
+              expanded={mobileMainDeckExpanded}
+              onExpand={() => setMobileMainDeckExpanded(true)}
+              onCollapse={() => setMobileMainDeckExpanded(false)}
+            />
           </div>
 
           {archivedTournaments.length > 0 ? (
@@ -310,12 +421,20 @@ export function Results({ initialTournaments }: ResultsProps) {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <div className="border-t border-border px-4 py-5 md:px-6">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="hidden md:grid md:grid-cols-3 md:gap-6">
                       {archivedTournaments.map((tournament, index) => (
                         <AnimatedSection key={tournament.id} animation="fadeInUp" delay={80 + index * 40}>
                           <ResultsAccordionCard tournament={tournament} />
                         </AnimatedSection>
                       ))}
+                    </div>
+                    <div className="md:hidden">
+                      <MobileActivityDeck
+                        tournaments={archivedTournaments}
+                        expanded={mobileArchivedDeckExpanded}
+                        onExpand={() => setMobileArchivedDeckExpanded(true)}
+                        onCollapse={() => setMobileArchivedDeckExpanded(false)}
+                      />
                     </div>
                   </div>
                 </CollapsibleContent>
