@@ -3,6 +3,7 @@ import { Hero } from "@/components/hero"
 import { TeamAbout } from "@/components/team-about"
 import { News } from "@/components/news"
 import { Results } from "@/components/results"
+import { RelatedLinks } from "@/components/related-links"
 import { InstagramFeed } from "@/components/instagram-feed"
 import { ContactForm } from "@/components/contact-form"
 import { ClientOnly } from "@/components/client-only"
@@ -37,6 +38,7 @@ export default function HomePage() {
       <News />
       <TeamAbout />
       <Results />
+      <RelatedLinks />
       <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
       <ClientOnly>
         <ContactForm />
