@@ -6,7 +6,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { AnimatedSection } from "@/components/animated-section"
-import { sortMatchesNewestFirst, sortTournamentsNewestFirst } from "@/lib/activity-records-sort"
+import {
+  inferCalendarYearFromYearLabel,
+  publicTournamentCalendarYear,
+  sortMatchesNewestFirst,
+  sortSlashDateStringsDesc,
+  sortTournamentsNewestFirst,
+} from "@/lib/activity-records-sort"
 
 export type Match = {
   id: string
@@ -24,7 +30,6 @@ export type Tournament = {
 }
 
 const MAX_VISIBLE_RESULTS = 6
-const MAX_VISIBLE_MATCHES_PER_CARD = 6
 
 const fallbackTournaments: Tournament[] = [
   {
@@ -134,62 +139,102 @@ function BasketballIcon({ className }: { className?: string }) {
   )
 }
 
-function ResultsCard({ tournament }: { tournament: Tournament }) {
-  const visibleMatches = tournament.matches.slice(0, MAX_VISIBLE_MATCHES_PER_CARD)
-  const hiddenMatchesCount = Math.max(0, tournament.matches.length - visibleMatches.length)
+function groupMatchesByDate(
+  matches: Match[],
+  tournament: { id: string; period: string; year?: string },
+): { date: string; matches: Match[] }[] {
+  const year =
+    (tournament.year ? inferCalendarYearFromYearLabel(tournament.year) : null) ??
+    publicTournamentCalendarYear(tournament)
+  const order: string[] = []
+  const grouped = new Map<string, Match[]>()
+
+  for (const match of matches) {
+    if (!grouped.has(match.date)) {
+      order.push(match.date)
+      grouped.set(match.date, [])
+    }
+    grouped.get(match.date)?.push(match)
+  }
+
+  return sortSlashDateStringsDesc(order, year).map((date) => ({
+    date,
+    matches: grouped.get(date) ?? [],
+  }))
+}
+
+function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
+  const groupedMatches = groupMatchesByDate(tournament.matches, tournament)
 
   return (
-    <Card className="h-full border-border bg-card transition-all duration-300 hover:border-primary/30">
-      <CardContent className="flex h-full min-h-[340px] flex-col p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15">
-            <Calendar className="h-6 w-6 text-primary" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 shrink-0" />
-              <span>{tournament.period}</span>
-            </div>
-            <h3 className="line-clamp-2 text-lg font-bold text-foreground md:text-xl">{tournament.name}</h3>
-            {tournament.venue ? (
-              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4 shrink-0" />
-                <span className="line-clamp-1">{tournament.venue}</span>
+    <Card className="h-full overflow-hidden border-border bg-card transition-all duration-300 hover:border-primary/30">
+      <CardContent className="p-0">
+        <Collapsible className="group" defaultOpen={false}>
+          <CollapsibleTrigger className="flex w-full items-center gap-4 border-b border-border bg-secondary/50 p-6 text-left outline-none transition-colors hover:bg-secondary/65 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40">
+            <div className="flex min-w-0 flex-1 items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15">
+                <Calendar className="h-6 w-6 text-primary" />
               </div>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-1 flex-col">
-          <p className="mb-3 text-sm font-semibold text-foreground">対戦相手</p>
-          {visibleMatches.length > 0 ? (
-            <ul className="grid gap-2">
-              {visibleMatches.map((match) => (
-                <li
-                  key={match.id}
-                  className="flex items-start gap-3 rounded-xl border border-border/60 bg-secondary/30 px-3 py-2"
-                >
-                  <Badge variant="outline" className="shrink-0 border-primary/30 text-primary">
-                    {match.date}
-                  </Badge>
-                  <p className="min-w-0 text-sm font-medium text-foreground md:text-base">
-                    {match.opponent}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="rounded-xl border border-dashed border-border/70 px-4 py-5 text-sm text-muted-foreground">
-              対戦情報を準備中です。
+              <div className="min-w-0 flex-1">
+                <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4 shrink-0" />
+                  <span>{tournament.period}</span>
+                </div>
+                <h3 className="line-clamp-2 text-lg font-bold text-foreground md:text-xl">
+                  {tournament.name}
+                </h3>
+                {tournament.venue ? (
+                  <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4 shrink-0" />
+                    <span className="line-clamp-1">{tournament.venue}</span>
+                  </div>
+                ) : null}
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {tournament.matches.length}試合を表示
+                </p>
+              </div>
             </div>
-          )}
+            <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </CollapsibleTrigger>
 
-          {hiddenMatchesCount > 0 ? (
-            <p className="mt-auto pt-4 text-sm text-muted-foreground">
-              ほか {hiddenMatchesCount} 試合は活動記録内に含まれています。
-            </p>
-          ) : null}
-        </div>
+          <CollapsibleContent>
+            <div className="p-6">
+              {groupedMatches.length > 0 ? (
+                <div className="space-y-6">
+                  {groupedMatches.map(({ date, matches }) => (
+                    <div key={`${tournament.id}-${date}`}>
+                      <div className="mb-3 flex flex-wrap items-center gap-3">
+                        <Badge
+                          variant="outline"
+                          className="border-primary/30 px-3 py-1 text-xs text-primary md:text-sm"
+                        >
+                          {date}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground md:text-sm">
+                          {matches.length}試合
+                        </span>
+                      </div>
+                      <ul className="grid gap-2 md:gap-3">
+                        {matches.map((match) => (
+                          <li
+                            key={match.id}
+                            className="rounded-xl border border-border/50 bg-secondary/30 px-4 py-3 text-base font-semibold text-foreground"
+                          >
+                            <p>{match.opponent}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-border/70 px-4 py-5 text-sm text-muted-foreground">
+                  対戦情報を準備中です。
+                </div>
+              )}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
     </Card>
   )
@@ -251,7 +296,7 @@ export function Results({ initialTournaments }: ResultsProps) {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {visibleTournaments.map((tournament, index) => (
               <AnimatedSection key={tournament.id} animation="scaleIn" delay={100 + index * 50}>
-                <ResultsCard tournament={tournament} />
+                <ResultsAccordionCard tournament={tournament} />
               </AnimatedSection>
             ))}
           </div>
@@ -268,7 +313,7 @@ export function Results({ initialTournaments }: ResultsProps) {
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                       {archivedTournaments.map((tournament, index) => (
                         <AnimatedSection key={tournament.id} animation="fadeInUp" delay={80 + index * 40}>
-                          <ResultsCard tournament={tournament} />
+                          <ResultsAccordionCard tournament={tournament} />
                         </AnimatedSection>
                       ))}
                     </div>
