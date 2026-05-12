@@ -12,6 +12,7 @@ const navLinks = [
   { label: "チーム紹介", href: "#about" },
   { label: "活動記録", href: "#results" },
   { label: "Instagram", href: "#instagram" },
+  { label: "関連リンク集", href: "#related-links" },
   { label: "お問い合わせ", href: "#contact" },
 ]
 

@@ -38,8 +38,8 @@ export default function HomePage() {
       <News />
       <TeamAbout />
       <Results />
-      <RelatedLinks />
       <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
+      <RelatedLinks />
       <ClientOnly>
         <ContactForm />
       </ClientOnly>

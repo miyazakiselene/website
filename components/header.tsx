@@ -22,6 +22,7 @@ const navItems = [
   { label: "チーム紹介", href: "#about" },
   { label: "活動記録", href: "#results" },
   { label: "Instagram", href: "#instagram" },
+  { label: "関連リンク集", href: "#related-links" },
   { label: "お問い合わせ", href: "#contact" },
   { label: "関係者専用", href: "/staff" },
 ]
@@ -111,7 +112,7 @@ export function Header() {
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-primary/10">
-                <Menu className="h-7 w-7" />
+                <Menu className="h-8 w-8" />
                 <span className="sr-only">メニューを開く</span>
               </Button>
             </SheetTrigger>
