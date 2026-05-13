@@ -19,6 +19,12 @@ function formatLastmod(d: Date): string {
   return d.toISOString().split("T")[0] ?? ""
 }
 
+function lastModFromIsoDate(value: string | undefined): Date | undefined {
+  if (value == null || value.trim() === "") return undefined
+  const d = parseISO(value)
+  return isValid(d) ? d : undefined
+}
+
 export async function GET() {
   const base = getPublicSiteBaseHref()
   const [newsItems, activityItems] = await Promise.all([readNewsRecords(), readActivityRecords()])
@@ -74,10 +80,4 @@ export async function GET() {
       "Cache-Control": "public, max-age=0, must-revalidate",
     },
   })
-}
-
-function lastModFromIsoDate(value: string | undefined): Date | undefined {
-  if (value == null || value.trim() === "") return undefined
-  const d = parseISO(value)
-  return isValid(d) ? d : undefined
 }
