@@ -28,7 +28,7 @@ export default function StaffPage() {
           チーム関係者専用ページ
         </h1>
         <p className="text-muted-foreground leading-relaxed">
-          アクセスコード認証後、試合結果の管理とアクセス分析用のダッシュボードをそれぞれ別ページから開けます。
+          アクセスコード認証後、お知らせ・活動記録・試合結果の管理とアクセス分析用のダッシュボードをそれぞれ別ページから開けます。
         </p>
       </header>
 

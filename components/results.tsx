@@ -13,21 +13,9 @@ import {
   sortSlashDateStringsDesc,
   sortTournamentsNewestFirst,
 } from "@/lib/activity-records-sort"
+import type { Match, Tournament } from "@/lib/activity-results-types"
 
-export type Match = {
-  id: string
-  date: string
-  opponent: string
-}
-
-export type Tournament = {
-  id: string
-  period: string
-  year?: string
-  name: string
-  venue?: string
-  matches: Match[]
-}
+export type { Match, Tournament } from "@/lib/activity-results-types"
 
 const MAX_VISIBLE_RESULTS = 6
 
@@ -221,6 +209,11 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
                             className="rounded-xl border border-border/50 bg-secondary/30 px-3 py-2.5 text-sm font-semibold text-foreground md:px-4 md:py-3 md:text-base"
                           >
                             <p>{match.opponent}</p>
+                            {match.content != null && match.content.trim().length > 0 ? (
+                              <p className="mt-2 whitespace-pre-wrap text-xs font-normal leading-relaxed text-muted-foreground md:text-sm">
+                                {match.content}
+                              </p>
+                            ) : null}
                           </li>
                         ))}
                       </ul>
@@ -355,22 +348,25 @@ export function Results({ initialTournaments }: ResultsProps) {
   const [mobileMainDeckExpanded, setMobileMainDeckExpanded] = useState(false)
   const [mobileArchivedDeckExpanded, setMobileArchivedDeckExpanded] = useState(false)
 
-  const displayTournaments: Tournament[] = useMemo(() => {
+  const sortedNewestFirst: Tournament[] = useMemo(() => {
     const source =
       initialTournaments != null && initialTournaments.length > 0 ? initialTournaments : fallbackTournaments
 
+    // 表示直前に必ず日付基準でソート（大会の最新試合日が新しい順）
     return sortTournamentsNewestFirst(source).map((tournament) => ({
       ...tournament,
       matches: sortMatchesNewestFirst(
         tournament.matches,
-        tournament.year
+        tournament.year !== undefined
           ? { id: tournament.id, year: tournament.year }
           : { id: tournament.id, period: tournament.period },
       ),
     }))
   }, [initialTournaments])
-  const visibleTournaments = displayTournaments.slice(0, MAX_VISIBLE_RESULTS)
-  const archivedTournaments = displayTournaments.slice(MAX_VISIBLE_RESULTS)
+
+  // 先頭6件をメイン表示、7件目以降は「過去の活動記録」へ
+  const visibleTournaments = sortedNewestFirst.slice(0, MAX_VISIBLE_RESULTS)
+  const archivedTournaments = sortedNewestFirst.slice(MAX_VISIBLE_RESULTS)
 
   return (
     <section id="results" className="py-24 md:py-32 bg-background relative overflow-hidden">

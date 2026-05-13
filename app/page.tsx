@@ -4,14 +4,18 @@ import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
 import { TeamAbout } from "@/components/team-about"
 import { News } from "@/components/news"
-import { Results, type Tournament } from "@/components/results"
+import { Results } from "@/components/results"
 import { RelatedLinks } from "@/components/related-links"
 import { InstagramFeed } from "@/components/instagram-feed"
 import { ContactForm } from "@/components/contact-form"
 import { ClientOnly } from "@/components/client-only"
 import { Sponsors } from "@/components/sponsors"
 import { Footer } from "@/components/footer"
+import { readActivityRecords } from "@/lib/activities"
+import { sortMatchesNewestFirst, sortTournamentsNewestFirst } from "@/lib/activity-records-sort"
+import type { Tournament } from "@/lib/activity-results-types"
 import { parseInstagramEmbedPostUrlsFromEnv } from "@/lib/instagram-embed"
+import { mapActivitiesToTournaments } from "@/lib/map-activities-to-tournaments"
 import { getPublicTeamGallery } from "@/lib/team-images"
 import { readNewsRecords } from "@/lib/news"
 
@@ -40,13 +44,13 @@ type StaffRecord = {
   }[]
 }
 
-async function readInitialPublicResults(): Promise<Tournament[] | undefined> {
+async function readStaffRecordsAsTournaments(): Promise<Tournament[]> {
   const dataFile = path.join(process.cwd(), "data", "staff-records.json")
 
   try {
     const raw = await fs.readFile(dataFile, "utf-8")
     const parsed = JSON.parse(raw) as StaffRecord[]
-    if (!Array.isArray(parsed) || parsed.length === 0) return undefined
+    if (!Array.isArray(parsed) || parsed.length === 0) return []
 
     return parsed.map((record) => ({
       id: record.id,
@@ -63,8 +67,27 @@ async function readInitialPublicResults(): Promise<Tournament[] | undefined> {
         : [],
     }))
   } catch {
-    return undefined
+    return []
   }
+}
+
+/** staff-records.json と data/activities.json を統合し、日付の新しい順で整列したうえで Results に渡す */
+async function readMergedPublicResults(): Promise<Tournament[] | undefined> {
+  const [staff, activityRecords] = await Promise.all([readStaffRecordsAsTournaments(), readActivityRecords()])
+  const fromActivities = mapActivitiesToTournaments(activityRecords)
+  const combined = [...staff, ...fromActivities]
+  if (combined.length === 0) return undefined
+
+  const sortedTournaments = sortTournamentsNewestFirst(combined)
+  return sortedTournaments.map((tournament) => ({
+    ...tournament,
+    matches: sortMatchesNewestFirst(
+      tournament.matches,
+      tournament.year !== undefined
+        ? { id: tournament.id, year: tournament.year }
+        : { id: tournament.id, period: tournament.period },
+    ),
+  }))
 }
 
 export default async function HomePage() {
@@ -76,7 +99,7 @@ export default async function HomePage() {
       0,
       MAX_VISIBLE_INSTAGRAM_POSTS,
     )
-  const initialPublicResults = await readInitialPublicResults()
+  const initialPublicResults = await readMergedPublicResults()
   const { photos: teamGalleryPhotos } = await getPublicTeamGallery()
   const newsItems = await readNewsRecords()
 
