@@ -16,6 +16,7 @@ import { sortMatchesNewestFirst, sortTournamentsNewestFirst } from "@/lib/activi
 import type { Tournament } from "@/lib/activity-results-types"
 import { parseInstagramEmbedPostUrlsFromEnv } from "@/lib/instagram-embed"
 import { mapActivitiesToTournaments } from "@/lib/map-activities-to-tournaments"
+import { filterStaffTournamentsForPublicTop } from "@/lib/public-results-dedupe"
 import { getPublicTeamGallery } from "@/lib/team-images"
 import { readNewsRecords } from "@/lib/news"
 
@@ -74,8 +75,9 @@ async function readStaffRecordsAsTournaments(): Promise<Tournament[]> {
 /** staff-records.json と data/activities.json を統合し、日付の新しい順で整列したうえで Results に渡す */
 async function readMergedPublicResults(): Promise<Tournament[] | undefined> {
   const [staff, activityRecords] = await Promise.all([readStaffRecordsAsTournaments(), readActivityRecords()])
+  const staffForTop = filterStaffTournamentsForPublicTop(staff)
   const fromActivities = mapActivitiesToTournaments(activityRecords)
-  const combined = [...staff, ...fromActivities]
+  const combined = [...staffForTop, ...fromActivities]
   if (combined.length === 0) return undefined
 
   const sortedTournaments = sortTournamentsNewestFirst(combined)
