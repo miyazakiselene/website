@@ -92,3 +92,41 @@ export async function appendNewsRecord(record: NewsRecord): Promise<NewsRecord[]
     return finalizeRecords(next)
   })
 }
+
+export async function updateNewsRecord(record: NewsRecord): Promise<NewsRecord[]> {
+  return runExclusiveNewsWrite(async () => {
+    const raw = await fs.readFile(NEWS_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
+      if (e.code === "ENOENT") return "[]"
+      throw e
+    })
+    const existing = finalizeRecords(await parseNewsFile(raw))
+    const idx = existing.findIndex((r) => r.id === record.id)
+    if (idx === -1) {
+      throw new Error("NEWS_NOT_FOUND")
+    }
+    const normalized = normalizeNewsRecord(record)
+    if (normalized === null) {
+      throw new Error("NEWS_INVALID")
+    }
+    const next = [...existing]
+    next[idx] = normalized
+    await writeNewsRecordsAtomic(finalizeRecords(next))
+    return finalizeRecords(next)
+  })
+}
+
+export async function deleteNewsRecordById(id: string): Promise<NewsRecord[]> {
+  return runExclusiveNewsWrite(async () => {
+    const raw = await fs.readFile(NEWS_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
+      if (e.code === "ENOENT") return "[]"
+      throw e
+    })
+    const existing = finalizeRecords(await parseNewsFile(raw))
+    if (!existing.some((r) => r.id === id)) {
+      throw new Error("NEWS_NOT_FOUND")
+    }
+    const next = existing.filter((r) => r.id !== id)
+    await writeNewsRecordsAtomic(next)
+    return next
+  })
+}

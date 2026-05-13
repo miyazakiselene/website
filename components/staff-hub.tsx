@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { BarChart3, ClipboardList, Images, Megaphone, ScrollText } from "lucide-react"
+import { BarChart3, ClipboardList, History, Images, Megaphone, ScrollText } from "lucide-react"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ export function StaffHub() {
     <div className="space-y-10">
       <StaffAreaNav />
       <p className="text-center text-muted-foreground text-sm md:text-base">
-        行き先を選んでください。お知らせの投稿・試合結果の編集・アクセス分析はそれぞれ別ページです。
+        行き先を選んでください。お知らせ・活動記録・試合結果の編集などはそれぞれ別ページです。
       </p>
 
       <div className="flex flex-col gap-10 md:gap-12">
@@ -25,10 +25,27 @@ export function StaffHub() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                トップページのお知らせを追加します（ローカルでは data/news.json に保存）。
+                トップページのお知らせを追加・修正・削除します（ローカルでは data/news.json に保存）。
               </p>
               <Button asChild variant="secondary" className="w-full sm:w-auto">
-                <Link href="/staff/news">お知らせの投稿ページへ</Link>
+                <Link href="/staff/news">お知らせの管理ページへ</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                <History className="h-6 w-6 text-primary" />
+                活動記録
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                トップの活動記録に載せる1件単位の記録を追加・削除します（data/activities.json）。
+              </p>
+              <Button asChild variant="secondary" className="w-full sm:w-auto">
+                <Link href="/staff/activities">活動記録の管理ページへ</Link>
               </Button>
             </CardContent>
           </Card>

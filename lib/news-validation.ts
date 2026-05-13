@@ -28,4 +28,15 @@ export const newsPostBodySchema = z.object({
   venue: z.string().max(NEWS_VENUE_MAX).optional(),
 })
 
+export const newsPatchBodySchema = newsPostBodySchema.extend({
+  id: z.string().trim().min(1).max(200),
+})
+
+export const newsDeleteBodySchema = z.object({
+  accessCode: z.string().min(1).max(NEWS_ACCESS_CODE_MAX),
+  id: z.string().trim().min(1).max(200),
+})
+
 export type NewsPostBody = z.infer<typeof newsPostBodySchema>
+export type NewsPatchBody = z.infer<typeof newsPatchBodySchema>
+export type NewsDeleteBody = z.infer<typeof newsDeleteBodySchema>
