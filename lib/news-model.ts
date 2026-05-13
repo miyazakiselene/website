@@ -79,8 +79,29 @@ export function getNewsArchiveThreshold(record: NewsRecord): Date {
   return startOfDay(addDays(end, 1))
 }
 
+/** トップ「今後の予定」欄: より近い開始日の予定が先（開始日昇順→終了日昇順→id） */
+export function sortNewsCurrentByUpcomingFirst(items: NewsRecord[]): NewsRecord[] {
+  return [...items].sort((a, b) => {
+    const byStart = a.eventStartDate.localeCompare(b.eventStartDate)
+    if (byStart !== 0) return byStart
+    const byEnd = a.eventEndDate.localeCompare(b.eventEndDate)
+    if (byEnd !== 0) return byEnd
+    return a.id.localeCompare(b.id)
+  })
+}
+
+/** 「過去のお知らせ」: 直近に終わったものが上（終了日降順→id） */
+export function sortNewsPastByRecentEndFirst(items: NewsRecord[]): NewsRecord[] {
+  return [...items].sort((a, b) => {
+    const byEnd = b.eventEndDate.localeCompare(a.eventEndDate)
+    if (byEnd !== 0) return byEnd
+    return b.id.localeCompare(a.id)
+  })
+}
+
 /**
  * 現在時刻 `now` に基づき、最新 / 過去に振り分ける（表示側の .filter 相当）。
+ * 各グループは表示向けに自動整列される（予定は近い日付から、過去は直近に終わった順）。
  */
 export function partitionNewsByArchiveThreshold(
   items: NewsRecord[],
@@ -89,7 +110,16 @@ export function partitionNewsByArchiveThreshold(
   const safeNow = isValid(now) ? now : new Date()
   const current = items.filter((item) => isBefore(safeNow, getNewsArchiveThreshold(item)))
   const past = items.filter((item) => !isBefore(safeNow, getNewsArchiveThreshold(item)))
-  return { current, past }
+  return {
+    current: sortNewsCurrentByUpcomingFirst(current),
+    past: sortNewsPastByRecentEndFirst(past),
+  }
+}
+
+/** 関係者一覧など: 予定（近い日付先）をすべて並べたあと、過去（直近終了先）を続ける */
+export function sortNewsRecordsForDisplayOrder(items: NewsRecord[], now: Date): NewsRecord[] {
+  const { current, past } = partitionNewsByArchiveThreshold(items, now)
+  return [...current, ...past]
 }
 
 /** 読み込み後: 重複 id は先頭優先、無効な eventEndDate は除外済みを前提。 */

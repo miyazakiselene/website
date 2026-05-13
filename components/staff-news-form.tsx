@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Megaphone, Pencil, Trash2 } from "lucide-react"
 import { getStaffApiAccessCode } from "@/lib/staff-session"
-import type { NewsRecord } from "@/lib/news-model"
+import { sortNewsRecordsForDisplayOrder, type NewsRecord } from "@/lib/news-model"
 import { NEWS_CONTENT_MAX, NEWS_TITLE_MAX, NEWS_VENUE_MAX } from "@/lib/news-validation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -17,15 +17,32 @@ type StaffNewsFormProps = {
   initialItems: NewsRecord[]
 }
 
-function sortNewsStaffOrder(items: NewsRecord[]): NewsRecord[] {
-  return [...items].sort((a, b) => b.eventEndDate.localeCompare(a.eventEndDate) || b.id.localeCompare(a.id))
+function sortNewsStaffList(items: NewsRecord[]): NewsRecord[] {
+  return sortNewsRecordsForDisplayOrder(items, new Date())
+}
+
+type StaffNewsApiErrorBody = { error?: string; detail?: string; items?: NewsRecord[] }
+
+function buildStaffNewsSaveError(response: Response, data: StaffNewsApiErrorBody, fallback: string): string {
+  const lines: string[] = [`[HTTP ${response.status}]`, data.error ?? fallback]
+  const d = data.detail
+  if (d != null && String(d).trim() !== "") {
+    lines.push(`（詳細）${String(d).trim()}`)
+  }
+  return lines.join("\n\n")
+}
+
+function isLikelyVercelPreviewHost(): boolean {
+  if (typeof window === "undefined") return false
+  const h = window.location.hostname
+  return h === "vercel.app" || h.endsWith(".vercel.app")
 }
 
 const fetchJsonTimeoutMs = 30_000
 
 export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
   const router = useRouter()
-  const [items, setItems] = useState<NewsRecord[]>(() => sortNewsStaffOrder(initialItems))
+  const [items, setItems] = useState<NewsRecord[]>(() => sortNewsStaffList(initialItems))
 
   const [title, setTitle] = useState("")
   const [startDate, setStartDate] = useState("")
@@ -46,7 +63,7 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
-    setItems(sortNewsStaffOrder(initialItems))
+    setItems(sortNewsStaffList(initialItems))
   }, [initialItems])
 
   const beginEdit = (row: NewsRecord) => {
@@ -86,6 +103,12 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("終了日は開始日以降にしてください。")
       return
     }
+    if (isLikelyVercelPreviewHost()) {
+      setError(
+        "[このホストでは保存不可]\n\nVercel の URL（*.vercel.app）上では data/news.json へ書き込めません。お知らせの追加は、PC でリポジトリを開き `pnpm dev` を起動した http://localhost:3000（など）から行うか、GitHub 上の data/news.json を編集してコミットしてください。",
+      )
+      return
+    }
     setPendingAdd(true)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -103,18 +126,18 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
         }),
         signal: controller.signal,
       })
-      let data: { error?: string; items?: NewsRecord[] }
+      let data: StaffNewsApiErrorBody
       try {
-        data = (await response.json()) as { error?: string; items?: NewsRecord[] }
+        data = (await response.json()) as StaffNewsApiErrorBody
       } catch {
         setError("サーバーからの応答を解釈できませんでした。")
         return
       }
       if (!response.ok) {
-        setError(data.error ?? "保存に失敗しました。")
+        setError(buildStaffNewsSaveError(response, data, "保存に失敗しました。"))
         return
       }
-      if (Array.isArray(data.items)) setItems(sortNewsStaffOrder(data.items))
+      if (Array.isArray(data.items)) setItems(sortNewsStaffList(data.items))
       setMessage("お知らせを保存しました。")
       setTitle("")
       setStartDate("")
@@ -152,6 +175,12 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("終了日は開始日以降にしてください。")
       return
     }
+    if (isLikelyVercelPreviewHost()) {
+      setError(
+        "[このホストでは保存不可]\n\nVercel の URL 上では data/news.json へ書き込めません。手元で `pnpm dev` を起動した URL から編集するか、GitHub の data/news.json を編集してください。",
+      )
+      return
+    }
     setPendingEdit(true)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -170,18 +199,18 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
         }),
         signal: controller.signal,
       })
-      let data: { error?: string; items?: NewsRecord[] }
+      let data: StaffNewsApiErrorBody
       try {
-        data = (await response.json()) as { error?: string; items?: NewsRecord[] }
+        data = (await response.json()) as StaffNewsApiErrorBody
       } catch {
         setError("サーバーからの応答を解釈できませんでした。")
         return
       }
       if (!response.ok) {
-        setError(data.error ?? "更新に失敗しました。")
+        setError(buildStaffNewsSaveError(response, data, "更新に失敗しました。"))
         return
       }
-      if (Array.isArray(data.items)) setItems(sortNewsStaffOrder(data.items))
+      if (Array.isArray(data.items)) setItems(sortNewsStaffList(data.items))
       setMessage("お知らせを更新しました。")
       cancelEdit()
       router.refresh()
@@ -207,6 +236,12 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("セッションにアクセスコードがありません。")
       return
     }
+    if (isLikelyVercelPreviewHost()) {
+      setError(
+        "[このホストでは保存不可]\n\nVercel の URL 上では data/news.json へ書き込めません。手元で `pnpm dev` を起動した URL から削除するか、GitHub の data/news.json を編集してください。",
+      )
+      return
+    }
     setDeletingId(id)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -217,18 +252,18 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
         body: JSON.stringify({ accessCode, id }),
         signal: controller.signal,
       })
-      let data: { error?: string; items?: NewsRecord[] }
+      let data: StaffNewsApiErrorBody
       try {
-        data = (await response.json()) as { error?: string; items?: NewsRecord[] }
+        data = (await response.json()) as StaffNewsApiErrorBody
       } catch {
         setError("サーバーからの応答を解釈できませんでした。")
         return
       }
       if (!response.ok) {
-        setError(data.error ?? "削除に失敗しました。")
+        setError(buildStaffNewsSaveError(response, data, "削除に失敗しました。"))
         return
       }
-      if (Array.isArray(data.items)) setItems(sortNewsStaffOrder(data.items))
+      if (Array.isArray(data.items)) setItems(sortNewsStaffList(data.items))
       setMessage("お知らせを削除しました。")
       if (editingId === id) cancelEdit()
       router.refresh()
@@ -257,6 +292,10 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
           <p className="text-sm leading-relaxed text-muted-foreground">
             入力内容は <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/news.json</code>{" "}
             に追記されます（ローカル開発向け）。終了日の翌日0時からトップの「過去のお知らせ」に移ります。1日のみの予定は終了日を空欄にしてください（活動記録と同じ操作です）。
+            <span className="mt-2 block text-amber-200/90">
+              Vercel などの本番サーバー上ではファイルへ書き込めないため、このフォームからの保存は動きません。手元で{" "}
+              <code className="rounded bg-muted px-1.5 py-0.5 text-xs">pnpm dev</code> を起動したときにご利用ください。
+            </span>
           </p>
           <p className="text-xs text-muted-foreground">現在の登録件数: {items.length} 件</p>
 
@@ -269,7 +308,7 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
           {error ? (
             <Alert variant="destructive">
               <AlertTitle>エラー</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription className="whitespace-pre-wrap">{error}</AlertDescription>
             </Alert>
           ) : null}
 

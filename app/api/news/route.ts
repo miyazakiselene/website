@@ -1,5 +1,4 @@
 import { randomUUID, timingSafeEqual } from "node:crypto"
-import { revalidatePath } from "next/cache"
 import { NextResponse } from "next/server"
 import {
   appendNewsRecord,
@@ -9,6 +8,7 @@ import {
 } from "@/lib/news"
 import type { NewsRecord } from "@/lib/news-model"
 import { formatActivityPeriodHeading } from "@/lib/map-activities-to-tournaments"
+import { revalidatePathsSafe } from "@/lib/safe-revalidate"
 import {
   NEWS_CONTENT_MAX,
   NEWS_JSON_BODY_MAX_BYTES,
@@ -16,6 +16,7 @@ import {
   newsPatchBodySchema,
   newsPostBodySchema,
 } from "@/lib/news-validation"
+import { errorToDetailString, persistJsonFilesystemUserMessage } from "@/lib/persist-json-fs-message"
 
 export const runtime = "nodejs"
 
@@ -113,18 +114,29 @@ export async function POST(request: Request) {
 
   try {
     const items = await appendNewsRecord(record)
-    revalidatePath("/")
-    revalidatePath("/staff/news")
+    revalidatePathsSafe(["/", "/staff/news"])
     return NextResponse.json({ ok: true, items })
   } catch (error) {
-    const message = error instanceof Error ? error.message : ""
+    const message = error instanceof Error ? error.message : String(error)
     if (message.startsWith("NEWS_LIMIT")) {
       return NextResponse.json({ error: "お知らせの登録上限に達しています。" }, { status: 413 })
     }
     if (message === "NEWS_INVALID") {
       return NextResponse.json({ error: "保存内容が無効です。日付と会場を確認してください。" }, { status: 400 })
     }
-    return NextResponse.json({ error: "保存に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
+    const fsMsg = persistJsonFilesystemUserMessage(error)
+    if (fsMsg) {
+      console.error("[api/news POST]", error)
+      return NextResponse.json({ error: fsMsg, detail: errorToDetailString(error) }, { status: 503 })
+    }
+    console.error("[api/news POST]", error)
+    return NextResponse.json(
+      {
+        error: "保存に失敗しました。しばらくしてから再度お試しください。",
+        detail: errorToDetailString(error),
+      },
+      { status: 500 },
+    )
   }
 }
 
@@ -167,18 +179,29 @@ export async function PATCH(request: Request) {
 
   try {
     const items = await updateNewsRecord(record)
-    revalidatePath("/")
-    revalidatePath("/staff/news")
+    revalidatePathsSafe(["/", "/staff/news"])
     return NextResponse.json({ ok: true, items })
   } catch (error) {
-    const message = error instanceof Error ? error.message : ""
+    const message = error instanceof Error ? error.message : String(error)
     if (message === "NEWS_NOT_FOUND") {
       return NextResponse.json({ error: "指定のお知らせが見つかりません。" }, { status: 404 })
     }
     if (message === "NEWS_INVALID") {
       return NextResponse.json({ error: "保存内容が無効です。" }, { status: 400 })
     }
-    return NextResponse.json({ error: "保存に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
+    const fsMsg = persistJsonFilesystemUserMessage(error)
+    if (fsMsg) {
+      console.error("[api/news PATCH]", error)
+      return NextResponse.json({ error: fsMsg, detail: errorToDetailString(error) }, { status: 503 })
+    }
+    console.error("[api/news PATCH]", error)
+    return NextResponse.json(
+      {
+        error: "保存に失敗しました。しばらくしてから再度お試しください。",
+        detail: errorToDetailString(error),
+      },
+      { status: 500 },
+    )
   }
 }
 
@@ -213,14 +236,25 @@ export async function DELETE(request: Request) {
 
   try {
     const items = await deleteNewsRecordById(parsed.data.id)
-    revalidatePath("/")
-    revalidatePath("/staff/news")
+    revalidatePathsSafe(["/", "/staff/news"])
     return NextResponse.json({ ok: true, items })
   } catch (error) {
-    const message = error instanceof Error ? error.message : ""
+    const message = error instanceof Error ? error.message : String(error)
     if (message === "NEWS_NOT_FOUND") {
       return NextResponse.json({ error: "指定のお知らせが見つかりません。" }, { status: 404 })
     }
-    return NextResponse.json({ error: "削除に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
+    const fsMsg = persistJsonFilesystemUserMessage(error)
+    if (fsMsg) {
+      console.error("[api/news DELETE]", error)
+      return NextResponse.json({ error: fsMsg, detail: errorToDetailString(error) }, { status: 503 })
+    }
+    console.error("[api/news DELETE]", error)
+    return NextResponse.json(
+      {
+        error: "削除に失敗しました。しばらくしてから再度お試しください。",
+        detail: errorToDetailString(error),
+      },
+      { status: 500 },
+    )
   }
 }

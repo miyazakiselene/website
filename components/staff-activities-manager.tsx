@@ -31,6 +31,24 @@ type StaffActivitiesManagerProps = {
 
 const fetchJsonTimeoutMs = 30_000
 
+type StaffActivitiesApiErrorBody = { error?: string; detail?: string; items?: ActivityRecord[] }
+
+function formatStaffActivitiesApiError(
+  data: StaffActivitiesApiErrorBody,
+  fallback: string,
+  httpStatus?: number,
+): string {
+  const main = data.error ?? fallback
+  const d = data.detail
+  if (d != null && String(d).trim() !== "") {
+    return `${main}\n\n（詳細）${String(d)}`
+  }
+  if (httpStatus != null) {
+    return `${main}\n\n（HTTP ${httpStatus}・詳細なし）`
+  }
+  return main
+}
+
 function updateOpponentLines(lines: string[], index: number, value: string): string[] {
   const next = [...lines]
   next[index] = value
@@ -137,15 +155,15 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         }),
         signal: controller.signal,
       })
-      let data: { error?: string; items?: ActivityRecord[] }
+      let data: StaffActivitiesApiErrorBody
       try {
-        data = (await response.json()) as { error?: string; items?: ActivityRecord[] }
+        data = (await response.json()) as StaffActivitiesApiErrorBody
       } catch {
         setError("サーバーからの応答を解釈できませんでした。")
         return
       }
       if (!response.ok) {
-        setError(data.error ?? "保存に失敗しました。")
+        setError(formatStaffActivitiesApiError(data, "保存に失敗しました。", response.status))
         return
       }
       if (Array.isArray(data.items)) setItems(data.items)
@@ -213,15 +231,15 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         }),
         signal: controller.signal,
       })
-      let data: { error?: string; items?: ActivityRecord[] }
+      let data: StaffActivitiesApiErrorBody
       try {
-        data = (await response.json()) as { error?: string; items?: ActivityRecord[] }
+        data = (await response.json()) as StaffActivitiesApiErrorBody
       } catch {
         setError("サーバーからの応答を解釈できませんでした。")
         return
       }
       if (!response.ok) {
-        setError(data.error ?? "更新に失敗しました。")
+        setError(formatStaffActivitiesApiError(data, "更新に失敗しました。", response.status))
         return
       }
       if (Array.isArray(data.items)) setItems(data.items)
@@ -260,15 +278,15 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         body: JSON.stringify({ accessCode, id }),
         signal: controller.signal,
       })
-      let data: { error?: string; items?: ActivityRecord[] }
+      let data: StaffActivitiesApiErrorBody
       try {
-        data = (await response.json()) as { error?: string; items?: ActivityRecord[] }
+        data = (await response.json()) as StaffActivitiesApiErrorBody
       } catch {
         setError("サーバーからの応答を解釈できませんでした。")
         return
       }
       if (!response.ok) {
-        setError(data.error ?? "削除に失敗しました。")
+        setError(formatStaffActivitiesApiError(data, "削除に失敗しました。", response.status))
         return
       }
       if (Array.isArray(data.items)) setItems(data.items)
@@ -312,7 +330,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
           {error ? (
             <Alert variant="destructive">
               <AlertTitle>エラー</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription className="whitespace-pre-wrap">{error}</AlertDescription>
             </Alert>
           ) : null}
 
