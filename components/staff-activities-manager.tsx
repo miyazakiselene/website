@@ -3,11 +3,17 @@
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ClipboardList, Pencil, Trash2 } from "lucide-react"
-import { formatActivityDateRangeJa, type ActivityRecord } from "@/lib/activities-model"
+import {
+  formatActivityDateRangeJa,
+  formatOpponentsDisplayJa,
+  joinOpponentLinesForStorage,
+  opponentStoredToFormLines,
+  type ActivityRecord,
+} from "@/lib/activities-model"
 import {
   ACTIVITIES_CONTENT_MAX,
   ACTIVITIES_LOCATION_MAX,
-  ACTIVITIES_OPPONENT_MAX,
+  ACTIVITIES_OPPONENT_LINE_MAX,
   ACTIVITIES_STAFF_RECENT_MANAGE_COUNT,
   ACTIVITIES_TITLE_MAX,
 } from "@/lib/activities-validation"
@@ -25,6 +31,16 @@ type StaffActivitiesManagerProps = {
 
 const fetchJsonTimeoutMs = 30_000
 
+function updateOpponentLines(lines: string[], index: number, value: string): string[] {
+  const next = [...lines]
+  next[index] = value
+  const last = next.length - 1
+  if (value.trim() !== "" && index === last) {
+    next.push("")
+  }
+  return next
+}
+
 export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerProps) {
   const router = useRouter()
   const [items, setItems] = useState<ActivityRecord[]>(initialItems)
@@ -38,7 +54,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
   const [title, setTitle] = useState("")
   const [location, setLocation] = useState("")
   const [content, setContent] = useState("")
-  const [opponent, setOpponent] = useState("")
+  const [opponentLines, setOpponentLines] = useState<string[]>([""])
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
   const [pending, setPending] = useState(false)
@@ -50,7 +66,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
   const [editTitle, setEditTitle] = useState("")
   const [editLocation, setEditLocation] = useState("")
   const [editContent, setEditContent] = useState("")
-  const [editOpponent, setEditOpponent] = useState("")
+  const [editOpponentLines, setEditOpponentLines] = useState<string[]>([""])
   const [pendingEdit, setPendingEdit] = useState(false)
 
   useEffect(() => {
@@ -66,7 +82,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
     setEditTitle(row.title)
     setEditLocation(row.location)
     setEditContent(row.content)
-    setEditOpponent(row.opponent)
+    setEditOpponentLines(opponentStoredToFormLines(row.opponent))
   }
 
   const cancelEdit = () => {
@@ -76,7 +92,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
     setEditTitle("")
     setEditLocation("")
     setEditContent("")
-    setEditOpponent("")
+    setEditOpponentLines([""])
   }
 
   const submit = async () => {
@@ -97,6 +113,12 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       return
     }
 
+    const opponentJoined = joinOpponentLinesForStorage(opponentLines)
+    if (opponentJoined.length === 0) {
+      setError("対戦相手を1チーム以上入力してください。")
+      return
+    }
+
     setPending(true)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -111,7 +133,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
           endDate: endDate.trim() === "" ? undefined : endDate.trim(),
           location: location.trim(),
           content,
-          opponent,
+          opponent: opponentJoined,
         }),
         signal: controller.signal,
       })
@@ -133,7 +155,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       setTitle("")
       setLocation("")
       setContent("")
-      setOpponent("")
+      setOpponentLines([""])
       router.refresh()
     } catch (e) {
       if (e instanceof DOMException && e.name === "AbortError") {
@@ -166,6 +188,12 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       return
     }
 
+    const editOpponentJoined = joinOpponentLinesForStorage(editOpponentLines)
+    if (editOpponentJoined.length === 0) {
+      setError("対戦相手を1チーム以上入力してください。")
+      return
+    }
+
     setPendingEdit(true)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -181,7 +209,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
           endDate: editEndDate.trim() === "" ? undefined : editEndDate.trim(),
           location: editLocation.trim(),
           content: editContent,
-          opponent: editOpponent,
+          opponent: editOpponentJoined,
         }),
         signal: controller.signal,
       })
@@ -332,15 +360,23 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="activity-opponent">対戦相手</Label>
-            <Input
-              id="activity-opponent"
-              value={opponent}
-              onChange={(e) => setOpponent(e.target.value)}
-              placeholder="例: ○○中学校"
-              autoComplete="off"
-              maxLength={ACTIVITIES_OPPONENT_MAX}
-            />
+            <Label>対戦相手（1行に1チーム。入力すると次の行が追加されます）</Label>
+            <div className="space-y-2">
+              {opponentLines.map((line, index) => (
+                <Input
+                  key={`opp-add-${index}`}
+                  id={index === 0 ? "activity-opponent-0" : undefined}
+                  aria-label={`対戦相手 ${index + 1}`}
+                  value={line}
+                  onChange={(e) =>
+                    setOpponentLines((prev) => updateOpponentLines(prev, index, e.target.value))
+                  }
+                  placeholder={index === 0 ? "例: ○○中学校" : "続けて入力"}
+                  autoComplete="off"
+                  maxLength={ACTIVITIES_OPPONENT_LINE_MAX}
+                />
+              ))}
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="activity-content">内容（任意）</Label>
@@ -429,14 +465,24 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor={`edit-opp-${row.id}`}>対戦相手</Label>
-                        <Input
-                          id={`edit-opp-${row.id}`}
-                          value={editOpponent}
-                          onChange={(e) => setEditOpponent(e.target.value)}
-                          maxLength={ACTIVITIES_OPPONENT_MAX}
-                          autoComplete="off"
-                        />
+                        <Label>対戦相手（1行に1チーム）</Label>
+                        <div className="space-y-2">
+                          {editOpponentLines.map((line, index) => (
+                            <Input
+                              key={`opp-edit-${row.id}-${index}`}
+                              aria-label={`対戦相手 ${index + 1}`}
+                              value={line}
+                              onChange={(e) =>
+                                setEditOpponentLines((prev) =>
+                                  updateOpponentLines(prev, index, e.target.value),
+                                )
+                              }
+                              placeholder={index === 0 ? "例: ○○中学校" : "続けて入力"}
+                              maxLength={ACTIVITIES_OPPONENT_LINE_MAX}
+                              autoComplete="off"
+                            />
+                          ))}
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor={`edit-content-${row.id}`}>内容（任意）</Label>
@@ -466,7 +512,9 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
                         {row.location.trim().length > 0 ? (
                           <p className="text-muted-foreground">場所: {row.location}</p>
                         ) : null}
-                        <p className="text-muted-foreground">対戦: {row.opponent}</p>
+                        <p className="text-muted-foreground">
+                          対戦: {formatOpponentsDisplayJa(row.opponent)}
+                        </p>
                         {row.content.trim().length > 0 ? (
                           <p className="whitespace-pre-wrap text-muted-foreground">{row.content}</p>
                         ) : null}

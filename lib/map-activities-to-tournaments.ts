@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns"
 import { ja } from "date-fns/locale"
-import type { ActivityRecord } from "@/lib/activities-model"
+import { formatOpponentsDisplayJa, type ActivityRecord } from "@/lib/activities-model"
 import type { Tournament } from "@/lib/activity-results-types"
 
 /** トップ表示用：期間の見出し（例: 2026年5月10日 / 2026年5月10日〜12日） */
@@ -42,7 +42,7 @@ export function activityRecordToTournament(record: ActivityRecord): Tournament {
       {
         id: `${record.endDate}-activity-${record.id}`,
         date: slashDate,
-        opponent: record.opponent,
+        opponent: formatOpponentsDisplayJa(record.opponent),
         ...(contentTrimmed.length > 0 ? { content: contentTrimmed } : {}),
       },
     ],

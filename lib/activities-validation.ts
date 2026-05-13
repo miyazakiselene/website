@@ -4,7 +4,12 @@ import { z } from "zod"
 export const ACTIVITIES_TITLE_MAX = 200
 export const ACTIVITIES_LOCATION_MAX = 200
 export const ACTIVITIES_CONTENT_MAX = 8000
-export const ACTIVITIES_OPPONENT_MAX = 200
+/** 対戦相手1行あたり（1チーム）の最大文字数 */
+export const ACTIVITIES_OPPONENT_LINE_MAX = 120
+/** 対戦相手の最大行数（チーム数） */
+export const ACTIVITIES_OPPONENT_MAX_LINES = 40
+/** 対戦相手フィールド全体（改行区切り複数チーム）の最大文字数 */
+export const ACTIVITIES_OPPONENT_MAX = 2400
 export const ACTIVITIES_ACCESS_CODE_MAX = 256
 export const ACTIVITIES_JSON_BODY_MAX_BYTES = 96_000
 export const ACTIVITIES_MAX_ITEMS = 500
