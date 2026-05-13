@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, Target, Award, Star } from "lucide-react"
+import { Target, Award, Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 import { AnimatedSection } from "@/components/animated-section"
@@ -113,13 +113,25 @@ export function TeamAbout({ galleryPhotos }: TeamAboutProps) {
         <AnimatedSection className="mb-20" animation="fadeInUp" delay={100}>
           <Card className="bg-background border-border overflow-hidden hover:border-primary/50 transition-colors duration-300">
             <CardContent className="p-8 md:p-14">
-              <div className="flex flex-col md:flex-row items-start gap-8">
-                <div className="flex-shrink-0">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Heart className="h-10 w-10 text-primary" />
+              <div className="flex flex-col gap-6 md:flex-row md:items-stretch md:gap-10">
+                <div
+                  className="hidden shrink-0 self-stretch rounded-full bg-gradient-to-b from-primary via-primary/50 to-primary/15 md:block md:w-1.5 md:min-h-[7rem]"
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="mb-5">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary md:text-sm md:tracking-[0.25em]">
+                      Mission
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="h-1 w-14 shrink-0 rounded-full bg-gradient-to-r from-primary to-primary/40 md:w-20"
+                        aria-hidden
+                      />
+                      <span className="text-sm font-semibold text-foreground md:text-base">チームの想い</span>
+                      <span className="h-px min-w-0 flex-1 bg-border" aria-hidden />
+                    </div>
                   </div>
-                </div>
-                <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-5">
                     私たちの目的
                   </h3>
