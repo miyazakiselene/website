@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { isStaffSessionUnlocked } from "@/lib/staff-session"
+import { isStaffSessionUnlocked, repairStaffSessionIfIncomplete } from "@/lib/staff-session"
 import { StaffAuthForm } from "@/components/staff-auth-form"
 import { StaffHub } from "@/components/staff-hub"
 
@@ -10,6 +10,7 @@ export function StaffEntry() {
   const [unlocked, setUnlocked] = useState(false)
 
   useEffect(() => {
+    repairStaffSessionIfIncomplete()
     setUnlocked(isStaffSessionUnlocked())
     setReady(true)
   }, [])

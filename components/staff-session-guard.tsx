@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { isStaffSessionUnlocked } from "@/lib/staff-session"
+import { isStaffSessionUnlocked, repairStaffSessionIfIncomplete } from "@/lib/staff-session"
 
 type StaffSessionGuardProps = {
   children: React.ReactNode
@@ -13,6 +13,7 @@ export function StaffSessionGuard({ children }: StaffSessionGuardProps) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
+    repairStaffSessionIfIncomplete()
     if (isStaffSessionUnlocked()) {
       setReady(true)
       return

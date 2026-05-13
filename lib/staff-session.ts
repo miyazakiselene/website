@@ -27,3 +27,16 @@ export function clearStaffSession(): void {
   window.sessionStorage.removeItem(STAFF_SESSION_STORAGE_KEY)
   window.sessionStorage.removeItem(STAFF_API_ACCESS_CODE_KEY)
 }
+
+/**
+ * 解錠フラグだけ残り API 用アクセスコードが無い不整合を直す（旧実装や手動操作のあとに発生しうる）。
+ * 呼び出し後は未認証扱いとなり、関係者トップでコードの再入力が必要になる。
+ */
+export function repairStaffSessionIfIncomplete(): void {
+  if (typeof window === "undefined") return
+  if (!isStaffSessionUnlocked()) return
+  const code = getStaffApiAccessCode()
+  if (code == null || code.trim().length === 0) {
+    clearStaffSession()
+  }
+}
