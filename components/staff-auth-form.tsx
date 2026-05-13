@@ -19,7 +19,7 @@ export function StaffAuthForm({ onUnlocked }: StaffAuthFormProps) {
 
   const unlock = () => {
     if (codeInput.trim() === expectedCode) {
-      setStaffSessionUnlocked()
+      setStaffSessionUnlocked(codeInput.trim())
       setAuthError("")
       onUnlocked()
       return

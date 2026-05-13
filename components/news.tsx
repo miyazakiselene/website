@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { CalendarDays, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,67 +10,27 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { partitionNewsByArchiveThreshold, type NewsRecord } from "@/lib/news-model"
 
-type NewsItem = {
-  id: string
-  date: string
-  title: string
-  venue: string
-  status: "current" | "past"
-}
-
-const newsItems: NewsItem[] = [
-  {
-    id: "2026-05-24",
-    date: "2026年5月24日",
-    title: "大分遠征",
-    venue: "詳細未定",
-    status: "current",
-  },
-  {
-    id: "2026-05-30",
-    date: "2026年5月30日",
-    title: "大宮中学校との練習試合",
-    venue: "大宮中学校",
-    status: "current",
-  },
-  {
-    id: "2026-05-31",
-    date: "2026年5月31日",
-    title: "赤江東中学校・日向中学校との練習試合",
-    venue: "赤江東中学校",
-    status: "current",
-  },
-  {
-    id: "2026-06-06-07",
-    date: "2026年6月6日-7日",
-    title: "アーリーサマーチャレンジ鹿児島2026",
-    venue: "鹿児島県郡山体育館等",
-    status: "current",
-  },
-  {
-    id: "2026-06-20-21",
-    date: "2026年6月20日-21日",
-    title: "令和8年度第3回宮崎県U15クラブバスケットボール夏季大会",
-    venue: "詳細未定",
-    status: "current",
-  },
-]
-
-function NewsCard({ item }: { item: NewsItem }) {
+function NewsCard({ item }: { item: NewsRecord }) {
   return (
-    <Card className="bg-background border-border hover:border-primary/40 transition-colors duration-300">
+    <Card className="border-border bg-background transition-colors duration-300 hover:border-primary/40">
       <CardContent className="p-4 md:p-7">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
-          <div>
+          <div className="min-w-0 flex-1">
             <div className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-primary md:mb-2 md:text-base">
-              <CalendarDays className="h-4 w-4 md:h-5 md:w-5" />
+              <CalendarDays className="h-4 w-4 shrink-0 md:h-5 md:w-5" />
               <span>{item.date}</span>
             </div>
             <h3 className="text-lg font-bold leading-snug text-foreground md:text-2xl">{item.title}</h3>
+            {item.content != null && item.content.length > 0 ? (
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground md:text-base">
+                {item.content}
+              </p>
+            ) : null}
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground md:text-base">
-            <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4" />
+          <div className="flex shrink-0 items-center gap-2 text-sm text-muted-foreground md:text-base">
+            <MapPin className="h-3.5 w-3.5 shrink-0 md:h-4 md:w-4" />
             <span>{item.venue}</span>
           </div>
         </div>
@@ -78,26 +39,37 @@ function NewsCard({ item }: { item: NewsItem }) {
   )
 }
 
-export function News() {
-  const currentNews = newsItems.filter((item) => item.status === "current")
-  const pastNews = newsItems.filter((item) => item.status === "past")
+type NewsProps = {
+  initialItems: NewsRecord[]
+}
+
+export function News({ initialItems }: NewsProps) {
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60_000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  const { current: currentNews, past: pastNews } = useMemo(
+    () => partitionNewsByArchiveThreshold(initialItems, now),
+    [initialItems, now],
+  )
 
   return (
-    <section id="news" className="py-24 md:py-28 bg-card">
+    <section id="news" className="bg-card py-24 md:py-28">
       <div className="container mx-auto px-4">
-        <AnimatedSection className="text-center mb-14" animation="fadeInUp">
-          <span className="text-base md:text-lg font-semibold text-primary uppercase tracking-widest">
+        <AnimatedSection className="mb-14 text-center" animation="fadeInUp">
+          <span className="text-base font-semibold uppercase tracking-widest text-primary md:text-lg">
             News
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mt-3 mb-6">
-            お知らせ
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            今後の活動予定（試合予定）を掲載します。
+          <h2 className="mt-3 mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">お知らせ</h2>
+          <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl">
+            今後の活動予定（試合予定）を掲載します。掲載終了日の翌日0時から「過去のお知らせ」へ移ります。
           </p>
         </AnimatedSection>
 
-        <div className="max-w-4xl mx-auto grid gap-4 md:gap-5">
+        <div className="mx-auto grid max-w-4xl gap-4 md:gap-5">
           {currentNews.map((plan, index) => (
             <AnimatedSection key={plan.id} animation="fadeInUp" delay={100 + index * 100}>
               <NewsCard item={plan} />
@@ -123,7 +95,7 @@ export function News() {
                       </div>
                     ) : (
                       <p className="px-2 py-3 text-sm text-muted-foreground">
-                        まだ過去のお知らせはありません。終了したらこの中へ移します。
+                        まだ過去のお知らせはありません。予定日の翌日以降に自動でここへ表示されます。
                       </p>
                     )}
                   </div>
