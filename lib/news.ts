@@ -9,14 +9,22 @@ import {
   normalizeNewsRecord,
   type NewsRecord,
 } from "@/lib/news-model"
+import {
+  appendNewsRecordSupabase,
+  deleteNewsRecordByIdSupabase,
+  isNewsSupabaseEnabled,
+  readNewsFromSupabase,
+  updateNewsRecordSupabase,
+} from "@/lib/news-supabase"
 import { NEWS_MAX_ITEMS } from "@/lib/news-validation"
 
 export type { NewsRecord } from "@/lib/news-model"
 export { getNewsArchiveThreshold, partitionNewsByArchiveThreshold } from "@/lib/news-model"
+export { isNewsSupabaseEnabled } from "@/lib/news-supabase"
 
 const NEWS_FILE = path.join(process.cwd(), "data", "news.json")
 
-/** 同一プロセス内の news.json 更新を直列化（読み取り→追記→書き込みの競合を防ぐ） */
+/** 同一プロセス内の news.json / Supabase 更新を直列化（読み取り→更新の競合を防ぐ） */
 let newsWriteChain: Promise<unknown> = Promise.resolve()
 
 function runExclusiveNewsWrite<T>(task: () => Promise<T>): Promise<T> {
@@ -60,6 +68,9 @@ async function writeNewsRecordsAtomic(items: NewsRecord[]): Promise<void> {
 }
 
 export async function readNewsRecords(): Promise<NewsRecord[]> {
+  if (isNewsSupabaseEnabled()) {
+    return readNewsFromSupabase()
+  }
   try {
     const raw = await fs.readFile(NEWS_FILE, "utf-8")
     const list = await parseNewsFile(raw)
@@ -72,12 +83,18 @@ export async function readNewsRecords(): Promise<NewsRecord[]> {
 }
 
 export async function writeNewsRecords(items: NewsRecord[]): Promise<void> {
+  if (isNewsSupabaseEnabled()) {
+    throw new Error("writeNewsRecords は Supabase モードでは未対応です。")
+  }
   await runExclusiveNewsWrite(async () => {
     await writeNewsRecordsAtomic(finalizeRecords(items))
   })
 }
 
 export async function appendNewsRecord(record: NewsRecord): Promise<NewsRecord[]> {
+  if (isNewsSupabaseEnabled()) {
+    return runExclusiveNewsWrite(() => appendNewsRecordSupabase(record))
+  }
   return runExclusiveNewsWrite(async () => {
     const raw = await fs.readFile(NEWS_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
       if (e.code === "ENOENT") return "[]"
@@ -98,6 +115,9 @@ export async function appendNewsRecord(record: NewsRecord): Promise<NewsRecord[]
 }
 
 export async function updateNewsRecord(record: NewsRecord): Promise<NewsRecord[]> {
+  if (isNewsSupabaseEnabled()) {
+    return runExclusiveNewsWrite(() => updateNewsRecordSupabase(record))
+  }
   return runExclusiveNewsWrite(async () => {
     const raw = await fs.readFile(NEWS_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
       if (e.code === "ENOENT") return "[]"
@@ -120,6 +140,9 @@ export async function updateNewsRecord(record: NewsRecord): Promise<NewsRecord[]
 }
 
 export async function deleteNewsRecordById(id: string): Promise<NewsRecord[]> {
+  if (isNewsSupabaseEnabled()) {
+    return runExclusiveNewsWrite(() => deleteNewsRecordByIdSupabase(id))
+  }
   return runExclusiveNewsWrite(async () => {
     const raw = await fs.readFile(NEWS_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
       if (e.code === "ENOENT") return "[]"

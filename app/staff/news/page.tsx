@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { StaffNewsForm } from "@/components/staff-news-form"
 import { StaffSessionGuard } from "@/components/staff-session-guard"
-import { readNewsRecords } from "@/lib/news"
+import { isNewsSupabaseEnabled, readNewsRecords } from "@/lib/news"
 
 export const metadata: Metadata = {
   title: "お知らせの管理 | 関係者専用 | 宮崎SELENE（セレーネ）",
@@ -19,9 +19,20 @@ export default async function StaffNewsPage() {
       <header className="mb-8">
         <h1 className="mb-2 text-2xl font-black text-foreground md:text-3xl">お知らせの管理</h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          お知らせの追加に加え、一覧から修正・削除ができます。変更は data/news.json に保存され、トップへ反映されます（手元で{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">pnpm dev</code>{" "}
-          を動かしているときのみ書き込み可能。Vercel 本番のみでは保存できません）。
+          {isNewsSupabaseEnabled() ? (
+            <>
+              お知らせの追加に加え、一覧から修正・削除ができます。保存先は{" "}
+              <strong className="font-semibold text-foreground">Supabase</strong> です（本番の Vercel からも保存可能）。トップへ反映されます。
+            </>
+          ) : (
+            <>
+              お知らせの追加に加え、一覧から修正・削除ができます。保存先は{" "}
+              <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/news.json</code>{" "}
+              です（手元で{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-xs">pnpm dev</code> を動かしているときのみ書き込み可能。Supabase
+              を有効にすると本番からも保存できます）。
+            </>
+          )}
         </p>
       </header>
       <StaffNewsForm initialItems={items} />

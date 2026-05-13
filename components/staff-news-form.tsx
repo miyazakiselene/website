@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Megaphone, Pencil, Trash2 } from "lucide-react"
 import { getStaffApiAccessCode } from "@/lib/staff-session"
 import { sortNewsRecordsForDisplayOrder, type NewsRecord } from "@/lib/news-model"
+import { isNewsSupabaseUrlConfigured } from "@/lib/news-storage-env"
 import { NEWS_CONTENT_MAX, NEWS_TITLE_MAX, NEWS_VENUE_MAX } from "@/lib/news-validation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -32,8 +33,10 @@ function buildStaffNewsSaveError(response: Response, data: StaffNewsApiErrorBody
   return lines.join("\n\n")
 }
 
-function isLikelyVercelPreviewHost(): boolean {
+/** *.vercel.app かつファイル保存のみのときはブロック（Supabase URL があれば本番保存を許可） */
+function shouldBlockStaffNewsSaveOnVercelPreview(): boolean {
   if (typeof window === "undefined") return false
+  if (isNewsSupabaseUrlConfigured()) return false
   const h = window.location.hostname
   return h === "vercel.app" || h.endsWith(".vercel.app")
 }
@@ -103,9 +106,9 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("終了日は開始日以降にしてください。")
       return
     }
-    if (isLikelyVercelPreviewHost()) {
+    if (shouldBlockStaffNewsSaveOnVercelPreview()) {
       setError(
-        "[このホストでは保存不可]\n\nVercel の URL（*.vercel.app）上では data/news.json へ書き込めません。お知らせの追加は、PC でリポジトリを開き `pnpm dev` を起動した http://localhost:3000（など）から行うか、GitHub 上の data/news.json を編集してコミットしてください。",
+        "[このホストでは保存不可]\n\nVercel のプレビュー URL では data/news.json へ書き込めません。Supabase を設定するか、手元で `pnpm dev` を起動した URL から登録するか、GitHub の data/news.json を編集してください。",
       )
       return
     }
@@ -175,9 +178,9 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("終了日は開始日以降にしてください。")
       return
     }
-    if (isLikelyVercelPreviewHost()) {
+    if (shouldBlockStaffNewsSaveOnVercelPreview()) {
       setError(
-        "[このホストでは保存不可]\n\nVercel の URL 上では data/news.json へ書き込めません。手元で `pnpm dev` を起動した URL から編集するか、GitHub の data/news.json を編集してください。",
+        "[このホストでは保存不可]\n\nVercel のプレビュー URL では data/news.json へ書き込めません。Supabase を設定するか、手元の開発 URL から編集するか、GitHub の data/news.json を編集してください。",
       )
       return
     }
@@ -236,9 +239,9 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("セッションにアクセスコードがありません。")
       return
     }
-    if (isLikelyVercelPreviewHost()) {
+    if (shouldBlockStaffNewsSaveOnVercelPreview()) {
       setError(
-        "[このホストでは保存不可]\n\nVercel の URL 上では data/news.json へ書き込めません。手元で `pnpm dev` を起動した URL から削除するか、GitHub の data/news.json を編集してください。",
+        "[このホストでは保存不可]\n\nVercel のプレビュー URL では data/news.json へ書き込めません。Supabase を設定するか、手元の開発 URL から削除するか、GitHub の data/news.json を編集してください。",
       )
       return
     }
@@ -290,12 +293,29 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
         </CardHeader>
         <CardContent className="space-y-5">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            入力内容は <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/news.json</code>{" "}
-            に追記されます（ローカル開発向け）。終了日の翌日0時からトップの「過去のお知らせ」に移ります。1日のみの予定は終了日を空欄にしてください（活動記録と同じ操作です）。
-            <span className="mt-2 block text-amber-200/90">
-              Vercel などの本番サーバー上ではファイルへ書き込めないため、このフォームからの保存は動きません。手元で{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 text-xs">pnpm dev</code> を起動したときにご利用ください。
-            </span>
+            {isNewsSupabaseUrlConfigured() ? (
+              <>
+                入力内容は <strong className="font-semibold text-foreground">Supabase</strong>{" "}
+                に保存されます。終了日の翌日0時からトップの「過去のお知らせ」に移ります。1日のみの予定は終了日を空欄にしてください（活動記録と同じ操作です）。
+              </>
+            ) : (
+              <>
+                入力内容は <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/news.json</code>{" "}
+                に追記されます（ローカル開発向け）。終了日の翌日0時からトップの「過去のお知らせ」に移ります。1日のみの予定は終了日を空欄にしてください（活動記録と同じ操作です）。
+              </>
+            )}
+            {isNewsSupabaseUrlConfigured() ? (
+              <span className="mt-2 block text-emerald-200/90">
+                Supabase に保存されます（本番の Vercel からも利用できます）。サーバーに{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 text-xs">SUPABASE_SERVICE_ROLE_KEY</code>{" "}
+                が設定されている必要があります。
+              </span>
+            ) : (
+              <span className="mt-2 block text-amber-200/90">
+                Vercel のプレビュー URL ではファイル（data/news.json）へ書き込めません。Supabase を設定するか、手元で{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 text-xs">pnpm dev</code> を起動したときにご利用ください。
+              </span>
+            )}
           </p>
           <p className="text-xs text-muted-foreground">現在の登録件数: {items.length} 件</p>
 

@@ -124,6 +124,12 @@ export async function POST(request: Request) {
     if (message === "NEWS_INVALID") {
       return NextResponse.json({ error: "保存内容が無効です。日付と会場を確認してください。" }, { status: 400 })
     }
+    if (message === "NEWS_DUPLICATE_ID") {
+      return NextResponse.json(
+        { error: "同じ ID のお知らせが既に存在します。ページを再読み込みしてから再度お試しください。" },
+        { status: 409 },
+      )
+    }
     const fsMsg = persistJsonFilesystemUserMessage(error)
     if (fsMsg) {
       console.error("[api/news POST]", error)
