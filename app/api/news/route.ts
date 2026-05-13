@@ -4,6 +4,7 @@ import { ja } from "date-fns/locale"
 import { revalidatePath } from "next/cache"
 import { NextResponse } from "next/server"
 import { appendNewsRecord, readNewsRecords, type NewsRecord } from "@/lib/news"
+import { NEWS_CONTENT_MAX, NEWS_JSON_BODY_MAX_BYTES, newsPostBodySchema } from "@/lib/news-validation"
 
 export const runtime = "nodejs"
 
@@ -27,62 +28,82 @@ function staffCodeMatches(input: string): boolean {
 
 export async function GET() {
   const items = await readNewsRecords()
-  return NextResponse.json({ items })
+  return NextResponse.json(
+    { items },
+    {
+      headers: {
+        "Cache-Control": "private, no-store, max-age=0",
+      },
+    },
+  )
 }
 
-type PostBody = {
-  accessCode?: string
-  title?: string
-  date?: string
+function buildRecordFromValidated(input: {
+  title: string
+  date: string
   content?: string
   venue?: string
-}
-
-function isValidIsoDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
-  const d = parseISO(value)
-  return !Number.isNaN(d.getTime()) && format(d, "yyyy-MM-dd") === value
+}): NewsRecord {
+  const parsed = parseISO(input.date)
+  const displayDate = format(parsed, "yyyy年M月d日", { locale: ja })
+  const venue = (input.venue ?? "").trim() || "詳細未定"
+  const contentRaw = input.content?.trim() ?? ""
+  return {
+    id: `news-${randomUUID()}`,
+    date: displayDate,
+    title: input.title.trim(),
+    venue,
+    content: contentRaw.length > 0 ? contentRaw.slice(0, NEWS_CONTENT_MAX) : undefined,
+    eventEndDate: input.date,
+  }
 }
 
 export async function POST(request: Request) {
-  let body: PostBody
+  let buf: ArrayBuffer
   try {
-    body = (await request.json()) as PostBody
+    buf = await request.arrayBuffer()
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
+    return NextResponse.json({ error: "リクエストの読み取りに失敗しました。" }, { status: 400 })
   }
 
-  if (!staffCodeMatches(String(body.accessCode ?? ""))) {
+  if (buf.byteLength > NEWS_JSON_BODY_MAX_BYTES) {
+    return NextResponse.json({ error: "リクエストが大きすぎます。" }, { status: 413 })
+  }
+
+  let json: unknown
+  try {
+    json = JSON.parse(new TextDecoder("utf-8").decode(buf)) as unknown
+  } catch {
+    return NextResponse.json({ error: "JSON の形式が不正です。" }, { status: 400 })
+  }
+
+  const parsed = newsPostBodySchema.safeParse(json)
+  if (!parsed.success) {
+    const msg = parsed.error.issues.map((i) => i.message).join(" ")
+    return NextResponse.json({ error: msg || "入力内容を確認してください。" }, { status: 400 })
+  }
+
+  if (!staffCodeMatches(parsed.data.accessCode)) {
     return NextResponse.json({ error: "認証に失敗しました。" }, { status: 401 })
   }
 
-  const title = String(body.title ?? "").trim()
-  const dateIso = String(body.date ?? "").trim()
-  const content = String(body.content ?? "").trim()
-  const venue = String(body.venue ?? "").trim() || "詳細未定"
+  const record = buildRecordFromValidated({
+    title: parsed.data.title,
+    date: parsed.data.date,
+    content: parsed.data.content,
+    venue: parsed.data.venue,
+  })
 
-  if (title.length === 0) {
-    return NextResponse.json({ error: "タイトルを入力してください。" }, { status: 400 })
+  try {
+    const items = await appendNewsRecord(record)
+    revalidatePath("/")
+    revalidatePath("/staff/news")
+    return NextResponse.json({ ok: true, items })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ""
+    if (message.startsWith("NEWS_LIMIT")) {
+      return NextResponse.json({ error: "お知らせの登録上限に達しています。" }, { status: 413 })
+    }
+    return NextResponse.json({ error: "保存に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
   }
-  if (!isValidIsoDate(dateIso)) {
-    return NextResponse.json({ error: "日付は YYYY-MM-DD 形式で入力してください。" }, { status: 400 })
-  }
-
-  const parsed = parseISO(dateIso)
-  const displayDate = format(parsed, "yyyy年M月d日", { locale: ja })
-
-  const record: NewsRecord = {
-    id: `news-${randomUUID()}`,
-    date: displayDate,
-    title,
-    venue,
-    content: content.length > 0 ? content : undefined,
-    eventEndDate: dateIso,
-  }
-
-  const items = await appendNewsRecord(record)
-  revalidatePath("/")
-  revalidatePath("/staff/news")
-
-  return NextResponse.json({ ok: true, items })
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Megaphone } from "lucide-react"
 import { getStaffApiAccessCode } from "@/lib/staff-session"
 import type { NewsRecord } from "@/lib/news-model"
+import { NEWS_CONTENT_MAX, NEWS_TITLE_MAX, NEWS_VENUE_MAX } from "@/lib/news-validation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,6 +36,8 @@ export function StaffNewsForm({ initialCount }: StaffNewsFormProps) {
       return
     }
     setPending(true)
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), 30_000)
     try {
       const response = await fetch("/api/news", {
         method: "POST",
@@ -46,8 +49,15 @@ export function StaffNewsForm({ initialCount }: StaffNewsFormProps) {
           content,
           venue: venue.trim(),
         }),
+        signal: controller.signal,
       })
-      const data = (await response.json()) as { error?: string; items?: NewsRecord[] }
+      let data: { error?: string; items?: NewsRecord[] }
+      try {
+        data = (await response.json()) as { error?: string; items?: NewsRecord[] }
+      } catch {
+        setError("サーバーからの応答を解釈できませんでした。")
+        return
+      }
       if (!response.ok) {
         setError(data.error ?? "保存に失敗しました。")
         return
@@ -58,9 +68,14 @@ export function StaffNewsForm({ initialCount }: StaffNewsFormProps) {
       setContent("")
       setVenue("")
       router.refresh()
-    } catch {
-      setError("通信に失敗しました。")
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") {
+        setError("通信がタイムアウトしました。ネットワークを確認して再度お試しください。")
+      } else {
+        setError("通信に失敗しました。")
+      }
     } finally {
+      window.clearTimeout(timeoutId)
       setPending(false)
     }
   }
@@ -101,6 +116,7 @@ export function StaffNewsForm({ initialCount }: StaffNewsFormProps) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="例: 練習試合のお知らせ"
             autoComplete="off"
+            maxLength={NEWS_TITLE_MAX}
           />
         </div>
         <div className="space-y-2">
@@ -115,6 +131,7 @@ export function StaffNewsForm({ initialCount }: StaffNewsFormProps) {
             onChange={(e) => setVenue(e.target.value)}
             placeholder="未入力の場合は「詳細未定」"
             autoComplete="off"
+            maxLength={NEWS_VENUE_MAX}
           />
         </div>
         <div className="space-y-2">
@@ -125,6 +142,7 @@ export function StaffNewsForm({ initialCount }: StaffNewsFormProps) {
             onChange={(e) => setContent(e.target.value)}
             rows={6}
             placeholder="お知らせの本文を入力"
+            maxLength={NEWS_CONTENT_MAX}
           />
         </div>
 
