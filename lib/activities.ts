@@ -30,11 +30,13 @@ function finalizeRecords(raw: ActivityRecord[]): ActivityRecord[] {
   return dedupeActivitiesByIdFirstWins(raw)
 }
 
-/** 日付（新しい順）→ id のタイブレークで安定ソート */
+/** 終了日が新しい順（同日なら開始日→ id） */
 export function sortActivitiesNewestFirst(items: ActivityRecord[]): ActivityRecord[] {
   return [...items].sort((a, b) => {
-    const c = b.date.localeCompare(a.date)
+    const c = b.endDate.localeCompare(a.endDate)
     if (c !== 0) return c
+    const s = b.startDate.localeCompare(a.startDate)
+    if (s !== 0) return s
     return b.id.localeCompare(a.id)
   })
 }

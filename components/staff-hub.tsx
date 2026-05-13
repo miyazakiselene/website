@@ -42,7 +42,7 @@ export function StaffHub() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                トップの活動記録に載せる1件単位の記録を追加・削除します（data/activities.json）。
+                トップの活動記録に載せる記録を追加・削除します（開始日・終了日・data/activities.json）。
               </p>
               <Button asChild variant="secondary" className="w-full sm:w-auto">
                 <Link href="/staff/activities">活動記録の管理ページへ</Link>

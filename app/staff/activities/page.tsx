@@ -19,7 +19,7 @@ export default async function StaffActivitiesPage() {
       <header className="mb-8">
         <h1 className="mb-2 text-2xl font-black text-foreground md:text-3xl">活動記録の管理</h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          日付・タイトル・場所・内容・対戦相手を登録すると data/activities.json に保存され、トップの活動記録に反映されます。
+          開始日・終了日（任意）・タイトル・場所・内容・対戦相手を登録すると data/activities.json に保存され、トップの活動記録に反映されます。1日のみのときは終了日は空欄で構いません。
         </p>
       </header>
       <StaffActivitiesManager initialItems={items} />

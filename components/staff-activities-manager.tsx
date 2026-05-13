@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ClipboardList, Trash2 } from "lucide-react"
-import type { ActivityRecord } from "@/lib/activities-model"
+import { formatActivityDateRangeJa, type ActivityRecord } from "@/lib/activities-model"
 import {
   ACTIVITIES_CONTENT_MAX,
   ACTIVITIES_LOCATION_MAX,
@@ -22,16 +22,11 @@ type StaffActivitiesManagerProps = {
   initialItems: ActivityRecord[]
 }
 
-function formatDisplayDate(iso: string): string {
-  const [y, m, d] = iso.split("-")
-  if (!y || !m || !d) return iso
-  return `${y}年${Number(m)}月${Number(d)}日`
-}
-
 export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerProps) {
   const router = useRouter()
   const [items, setItems] = useState<ActivityRecord[]>(initialItems)
-  const [date, setDate] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [title, setTitle] = useState("")
   const [location, setLocation] = useState("")
   const [content, setContent] = useState("")
@@ -53,8 +48,13 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       setError("セッションにアクセスコードがありません。一度ログアウトして、関係者ページから再度認証してください。")
       return
     }
-    if (date.trim() === "") {
-      setError("日付を入力してください。")
+    if (startDate.trim() === "") {
+      setError("開始日を入力してください。")
+      return
+    }
+    const effectiveEnd = endDate.trim() === "" ? startDate : endDate.trim()
+    if (effectiveEnd < startDate) {
+      setError("終了日は開始日以降にしてください。")
       return
     }
 
@@ -68,7 +68,8 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         body: JSON.stringify({
           accessCode,
           title,
-          date,
+          startDate,
+          endDate: endDate.trim() === "" ? undefined : endDate.trim(),
           location: location.trim(),
           content,
           opponent,
@@ -88,6 +89,8 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       }
       if (Array.isArray(data.items)) setItems(data.items)
       setMessage("活動記録を保存しました。")
+      setStartDate("")
+      setEndDate("")
       setTitle("")
       setLocation("")
       setContent("")
@@ -163,7 +166,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         <CardContent className="space-y-5">
           <p className="text-sm leading-relaxed text-muted-foreground">
             入力内容は <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/activities.json</code>{" "}
-            に保存され、トップの活動記録セクションに反映されます。
+            に保存され、トップの活動記録セクションに反映されます。複数日にまたがる場合は終了日を指定してください（1日のみのときは終了日は空欄で構いません）。
           </p>
           <p className="text-xs text-muted-foreground">現在の登録件数: {items.length} 件</p>
 
@@ -180,9 +183,26 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
             </Alert>
           ) : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="activity-date">日付</Label>
-            <Input id="activity-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="activity-start-date">開始日</Label>
+              <Input
+                id="activity-start-date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="activity-end-date">終了日（任意・1日のみなら空欄）</Label>
+              <Input
+                id="activity-end-date"
+                type="date"
+                value={endDate}
+                min={startDate || undefined}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="activity-title">タイトル</Label>
@@ -229,7 +249,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
             />
           </div>
 
-          <Button type="button" className="w-full sm:w-auto" disabled={pending} onClick={submit}>
+          <Button type="button" className="w-full sm:w-auto" disabled={pending} onClick={() => void submit()}>
             {pending ? "送信中…" : "活動記録を登録"}
           </Button>
         </CardContent>
@@ -250,7 +270,9 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
                   className="flex flex-col gap-3 rounded-xl border border-border/80 bg-secondary/20 p-4 sm:flex-row sm:items-start sm:justify-between"
                 >
                   <div className="min-w-0 flex-1 space-y-1 text-sm">
-                    <p className="font-semibold text-foreground">{formatDisplayDate(row.date)} — {row.title}</p>
+                    <p className="font-semibold text-foreground">
+                      {formatActivityDateRangeJa(row.startDate, row.endDate)} — {row.title}
+                    </p>
                     {row.location.trim().length > 0 ? (
                       <p className="text-muted-foreground">場所: {row.location}</p>
                     ) : null}

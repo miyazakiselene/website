@@ -46,7 +46,8 @@ export async function GET() {
 }
 
 function buildRecordFromValidated(input: {
-  date: string
+  startDate: string
+  endDate: string
   title: string
   location: string
   content?: string
@@ -54,7 +55,8 @@ function buildRecordFromValidated(input: {
 }): ActivityRecord {
   return {
     id: `activity-${randomUUID()}`,
-    date: input.date,
+    startDate: input.startDate,
+    endDate: input.endDate,
     title: input.title.trim(),
     location: input.location.trim(),
     content: (input.content ?? "").trim(),
@@ -92,7 +94,8 @@ export async function POST(request: Request) {
   }
 
   const record = buildRecordFromValidated({
-    date: parsed.data.date,
+    startDate: parsed.data.startDate,
+    endDate: parsed.data.endDate,
     title: parsed.data.title,
     location: parsed.data.location,
     content: parsed.data.content,
