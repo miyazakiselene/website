@@ -5,11 +5,13 @@ import {
   appendActivityRecord,
   deleteActivityRecordById,
   readActivityRecords,
-  type ActivityRecord,
+  updateActivityRecord,
 } from "@/lib/activities"
+import type { ActivityRecord } from "@/lib/activities-model"
 import {
   ACTIVITIES_JSON_BODY_MAX_BYTES,
   activityDeleteBodySchema,
+  activityPatchBodySchema,
   activityPostBodySchema,
 } from "@/lib/activities-validation"
 
@@ -45,16 +47,19 @@ export async function GET() {
   )
 }
 
-function buildRecordFromValidated(input: {
-  startDate: string
-  endDate: string
-  title: string
-  location: string
-  content?: string
-  opponent: string
-}): ActivityRecord {
+function buildActivityRecordWithId(
+  id: string,
+  input: {
+    startDate: string
+    endDate: string
+    title: string
+    location: string
+    content?: string
+    opponent: string
+  },
+): ActivityRecord {
   return {
-    id: `activity-${randomUUID()}`,
+    id,
     startDate: input.startDate,
     endDate: input.endDate,
     title: input.title.trim(),
@@ -93,7 +98,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "認証に失敗しました。" }, { status: 401 })
   }
 
-  const record = buildRecordFromValidated({
+  const record = buildActivityRecordWithId(`activity-${randomUUID()}`, {
     startDate: parsed.data.startDate,
     endDate: parsed.data.endDate,
     title: parsed.data.title,
@@ -111,6 +116,61 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : ""
     if (message.startsWith("ACTIVITIES_LIMIT")) {
       return NextResponse.json({ error: "活動記録の登録上限に達しています。" }, { status: 413 })
+    }
+    return NextResponse.json({ error: "保存に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
+  }
+}
+
+export async function PATCH(request: Request) {
+  let buf: ArrayBuffer
+  try {
+    buf = await request.arrayBuffer()
+  } catch {
+    return NextResponse.json({ error: "リクエストの読み取りに失敗しました。" }, { status: 400 })
+  }
+
+  if (buf.byteLength > ACTIVITIES_JSON_BODY_MAX_BYTES) {
+    return NextResponse.json({ error: "リクエストが大きすぎます。" }, { status: 413 })
+  }
+
+  let json: unknown
+  try {
+    json = JSON.parse(new TextDecoder("utf-8").decode(buf)) as unknown
+  } catch {
+    return NextResponse.json({ error: "JSON の形式が不正です。" }, { status: 400 })
+  }
+
+  const parsed = activityPatchBodySchema.safeParse(json)
+  if (!parsed.success) {
+    const msg = parsed.error.issues.map((i) => i.message).join(" ")
+    return NextResponse.json({ error: msg || "入力内容を確認してください。" }, { status: 400 })
+  }
+
+  if (!staffCodeMatches(parsed.data.accessCode)) {
+    return NextResponse.json({ error: "認証に失敗しました。" }, { status: 401 })
+  }
+
+  const record = buildActivityRecordWithId(parsed.data.id, {
+    startDate: parsed.data.startDate,
+    endDate: parsed.data.endDate,
+    title: parsed.data.title,
+    location: parsed.data.location,
+    content: parsed.data.content,
+    opponent: parsed.data.opponent,
+  })
+
+  try {
+    const items = await updateActivityRecord(record)
+    revalidatePath("/")
+    revalidatePath("/staff/activities")
+    return NextResponse.json({ ok: true, items })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ""
+    if (message === "ACTIVITIES_NOT_FOUND") {
+      return NextResponse.json({ error: "指定の活動記録が見つかりません。" }, { status: 404 })
+    }
+    if (message === "ACTIVITIES_INVALID") {
+      return NextResponse.json({ error: "保存内容が無効です。" }, { status: 400 })
     }
     return NextResponse.json({ error: "保存に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
   }
@@ -150,7 +210,11 @@ export async function DELETE(request: Request) {
     revalidatePath("/")
     revalidatePath("/staff/activities")
     return NextResponse.json({ ok: true, items })
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ""
+    if (message === "ACTIVITIES_NOT_FOUND") {
+      return NextResponse.json({ error: "指定の活動記録が見つかりません。" }, { status: 404 })
+    }
     return NextResponse.json({ error: "削除に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
   }
 }

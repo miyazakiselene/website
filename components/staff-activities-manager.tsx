@@ -1,13 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ClipboardList, Trash2 } from "lucide-react"
+import { ClipboardList, Pencil, Trash2 } from "lucide-react"
 import { formatActivityDateRangeJa, type ActivityRecord } from "@/lib/activities-model"
 import {
   ACTIVITIES_CONTENT_MAX,
   ACTIVITIES_LOCATION_MAX,
   ACTIVITIES_OPPONENT_MAX,
+  ACTIVITIES_STAFF_RECENT_MANAGE_COUNT,
   ACTIVITIES_TITLE_MAX,
 } from "@/lib/activities-validation"
 import { getStaffApiAccessCode } from "@/lib/staff-session"
@@ -22,9 +23,16 @@ type StaffActivitiesManagerProps = {
   initialItems: ActivityRecord[]
 }
 
+const fetchJsonTimeoutMs = 30_000
+
 export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerProps) {
   const router = useRouter()
   const [items, setItems] = useState<ActivityRecord[]>(initialItems)
+  const recentManaged = useMemo(
+    () => items.slice(0, ACTIVITIES_STAFF_RECENT_MANAGE_COUNT),
+    [items],
+  )
+
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [title, setTitle] = useState("")
@@ -36,9 +44,40 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
   const [pending, setPending] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editStartDate, setEditStartDate] = useState("")
+  const [editEndDate, setEditEndDate] = useState("")
+  const [editTitle, setEditTitle] = useState("")
+  const [editLocation, setEditLocation] = useState("")
+  const [editContent, setEditContent] = useState("")
+  const [editOpponent, setEditOpponent] = useState("")
+  const [pendingEdit, setPendingEdit] = useState(false)
+
   useEffect(() => {
     setItems(initialItems)
   }, [initialItems])
+
+  const beginEdit = (row: ActivityRecord) => {
+    setError("")
+    setMessage("")
+    setEditingId(row.id)
+    setEditStartDate(row.startDate)
+    setEditEndDate(row.startDate === row.endDate ? "" : row.endDate)
+    setEditTitle(row.title)
+    setEditLocation(row.location)
+    setEditContent(row.content)
+    setEditOpponent(row.opponent)
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditStartDate("")
+    setEditEndDate("")
+    setEditTitle("")
+    setEditLocation("")
+    setEditContent("")
+    setEditOpponent("")
+  }
 
   const submit = async () => {
     setError("")
@@ -60,7 +99,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
 
     setPending(true)
     const controller = new AbortController()
-    const timeoutId = window.setTimeout(() => controller.abort(), 30_000)
+    const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
     try {
       const response = await fetch("/api/activities", {
         method: "POST",
@@ -108,6 +147,71 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
     }
   }
 
+  const submitEdit = async () => {
+    if (editingId == null) return
+    setError("")
+    setMessage("")
+    const accessCode = getStaffApiAccessCode()
+    if (accessCode == null || accessCode.length === 0) {
+      setError("セッションにアクセスコードがありません。")
+      return
+    }
+    if (editStartDate.trim() === "") {
+      setError("開始日を入力してください。")
+      return
+    }
+    const effectiveEnd = editEndDate.trim() === "" ? editStartDate : editEndDate.trim()
+    if (effectiveEnd < editStartDate) {
+      setError("終了日は開始日以降にしてください。")
+      return
+    }
+
+    setPendingEdit(true)
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
+    try {
+      const response = await fetch("/api/activities", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessCode,
+          id: editingId,
+          title: editTitle,
+          startDate: editStartDate,
+          endDate: editEndDate.trim() === "" ? undefined : editEndDate.trim(),
+          location: editLocation.trim(),
+          content: editContent,
+          opponent: editOpponent,
+        }),
+        signal: controller.signal,
+      })
+      let data: { error?: string; items?: ActivityRecord[] }
+      try {
+        data = (await response.json()) as { error?: string; items?: ActivityRecord[] }
+      } catch {
+        setError("サーバーからの応答を解釈できませんでした。")
+        return
+      }
+      if (!response.ok) {
+        setError(data.error ?? "更新に失敗しました。")
+        return
+      }
+      if (Array.isArray(data.items)) setItems(data.items)
+      setMessage("活動記録を更新しました。")
+      cancelEdit()
+      router.refresh()
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") {
+        setError("通信がタイムアウトしました。")
+      } else {
+        setError("通信に失敗しました。")
+      }
+    } finally {
+      window.clearTimeout(timeoutId)
+      setPendingEdit(false)
+    }
+  }
+
   const remove = async (id: string) => {
     const confirmed = window.confirm("この活動記録を削除します。よろしいですか？")
     if (!confirmed) return
@@ -120,7 +224,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
     setMessage("")
     setDeletingId(id)
     const controller = new AbortController()
-    const timeoutId = window.setTimeout(() => controller.abort(), 30_000)
+    const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
     try {
       const response = await fetch("/api/activities", {
         method: "DELETE",
@@ -141,6 +245,7 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       }
       if (Array.isArray(data.items)) setItems(data.items)
       setMessage("削除しました。")
+      if (editingId === id) cancelEdit()
       router.refresh()
     } catch (e) {
       if (e instanceof DOMException && e.name === "AbortError") {
@@ -257,41 +362,140 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
 
       <Card className="border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-xl md:text-2xl">登録済みの活動記録</CardTitle>
+          <CardTitle className="text-xl md:text-2xl">登録済みの活動記録（直近{ACTIVITIES_STAFF_RECENT_MANAGE_COUNT}件）</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            終了日が新しい順の先頭 {ACTIVITIES_STAFF_RECENT_MANAGE_COUNT}{" "}
+            件だけ、ここから修正・削除できます。
+            {items.length > ACTIVITIES_STAFF_RECENT_MANAGE_COUNT ? (
+              <span className="block pt-1">
+                それ以外（{items.length - ACTIVITIES_STAFF_RECENT_MANAGE_COUNT}{" "}
+                件）は <code className="rounded bg-muted px-1 py-0.5 text-xs">data/activities.json</code>{" "}
+                を直接編集するか、不要なものを削除してからこの一覧に載せてください。
+              </span>
+            ) : null}
+          </p>
           {items.length === 0 ? (
             <p className="text-sm text-muted-foreground">まだ登録がありません。</p>
           ) : (
             <ul className="space-y-3">
-              {items.map((row) => (
+              {recentManaged.map((row) => (
                 <li
                   key={row.id}
-                  className="flex flex-col gap-3 rounded-xl border border-border/80 bg-secondary/20 p-4 sm:flex-row sm:items-start sm:justify-between"
+                  className="rounded-xl border border-border/80 bg-secondary/20 p-4 md:p-5"
                 >
-                  <div className="min-w-0 flex-1 space-y-1 text-sm">
-                    <p className="font-semibold text-foreground">
-                      {formatActivityDateRangeJa(row.startDate, row.endDate)} — {row.title}
-                    </p>
-                    {row.location.trim().length > 0 ? (
-                      <p className="text-muted-foreground">場所: {row.location}</p>
-                    ) : null}
-                    <p className="text-muted-foreground">対戦: {row.opponent}</p>
-                    {row.content.trim().length > 0 ? (
-                      <p className="whitespace-pre-wrap text-muted-foreground">{row.content}</p>
-                    ) : null}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="shrink-0 text-destructive hover:text-destructive"
-                    disabled={deletingId !== null}
-                    onClick={() => void remove(row.id)}
-                  >
-                    <Trash2 className="mr-1 h-4 w-4" aria-hidden />
-                    {deletingId === row.id ? "削除中…" : "削除"}
-                  </Button>
+                  {editingId === row.id ? (
+                    <div className="space-y-4">
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor={`edit-start-${row.id}`}>開始日</Label>
+                          <Input
+                            id={`edit-start-${row.id}`}
+                            type="date"
+                            value={editStartDate}
+                            onChange={(e) => setEditStartDate(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`edit-end-${row.id}`}>終了日（1日のみなら空欄）</Label>
+                          <Input
+                            id={`edit-end-${row.id}`}
+                            type="date"
+                            value={editEndDate}
+                            min={editStartDate || undefined}
+                            onChange={(e) => setEditEndDate(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`edit-title-${row.id}`}>タイトル</Label>
+                        <Input
+                          id={`edit-title-${row.id}`}
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          maxLength={ACTIVITIES_TITLE_MAX}
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`edit-loc-${row.id}`}>場所（任意）</Label>
+                        <Input
+                          id={`edit-loc-${row.id}`}
+                          value={editLocation}
+                          onChange={(e) => setEditLocation(e.target.value)}
+                          maxLength={ACTIVITIES_LOCATION_MAX}
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`edit-opp-${row.id}`}>対戦相手</Label>
+                        <Input
+                          id={`edit-opp-${row.id}`}
+                          value={editOpponent}
+                          onChange={(e) => setEditOpponent(e.target.value)}
+                          maxLength={ACTIVITIES_OPPONENT_MAX}
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`edit-content-${row.id}`}>内容（任意）</Label>
+                        <Textarea
+                          id={`edit-content-${row.id}`}
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          rows={4}
+                          maxLength={ACTIVITIES_CONTENT_MAX}
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button type="button" disabled={pendingEdit} onClick={() => void submitEdit()}>
+                          {pendingEdit ? "保存中…" : "変更を保存"}
+                        </Button>
+                        <Button type="button" variant="outline" disabled={pendingEdit} onClick={cancelEdit}>
+                          キャンセル
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 flex-1 space-y-1 text-sm">
+                        <p className="font-semibold text-foreground">
+                          {formatActivityDateRangeJa(row.startDate, row.endDate)} — {row.title}
+                        </p>
+                        {row.location.trim().length > 0 ? (
+                          <p className="text-muted-foreground">場所: {row.location}</p>
+                        ) : null}
+                        <p className="text-muted-foreground">対戦: {row.opponent}</p>
+                        {row.content.trim().length > 0 ? (
+                          <p className="whitespace-pre-wrap text-muted-foreground">{row.content}</p>
+                        ) : null}
+                      </div>
+                      <div className="flex shrink-0 flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          disabled={deletingId !== null || pendingEdit}
+                          onClick={() => beginEdit(row)}
+                        >
+                          <Pencil className="mr-1 h-4 w-4" aria-hidden />
+                          修正
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          disabled={deletingId !== null || pendingEdit}
+                          onClick={() => void remove(row.id)}
+                        >
+                          <Trash2 className="mr-1 h-4 w-4" aria-hidden />
+                          {deletingId === row.id ? "削除中…" : "削除"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

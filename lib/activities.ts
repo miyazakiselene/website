@@ -110,8 +110,34 @@ export async function deleteActivityRecordById(id: string): Promise<ActivityReco
       throw e
     })
     const existing = finalizeRecords(await parseActivitiesFile(raw))
+    if (!existing.some((r) => r.id === id)) {
+      throw new Error("ACTIVITIES_NOT_FOUND")
+    }
     const next = sortActivitiesNewestFirst(existing.filter((r) => r.id !== id))
     await writeActivitiesRecordsAtomic(next)
     return next
+  })
+}
+
+export async function updateActivityRecord(record: ActivityRecord): Promise<ActivityRecord[]> {
+  return runExclusiveActivitiesWrite(async () => {
+    const raw = await fs.readFile(ACTIVITIES_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
+      if (e.code === "ENOENT") return "[]"
+      throw e
+    })
+    const existing = finalizeRecords(await parseActivitiesFile(raw))
+    const idx = existing.findIndex((r) => r.id === record.id)
+    if (idx === -1) {
+      throw new Error("ACTIVITIES_NOT_FOUND")
+    }
+    const normalized = normalizeActivityRecord(record)
+    if (normalized === null) {
+      throw new Error("ACTIVITIES_INVALID")
+    }
+    const next = [...existing]
+    next[idx] = normalized
+    const finalized = finalizeRecords(sortActivitiesNewestFirst(next))
+    await writeActivitiesRecordsAtomic(finalized)
+    return finalized
   })
 }
