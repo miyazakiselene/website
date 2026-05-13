@@ -82,6 +82,9 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
     },
   },
+  verification: {
+    google: 'hPBjVcxHIoxVAD5YeyPkUlmKEOAq-Wnp97qEWv7OsMs',
+  },
   category: 'sports',
   referrer: 'origin-when-cross-origin',
   icons: {
