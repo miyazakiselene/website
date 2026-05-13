@@ -2,6 +2,12 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import {
+  primaryBrandImageAlt,
+  siteDescriptionDefault,
+  siteNameTemplate,
+  siteTitleDefault,
+} from '@/lib/site-seo'
 import './globals.css'
 
 const geistSans = Geist({
@@ -18,29 +24,30 @@ const siteUrl =
     ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
     : new URL('http://localhost:3000')
 
-const siteName = '宮崎 SELENE'
-const siteTitle = '宮崎 SELENE | 宮崎県の中学バスケットボールチーム公式サイト'
-const siteDescription =
-  '宮崎 SELENEは宮崎県宮崎市を拠点に活動する中学バスケットボールチームです。活動記録や大会情報を発信し、練習試合・カップ戦・大会のお誘いも歓迎しています。'
 const ogImageUrl = new URL('/images/team-gallery/team-05-group.png', siteUrl).toString()
 const logoImageUrl = new URL('/icon-512.png', siteUrl).toString()
 const instagramUrl = 'https://www.instagram.com/2026.selene/'
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
-  applicationName: siteName,
+  applicationName: siteNameTemplate,
   title: {
-    default: siteTitle,
-    template: `%s | ${siteName}`,
+    default: siteTitleDefault,
+    template: `%s | ${siteNameTemplate}`,
   },
-  description: siteDescription,
+  description: siteDescriptionDefault,
   keywords: [
-    '宮崎 SELENE',
+    '宮崎 中学 バスケ',
+    '宮崎市 中学女子バスケ',
+    '宮崎 中学女子バスケットボール',
+    '宮崎SELENE',
+    'SELENE',
+    'セレーネ',
+    'セレネ',
+    '宮崎 セレーネ',
     '宮崎 バスケットボール 中学',
     '宮崎市 バスケットボール クラブチーム',
-    'SELENE バスケ',
-    '宮崎県 中学バスケ 練習',
-    '宮崎県中学バスケットボール',
+    '宮崎県 中学バスケ',
     '宮崎市 中学バスケ',
     '中学女子バスケットボール 宮崎',
     '宮崎 練習試合 バスケットボール',
@@ -53,22 +60,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     url: siteUrl,
-    siteName,
-    title: siteTitle,
-    description: siteDescription,
+    siteName: siteNameTemplate,
+    title: siteTitleDefault,
+    description: siteDescriptionDefault,
     images: [
       {
         url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: '宮崎 SELENE の活動風景',
+        alt: primaryBrandImageAlt,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: siteTitle,
-    description: siteDescription,
+    title: siteTitleDefault,
+    description: siteDescriptionDefault,
     images: [ogImageUrl],
   },
   robots: {
@@ -89,11 +96,12 @@ export const metadata: Metadata = {
   referrer: 'origin-when-cross-origin',
   icons: {
     icon: [
+      { url: '/favicon.ico' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
     ],
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: ['/favicon.ico'],
   },
   manifest: '/manifest.webmanifest',
 }
@@ -112,10 +120,10 @@ export default function RootLayout({
 }>) {
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'SportsOrganization',
-    name: siteName,
-    alternateName: '宮崎 SELENE バスケットボールクラブ',
-    description: siteDescription,
+    '@type': 'SportsTeam',
+    name: '宮崎SELENE',
+    alternateName: ['セレーネ', 'セレネ'],
+    description: siteDescriptionDefault,
     sport: 'Basketball',
     url: siteUrl.toString(),
     logo: logoImageUrl,

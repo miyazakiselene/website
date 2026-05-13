@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronUp, ExternalLink, Instagram, Layers, Sparkles } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { primaryBrandImageAlt } from "@/lib/site-seo"
 
 const INSTAGRAM_URL = "https://www.instagram.com/2026.selene/"
 const MAX_VISIBLE_INSTAGRAM_POSTS = 9
@@ -215,7 +216,7 @@ export function InstagramFeed({ embedPostUrls = [] }: InstagramFeedProps) {
                   <div className="relative h-full w-full rounded-2xl overflow-hidden bg-card">
                     <Image
                       src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                      alt="宮崎 SELENE"
+                      alt={primaryBrandImageAlt}
                       fill
                       sizes="80px"
                       className="object-cover"

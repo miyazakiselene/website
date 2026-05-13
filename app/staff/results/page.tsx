@@ -7,7 +7,7 @@ import { StaffSessionGuard } from "@/components/staff-session-guard"
 import { normalizeTournamentRecords, type TournamentRecord } from "@/lib/staff-records"
 
 export const metadata: Metadata = {
-  title: "試合結果の管理 | 関係者専用 | 宮崎 SELENE",
+  title: "試合結果の管理 | 関係者専用 | 宮崎SELENE（セレーネ）",
   description: "試合記録・動画URLの管理（関係者専用）",
   robots: { index: false, follow: false },
 }

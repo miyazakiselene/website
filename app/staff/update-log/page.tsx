@@ -5,7 +5,7 @@ import { StaffAreaNav } from "@/components/staff-area-nav"
 import { StaffSessionGuard } from "@/components/staff-session-guard"
 
 export const metadata: Metadata = {
-  title: "更新ログ | 関係者専用 | 宮崎 SELENE",
+  title: "更新ログ | 関係者専用 | 宮崎SELENE（セレーネ）",
   description: "サイト変更履歴（関係者専用）",
   robots: { index: false, follow: false },
 }

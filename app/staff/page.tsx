@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react"
 import { StaffEntry } from "@/components/staff-entry"
 
 export const metadata: Metadata = {
-  title: "関係者専用 | 宮崎 SELENE",
+  title: "関係者専用 | 宮崎SELENE（セレーネ）",
   description: "チーム関係者向けの試合・戦績管理ページです。",
   robots: {
     index: false,

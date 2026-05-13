@@ -5,7 +5,7 @@ import { StaffSessionGuard } from "@/components/staff-session-guard"
 import { readNewsRecords } from "@/lib/news"
 
 export const metadata: Metadata = {
-  title: "お知らせの管理 | 関係者専用 | 宮崎 SELENE",
+  title: "お知らせの管理 | 関係者専用 | 宮崎SELENE（セレーネ）",
   description: "トップページのお知らせを追加・修正・削除する（関係者専用）",
   robots: { index: false, follow: false },
 }

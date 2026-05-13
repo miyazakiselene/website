@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { AnimatedSection } from "@/components/animated-section"
+import { primaryBrandImageAlt } from "@/lib/site-seo"
 
 const navLinks = [
   { label: "ホーム", href: "#hero" },
@@ -44,7 +45,7 @@ export function Footer() {
                 <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 transition-opacity group-hover:opacity-100" />
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                  alt="宮崎 SELENE ロゴ"
+                  alt={primaryBrandImageAlt}
                   fill
                   sizes="56px"
                   className="z-10 rounded-full object-cover"
@@ -109,7 +110,7 @@ export function Footer() {
         <AnimatedSection animation="fadeIn" delay={400}>
           <div className="border-t border-border pt-10">
             <p className="text-center text-base text-muted-foreground">
-              &copy; {new Date().getFullYear()} 宮崎 SELENE. All rights reserved.
+              &copy; {new Date().getFullYear()} 宮崎 SELENE (セレーネ). All rights reserved.
             </p>
           </div>
         </AnimatedSection>

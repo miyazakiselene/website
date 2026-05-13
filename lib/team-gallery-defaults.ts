@@ -1,3 +1,5 @@
+import { primaryBrandImageAlt } from "@/lib/site-seo"
+
 export type TeamGalleryPhoto = {
   id: string
   src: string
@@ -28,7 +30,7 @@ export const DEFAULT_TEAM_GALLERY_PHOTOS: TeamGalleryPhoto[] = [
   {
     id: "team-05",
     src: "/images/team-gallery/team-05-group.png",
-    alt: "チーム集合写真",
+    alt: `${primaryBrandImageAlt}のチーム集合写真`,
   },
   {
     id: "team-06",

@@ -5,7 +5,7 @@ import { StaffSessionGuard } from "@/components/staff-session-guard"
 import { readActivityRecords } from "@/lib/activities"
 
 export const metadata: Metadata = {
-  title: "活動記録の管理 | 関係者専用 | 宮崎 SELENE",
+  title: "活動記録の管理 | 関係者専用 | 宮崎SELENE（セレーネ）",
   description: "トップページの活動記録を追加・削除する（関係者専用）",
   robots: { index: false, follow: false },
 }

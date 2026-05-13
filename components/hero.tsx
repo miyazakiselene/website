@@ -3,6 +3,7 @@
 import { Trophy } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
+import { primaryBrandImageAlt } from "@/lib/site-seo"
 
 function BasketballIcon({ className }: { className?: string }) {
   return (
@@ -59,7 +60,7 @@ export function Hero() {
       <div className="absolute inset-0">
         <Image
           src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1920&q=80"
-          alt="Basketball court background"
+          alt={primaryBrandImageAlt}
           fill
           className="object-cover opacity-20"
           priority
@@ -109,7 +110,7 @@ export function Hero() {
               <div className="absolute inset-0 bg-primary/30 rounded-full blur-xl animate-pulse" />
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                alt="宮崎 SELENE ロゴ"
+                alt={primaryBrandImageAlt}
                 fill
                 sizes="200px"
                 className="z-10 rounded-full object-cover shadow-2xl shadow-primary/30"

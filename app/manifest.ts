@@ -1,11 +1,11 @@
 import type { MetadataRoute } from 'next'
+import { siteDescriptionDefault, siteNameTemplate } from '@/lib/site-seo'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: '宮崎 SELENE',
+    name: siteNameTemplate,
     short_name: 'SELENE',
-    description:
-      '宮崎県の女子中学生バスケットボールクラブ「宮崎 SELENE」の公式サイトです。',
+    description: siteDescriptionDefault,
     start_url: '/',
     display: 'standalone',
     background_color: '#3d4450',

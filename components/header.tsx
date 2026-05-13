@@ -14,6 +14,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet"
+import { primaryBrandImageAlt } from "@/lib/site-seo"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -71,7 +72,7 @@ export function Header() {
               <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 transition-opacity group-hover:opacity-100" />
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                alt="宮崎 SELENE ロゴ"
+                alt={primaryBrandImageAlt}
                 fill
                 sizes="48px"
                 className="z-10 rounded-full object-cover"
@@ -127,7 +128,7 @@ export function Header() {
                 <div className="relative h-10 w-10 shrink-0">
                   <Image
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                    alt="宮崎 SELENE ロゴ"
+                    alt={primaryBrandImageAlt}
                     fill
                     sizes="40px"
                     className="rounded-full object-cover"

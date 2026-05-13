@@ -124,7 +124,7 @@ export function TeamAbout({ galleryPhotos }: TeamAboutProps) {
                     私たちの目的
                   </h3>
                   <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                    宮崎 SELENEは、バスケットボールを通じて宮崎県の女子中学生の<span className="text-foreground font-semibold">心身の健全な育成</span>を目指すクラブチームです。
+                    宮崎SELENE（セレーネ）は、バスケットボールを通じて宮崎県の女子中学生の<span className="text-foreground font-semibold">心身の健全な育成</span>を目指すクラブチームです。
                     <br />
                     技術の向上だけでなく、チームワーク、礼儀、努力する姿勢など、人として大切なことを学ぶ場でありたいと考えています。
                   </p>

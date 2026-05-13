@@ -12,7 +12,7 @@ import { isAdminSessionAuthenticated } from "@/lib/admin-session"
 import { readManagedTeamImages } from "@/lib/team-images"
 
 export const metadata: Metadata = {
-  title: "画像管理 | 宮崎 SELENE",
+  title: "画像管理 | 宮崎SELENE（セレーネ）",
   description: "チーム紹介セクションで使う画像の管理画面です。",
   robots: {
     index: false,
