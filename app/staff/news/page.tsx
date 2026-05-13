@@ -4,6 +4,8 @@ import { StaffNewsForm } from "@/components/staff-news-form"
 import { StaffSessionGuard } from "@/components/staff-session-guard"
 import { isNewsSupabaseEnabled, readNewsRecords } from "@/lib/news"
 
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: "お知らせの管理 | 関係者専用 | 宮崎SELENE（セレーネ）",
   description: "トップページのお知らせを追加・修正・削除する（関係者専用）",

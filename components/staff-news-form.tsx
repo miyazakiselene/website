@@ -69,6 +69,25 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
     setItems(sortNewsStaffList(initialItems))
   }, [initialItems])
 
+  /** 関係者ガードの内側でマウントされるため、サーバーからの props が空のことがある。トップと同じ GET /api/news で一覧を揃える */
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch("/api/news", { cache: "no-store" })
+        if (!res.ok || cancelled) return
+        const data = (await res.json()) as { items?: NewsRecord[] }
+        if (cancelled || !Array.isArray(data.items)) return
+        setItems(sortNewsStaffList(data.items))
+      } catch {
+        // initialItems を維持
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const beginEdit = (row: NewsRecord) => {
     setError("")
     setMessage("")
@@ -390,6 +409,9 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle className="text-xl md:text-2xl">お知らせの修正・削除</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            トップページの「お知らせ」と同じ一覧です（今後の予定・過去に移ったものもすべて表示されます）。並びは開始日が近い順です。
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
           {items.length === 0 ? (
