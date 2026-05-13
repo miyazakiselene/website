@@ -22,14 +22,7 @@ function NewsCard({ item }: { item: NewsRecord }) {
               <CalendarDays className="h-4 w-4 shrink-0 md:h-5 md:w-5" />
               <span>{item.date}</span>
             </div>
-            <h3 className="text-lg font-bold leading-snug text-foreground md:text-2xl">
-              <Link
-                href={`/news/${encodeURIComponent(item.id)}`}
-                className="transition-colors hover:text-primary"
-              >
-                {item.title}
-              </Link>
-            </h3>
+            <h3 className="text-lg font-bold leading-snug text-foreground md:text-2xl">{item.title}</h3>
             {item.content != null && item.content.length > 0 ? (
               <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground md:text-base">
                 {item.content}
