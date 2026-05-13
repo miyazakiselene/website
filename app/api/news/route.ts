@@ -1,6 +1,4 @@
 import { randomUUID, timingSafeEqual } from "node:crypto"
-import { format, parseISO } from "date-fns"
-import { ja } from "date-fns/locale"
 import { revalidatePath } from "next/cache"
 import { NextResponse } from "next/server"
 import {
@@ -10,6 +8,7 @@ import {
   updateNewsRecord,
 } from "@/lib/news"
 import type { NewsRecord } from "@/lib/news-model"
+import { formatActivityPeriodHeading } from "@/lib/map-activities-to-tournaments"
 import {
   NEWS_CONTENT_MAX,
   NEWS_JSON_BODY_MAX_BYTES,
@@ -50,26 +49,28 @@ export async function GET() {
   )
 }
 
-function buildRecordWithId(
+function buildNewsRecordWithId(
   id: string,
   input: {
     title: string
-    date: string
+    startDate: string
+    endDate: string
     content?: string
     venue?: string
   },
 ): NewsRecord {
-  const parsed = parseISO(input.date)
-  const displayDate = format(parsed, "yyyy年M月d日", { locale: ja })
   const venue = (input.venue ?? "").trim() || "詳細未定"
   const contentRaw = input.content?.trim() ?? ""
+  const eventStartDate = input.startDate
+  const eventEndDate = input.endDate
   return {
     id,
-    date: displayDate,
+    date: formatActivityPeriodHeading(eventStartDate, eventEndDate),
     title: input.title.trim(),
     venue,
     content: contentRaw.length > 0 ? contentRaw.slice(0, NEWS_CONTENT_MAX) : undefined,
-    eventEndDate: input.date,
+    eventStartDate,
+    eventEndDate,
   }
 }
 
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
 
   const parsed = newsPostBodySchema.safeParse(json)
   if (!parsed.success) {
-    const msg = parsed.error.issues.map((i) => i.message).join(" ")
+    const msg = parsed.error.issues.map((issue) => issue.message).join(" ")
     return NextResponse.json({ error: msg || "入力内容を確認してください。" }, { status: 400 })
   }
 
@@ -102,9 +103,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "認証に失敗しました。" }, { status: 401 })
   }
 
-  const record = buildRecordWithId(`news-${randomUUID()}`, {
+  const record = buildNewsRecordWithId(`news-${randomUUID()}`, {
     title: parsed.data.title,
-    date: parsed.data.date,
+    startDate: parsed.data.startDate,
+    endDate: parsed.data.endDate,
     content: parsed.data.content,
     venue: parsed.data.venue,
   })
@@ -118,6 +120,9 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : ""
     if (message.startsWith("NEWS_LIMIT")) {
       return NextResponse.json({ error: "お知らせの登録上限に達しています。" }, { status: 413 })
+    }
+    if (message === "NEWS_INVALID") {
+      return NextResponse.json({ error: "保存内容が無効です。日付と会場を確認してください。" }, { status: 400 })
     }
     return NextResponse.json({ error: "保存に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
   }
@@ -144,7 +149,7 @@ export async function PATCH(request: Request) {
 
   const parsed = newsPatchBodySchema.safeParse(json)
   if (!parsed.success) {
-    const msg = parsed.error.issues.map((i) => i.message).join(" ")
+    const msg = parsed.error.issues.map((issue) => issue.message).join(" ")
     return NextResponse.json({ error: msg || "入力内容を確認してください。" }, { status: 400 })
   }
 
@@ -152,9 +157,10 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "認証に失敗しました。" }, { status: 401 })
   }
 
-  const record = buildRecordWithId(parsed.data.id, {
+  const record = buildNewsRecordWithId(parsed.data.id, {
     title: parsed.data.title,
-    date: parsed.data.date,
+    startDate: parsed.data.startDate,
+    endDate: parsed.data.endDate,
     content: parsed.data.content,
     venue: parsed.data.venue,
   })
@@ -197,7 +203,7 @@ export async function DELETE(request: Request) {
 
   const parsed = newsDeleteBodySchema.safeParse(json)
   if (!parsed.success) {
-    const msg = parsed.error.issues.map((i) => i.message).join(" ")
+    const msg = parsed.error.issues.map((issue) => issue.message).join(" ")
     return NextResponse.json({ error: msg || "入力内容を確認してください。" }, { status: 400 })
   }
 

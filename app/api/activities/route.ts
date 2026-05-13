@@ -117,6 +117,9 @@ export async function POST(request: Request) {
     if (message.startsWith("ACTIVITIES_LIMIT")) {
       return NextResponse.json({ error: "活動記録の登録上限に達しています。" }, { status: 413 })
     }
+    if (message === "ACTIVITIES_INVALID") {
+      return NextResponse.json({ error: "保存内容が無効です。日付・対戦相手・タイトルを確認してください。" }, { status: 400 })
+    }
     return NextResponse.json({ error: "保存に失敗しました。しばらくしてから再度お試しください。" }, { status: 500 })
   }
 }

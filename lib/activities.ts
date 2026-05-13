@@ -97,7 +97,11 @@ export async function appendActivityRecord(record: ActivityRecord): Promise<Acti
     if (existing.length >= ACTIVITIES_MAX_ITEMS) {
       throw new Error(`ACTIVITIES_LIMIT: 活動記録は最大 ${ACTIVITIES_MAX_ITEMS} 件までです。`)
     }
-    const next = sortActivitiesNewestFirst([...existing, record])
+    const normalized = normalizeActivityRecord(record)
+    if (normalized === null) {
+      throw new Error("ACTIVITIES_INVALID")
+    }
+    const next = sortActivitiesNewestFirst([...existing, normalized])
     await writeActivitiesRecordsAtomic(finalizeRecords(next))
     return finalizeRecords(next)
   })

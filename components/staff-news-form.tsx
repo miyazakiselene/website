@@ -28,7 +28,8 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
   const [items, setItems] = useState<NewsRecord[]>(() => sortNewsStaffOrder(initialItems))
 
   const [title, setTitle] = useState("")
-  const [date, setDate] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [content, setContent] = useState("")
   const [venue, setVenue] = useState("")
   const [message, setMessage] = useState("")
@@ -37,7 +38,8 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
-  const [editDate, setEditDate] = useState("")
+  const [editStartDate, setEditStartDate] = useState("")
+  const [editEndDate, setEditEndDate] = useState("")
   const [editContent, setEditContent] = useState("")
   const [editVenue, setEditVenue] = useState("")
   const [pendingEdit, setPendingEdit] = useState(false)
@@ -52,7 +54,8 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
     setMessage("")
     setEditingId(row.id)
     setEditTitle(row.title)
-    setEditDate(row.eventEndDate)
+    setEditStartDate(row.eventStartDate)
+    setEditEndDate(row.eventStartDate === row.eventEndDate ? "" : row.eventEndDate)
     setEditVenue(row.venue === "詳細未定" ? "" : row.venue)
     setEditContent(row.content ?? "")
   }
@@ -60,7 +63,8 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
   const cancelEdit = () => {
     setEditingId(null)
     setEditTitle("")
-    setEditDate("")
+    setEditStartDate("")
+    setEditEndDate("")
     setEditContent("")
     setEditVenue("")
   }
@@ -73,6 +77,15 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("セッションにアクセスコードがありません。一度ログアウトして、関係者ページから再度認証してください。")
       return
     }
+    if (startDate.trim() === "") {
+      setError("開始日を入力してください。")
+      return
+    }
+    const effectiveEnd = endDate.trim() === "" ? startDate : endDate.trim()
+    if (effectiveEnd < startDate) {
+      setError("終了日は開始日以降にしてください。")
+      return
+    }
     setPendingAdd(true)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -83,7 +96,8 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
         body: JSON.stringify({
           accessCode,
           title,
-          date,
+          startDate,
+          endDate: endDate.trim() === "" ? undefined : endDate.trim(),
           content,
           venue: venue.trim(),
         }),
@@ -103,7 +117,8 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       if (Array.isArray(data.items)) setItems(sortNewsStaffOrder(data.items))
       setMessage("お知らせを保存しました。")
       setTitle("")
-      setDate("")
+      setStartDate("")
+      setEndDate("")
       setContent("")
       setVenue("")
       router.refresh()
@@ -128,8 +143,13 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
       setError("セッションにアクセスコードがありません。")
       return
     }
-    if (editDate.trim() === "") {
-      setError("日付を入力してください。")
+    if (editStartDate.trim() === "") {
+      setError("開始日を入力してください。")
+      return
+    }
+    const effectiveEditEnd = editEndDate.trim() === "" ? editStartDate : editEndDate.trim()
+    if (effectiveEditEnd < editStartDate) {
+      setError("終了日は開始日以降にしてください。")
       return
     }
     setPendingEdit(true)
@@ -143,7 +163,8 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
           accessCode,
           id: editingId,
           title: editTitle,
-          date: editDate,
+          startDate: editStartDate,
+          endDate: editEndDate.trim() === "" ? undefined : editEndDate.trim(),
           content: editContent,
           venue: editVenue.trim(),
         }),
@@ -235,7 +256,7 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
         <CardContent className="space-y-5">
           <p className="text-sm leading-relaxed text-muted-foreground">
             入力内容は <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/news.json</code>{" "}
-            に追記されます（ローカル開発向け）。日付は試合・イベントの最終日として扱われ、翌日0時から「過去のお知らせ」に移ります。
+            に追記されます（ローカル開発向け）。終了日の翌日0時からトップの「過去のお知らせ」に移ります。1日のみの予定は終了日を空欄にしてください（活動記録と同じ操作です）。
           </p>
           <p className="text-xs text-muted-foreground">現在の登録件数: {items.length} 件</p>
 
@@ -263,9 +284,20 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
               maxLength={NEWS_TITLE_MAX}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="staff-news-date">日付（イベント最終日）</Label>
-            <Input id="staff-news-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="staff-news-start">開始日</Label>
+              <Input
+                id="staff-news-start"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="staff-news-end">終了日（1日のみのときは空欄）</Label>
+              <Input id="staff-news-end" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="staff-news-venue">会場（任意）</Label>
@@ -322,14 +354,25 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
                           autoComplete="off"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`edit-date-${row.id}`}>日付（イベント最終日）</Label>
-                        <Input
-                          id={`edit-date-${row.id}`}
-                          type="date"
-                          value={editDate}
-                          onChange={(e) => setEditDate(e.target.value)}
-                        />
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor={`edit-start-${row.id}`}>開始日</Label>
+                          <Input
+                            id={`edit-start-${row.id}`}
+                            type="date"
+                            value={editStartDate}
+                            onChange={(e) => setEditStartDate(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`edit-end-${row.id}`}>終了日（1日のみのときは空欄）</Label>
+                          <Input
+                            id={`edit-end-${row.id}`}
+                            type="date"
+                            value={editEndDate}
+                            onChange={(e) => setEditEndDate(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor={`edit-venue-${row.id}`}>会場（任意）</Label>
@@ -365,7 +408,7 @@ export function StaffNewsForm({ initialItems }: StaffNewsFormProps) {
                       <div className="min-w-0 flex-1 space-y-1 text-sm">
                         <p className="font-semibold text-foreground">{row.title}</p>
                         <p className="text-muted-foreground">
-                          表示日付: {row.date}（終了日 {row.eventEndDate}）
+                          表示: {row.date}（開始 {row.eventStartDate} / 終了 {row.eventEndDate}）
                         </p>
                         <p className="text-muted-foreground">会場: {row.venue}</p>
                         {row.content != null && row.content.length > 0 ? (

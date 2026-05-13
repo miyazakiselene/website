@@ -87,7 +87,11 @@ export async function appendNewsRecord(record: NewsRecord): Promise<NewsRecord[]
     if (existing.length >= NEWS_MAX_ITEMS) {
       throw new Error(`NEWS_LIMIT: お知らせは最大 ${NEWS_MAX_ITEMS} 件までです。`)
     }
-    const next = [...existing, record]
+    const normalized = normalizeNewsRecord(record)
+    if (normalized === null) {
+      throw new Error("NEWS_INVALID")
+    }
+    const next = [...existing, normalized]
     await writeNewsRecordsAtomic(finalizeRecords(next))
     return finalizeRecords(next)
   })
