@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "id": "activity-seed-practice-2026-05-09",
+    "startDate": "2026-05-09",
+    "endDate": "2026-05-09",
+    "title": "練習試合",
+    "location": "生目台中学校",
+    "content": "対戦: 清武中学校、生目台中学校",
+    "opponent": "清武中学校・生目台中学校"
+  },
+  {
+    "id": "activity-seed-practice-2026-05-06",
+    "startDate": "2026-05-06",
+    "endDate": "2026-05-06",
+    "title": "練習試合",
+    "location": "宮崎市総合体育館",
+    "content": "",
+    "opponent": "CRISIS"
+  },
+  {
+    "id": "activity-seed-practice-2026-05-04",
+    "startDate": "2026-05-04",
+    "endDate": "2026-05-04",
+    "title": "練習試合",
+    "location": "祝吉中学校",
+    "content": "対戦: EPSIRON、REDSUNS、祝吉中学校、ELPIS、苅田中学校",
+    "opponent": "EPSIRON ほか4試合"
+  },
+  {
+    "id": "activity-seed-practice-2026-05-02",
+    "startDate": "2026-05-02",
+    "endDate": "2026-05-02",
+    "title": "練習試合",
+    "location": "宮商高校",
+    "content": "",
+    "opponent": "宮商高校"
+  },
+  {
+    "id": "activity-seed-practice-2026-04-29",
+    "startDate": "2026-04-29",
+    "endDate": "2026-04-29",
+    "title": "練習試合",
+    "location": "国光春中学校",
+    "content": "1日7試合を実施。",
+    "opponent": "宮附中学校 ほか"
+  },
+  {
+    "id": "activity-seed-practice-2026-04-25",
+    "startDate": "2026-04-25",
+    "endDate": "2026-04-25",
+    "title": "練習試合",
+    "location": "日向学院高校",
+    "content": "",
+    "opponent": "日向学院高校・タートル（社会人）"
+  }
+]
