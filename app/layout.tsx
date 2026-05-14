@@ -8,6 +8,7 @@ import {
   siteNameTemplate,
   siteTitleDefault,
 } from "@/lib/site-seo"
+import { getPublicSiteBaseHref } from "@/lib/site-base"
 import './globals.css'
 
 const geistSans = Geist({
@@ -19,10 +20,7 @@ const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
 })
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL != null && process.env.NEXT_PUBLIC_SITE_URL !== ''
-    ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
-    : new URL('http://localhost:3000')
+const siteUrl = new URL(getPublicSiteBaseHref())
 
 const ogImageUrl = new URL('/images/team-gallery/team-05-group.png', siteUrl).toString()
 const logoImageUrl = new URL('/icon-512.png', siteUrl).toString()

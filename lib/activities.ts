@@ -68,10 +68,7 @@ async function writeActivitiesRecordsAtomic(items: ActivityRecord[]): Promise<vo
   }
 }
 
-export async function readActivityRecords(): Promise<ActivityRecord[]> {
-  if (isActivitiesSupabaseEnabled()) {
-    return readActivitiesFromSupabase()
-  }
+async function readActivityRecordsFromFile(): Promise<ActivityRecord[]> {
   try {
     const raw = await fs.readFile(ACTIVITIES_FILE, "utf-8")
     const list = await parseActivitiesFile(raw)
@@ -81,6 +78,18 @@ export async function readActivityRecords(): Promise<ActivityRecord[]> {
     if (code === "ENOENT") return []
     return []
   }
+}
+
+export async function readActivityRecords(): Promise<ActivityRecord[]> {
+  if (isActivitiesSupabaseEnabled()) {
+    try {
+      return await readActivitiesFromSupabase()
+    } catch (e) {
+      console.error("[readActivityRecords] Supabase read failed, falling back to activities.json", e)
+      return readActivityRecordsFromFile()
+    }
+  }
+  return readActivityRecordsFromFile()
 }
 
 export async function writeActivityRecords(items: ActivityRecord[]): Promise<void> {

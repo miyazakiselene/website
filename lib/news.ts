@@ -67,10 +67,7 @@ async function writeNewsRecordsAtomic(items: NewsRecord[]): Promise<void> {
   }
 }
 
-export async function readNewsRecords(): Promise<NewsRecord[]> {
-  if (isNewsSupabaseEnabled()) {
-    return readNewsFromSupabase()
-  }
+async function readNewsRecordsFromFile(): Promise<NewsRecord[]> {
   try {
     const raw = await fs.readFile(NEWS_FILE, "utf-8")
     const list = await parseNewsFile(raw)
@@ -80,6 +77,18 @@ export async function readNewsRecords(): Promise<NewsRecord[]> {
     if (code === "ENOENT") return []
     return []
   }
+}
+
+export async function readNewsRecords(): Promise<NewsRecord[]> {
+  if (isNewsSupabaseEnabled()) {
+    try {
+      return await readNewsFromSupabase()
+    } catch (e) {
+      console.error("[readNewsRecords] Supabase read failed, falling back to news.json", e)
+      return readNewsRecordsFromFile()
+    }
+  }
+  return readNewsRecordsFromFile()
 }
 
 export async function writeNewsRecords(items: NewsRecord[]): Promise<void> {
