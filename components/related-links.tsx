@@ -183,7 +183,7 @@ export function RelatedLinks() {
             <Link2 className="h-5 w-5" />
             <span className="text-base font-semibold uppercase tracking-widest md:text-lg">Related Links</span>
           </div>
-          <h2 className="mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">関連リンク集</h2>
+          <h2 className="mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">関連リンク</h2>
           <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
             大会情報や登録手続き、公式ルールの確認に便利な外部サイトをまとめています。
             <span className="mt-2 block md:hidden">

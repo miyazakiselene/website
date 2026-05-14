@@ -19,12 +19,13 @@ import { cn } from "@/lib/utils"
 
 const navItems = [
   { label: "ホーム", href: "#hero" },
-  { label: "お知らせ", href: "#news" },
   { label: "チーム紹介", href: "#about" },
+  { label: "お知らせ", href: "#news" },
   { label: "活動記録", href: "#results" },
-  { label: "Instagram", href: "#instagram" },
-  { label: "関連リンク集", href: "#related-links" },
+  { label: "FAQ", href: "#faq" },
   { label: "お問い合わせ", href: "#contact" },
+  { label: "Instagram", href: "#instagram" },
+  { label: "関連リンク", href: "#related-links" },
   { label: "関係者専用", href: "/staff" },
 ]
 
@@ -112,9 +113,14 @@ export function Header() {
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-primary/10">
-                <Menu className="h-8 w-8" />
-                <span className="sr-only">メニューを開く</span>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-11 gap-2 px-3 hover:bg-primary/10"
+                aria-label="メニューを開く"
+              >
+                <Menu className="h-6 w-6 shrink-0" aria-hidden />
+                <span className="text-sm font-semibold tracking-wide text-foreground">MENU</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] bg-background">

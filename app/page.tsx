@@ -92,15 +92,15 @@ export default async function HomePage() {
         <Header />
       </ClientOnly>
       <Hero />
-      <News initialItems={newsItems} />
       <TeamAbout galleryPhotos={teamGalleryPhotos} />
+      <News initialItems={newsItems} />
       <Results initialTournaments={initialPublicResults} />
       <FaqSection />
-      <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
-      <RelatedLinks />
       <ClientOnly>
         <ContactForm />
       </ClientOnly>
+      <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
+      <RelatedLinks />
       <Sponsors />
       <Footer />
     </main>

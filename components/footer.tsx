@@ -9,12 +9,13 @@ import { primaryBrandImageAlt } from "@/lib/site-seo"
 
 const navLinks = [
   { label: "ホーム", href: "#hero" },
-  { label: "お知らせ", href: "#news" },
   { label: "チーム紹介", href: "#about" },
+  { label: "お知らせ", href: "#news" },
   { label: "活動記録", href: "#results" },
-  { label: "Instagram", href: "#instagram" },
-  { label: "関連リンク集", href: "#related-links" },
+  { label: "FAQ", href: "#faq" },
   { label: "お問い合わせ", href: "#contact" },
+  { label: "Instagram", href: "#instagram" },
+  { label: "関連リンク", href: "#related-links" },
 ]
 
 export function Footer() {
