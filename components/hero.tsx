@@ -144,7 +144,7 @@ export function Hero() {
             className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground mb-8 leading-tight text-balance transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             style={{ transitionDelay: "0.4s" }}
           >
-            宮崎のバスケで
+            バスケで
             <br />
             <span className="text-primary relative">
               宮崎を元気に！
