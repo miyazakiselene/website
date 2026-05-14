@@ -69,7 +69,7 @@ export function News({ initialItems }: NewsProps) {
           </p>
         </AnimatedSection>
 
-        <div className="mx-auto grid max-w-4xl gap-4 md:gap-5">
+        <div className="mx-auto hidden max-w-4xl grid-cols-1 gap-4 md:grid md:gap-5">
           {currentNews.map((plan, index) => (
             <AnimatedSection key={plan.id} animation="fadeInUp" delay={100 + index * 100}>
               <NewsCard item={plan} />
@@ -102,12 +102,12 @@ export function News({ initialItems }: NewsProps) {
                 </CollapsibleContent>
               </Collapsible>
 
-              <p className="px-2 text-sm text-muted-foreground">
+              <p className="px-2 pt-2 text-center">
                 <Link
                   href="https://www.instagram.com/2026.selene/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  className="inline-block text-base font-semibold text-primary underline-offset-4 hover:underline md:text-lg"
                 >
                   練習試合・合同練習・大会のお誘いはこちらにDMを下さい
                 </Link>
@@ -115,6 +115,63 @@ export function News({ initialItems }: NewsProps) {
             </div>
           </AnimatedSection>
         </div>
+
+        <Collapsible defaultOpen={false} className="mx-auto max-w-4xl md:hidden">
+          <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-background px-4 py-4 text-center">
+            <p className="text-base font-bold text-foreground">お知らせ一覧を開く</p>
+            <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="space-y-4 border-t border-border pt-4">
+              <div className="grid gap-4">
+                {currentNews.map((plan, index) => (
+                  <AnimatedSection key={plan.id} animation="fadeInUp" delay={100 + index * 100}>
+                    <NewsCard item={plan} />
+                  </AnimatedSection>
+                ))}
+              </div>
+
+              <AnimatedSection animation="fadeInUp" delay={100 + currentNews.length * 100}>
+                <div className="space-y-4">
+                  <Collapsible className="rounded-2xl border border-border bg-background">
+                    <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center">
+                      <div>
+                        <p className="text-base font-bold text-foreground">過去のお知らせを見る</p>
+                      </div>
+                      <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="border-t border-border px-4 py-4">
+                        {pastNews.length > 0 ? (
+                          <div className="grid gap-4">
+                            {pastNews.map((item) => (
+                              <NewsCard key={item.id} item={item} />
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="px-2 py-3 text-sm text-muted-foreground">
+                            まだ過去のお知らせはありません。予定日の翌日以降に自動でここへ表示されます。
+                          </p>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  <p className="px-2 pt-2 text-center">
+                    <Link
+                      href="https://www.instagram.com/2026.selene/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-base font-semibold text-primary underline-offset-4 hover:underline md:text-lg"
+                    >
+                      練習試合・合同練習・大会のお誘いはこちらにDMを下さい
+                    </Link>
+                  </p>
+                </div>
+              </AnimatedSection>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </section>
   )
