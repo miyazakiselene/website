@@ -229,13 +229,6 @@ export function InstagramFeed({ embedPostUrls = [] }: InstagramFeedProps) {
                     LATEST 9 POSTS
                   </div>
                   <h3 className="text-2xl font-bold text-foreground">@2026.selene</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    最新の9件だけを表示しています。
-                    <span className="mt-1 block md:hidden">
-                      スマホでは投稿をカードのように重ね、タップで縦の一覧に切り替わります。
-                    </span>
-                    <span className="mt-1 hidden md:inline"> PC ではグリッド表示です。</span>
-                  </p>
                 </div>
               </div>
 
