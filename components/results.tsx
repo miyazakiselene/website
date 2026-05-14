@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Calendar, ChevronDown, ChevronUp, Layers, MapPin } from "lucide-react"
+import { Calendar, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -115,18 +115,6 @@ const fallbackTournaments: Tournament[] = [
   },
 ]
 
-function BasketballIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 100 100" className={className} fill="currentColor">
-      <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M50 2 Q50 50 50 98" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M2 50 Q50 50 98 50" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M8 20 Q50 35 92 20" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M8 80 Q50 65 92 80" fill="none" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  )
-}
-
 function groupMatchesByDate(
   matches: Match[],
   tournament: { id: string; period: string; year?: string },
@@ -237,122 +225,68 @@ type ResultsProps = {
   initialTournaments?: Tournament[]
 }
 
-function MobileActivityDeck({
-  tournaments,
-  expanded,
-  onExpand,
-  onCollapse,
+function MobileResultsList({
+  visibleTournaments,
+  archivedTournaments,
 }: {
-  tournaments: Tournament[]
-  expanded: boolean
-  onExpand: () => void
-  onCollapse: () => void
+  visibleTournaments: Tournament[]
+  archivedTournaments: Tournament[]
 }) {
-  const count = tournaments.length
-  if (count === 0) return null
-
-  const stackHeight = Math.min(320, 140 + Math.max(0, count - 1) * 28)
-
-  if (expanded) {
-    return (
-      <div className="space-y-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 motion-reduce:animate-none">
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/80 bg-secondary/40 px-4 py-3">
-          <p className="text-sm font-semibold text-foreground">一覧表示</p>
-          <button
-            type="button"
-            onClick={onCollapse}
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted motion-reduce:transition-none"
-          >
-            <Layers className="h-4 w-4" aria-hidden />
-            カード表示に戻す
-          </button>
-        </div>
-        <div className="grid grid-cols-1 gap-6">
-          {tournaments.map((tournament, index) => (
-            <div
-              key={tournament.id}
-              className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-reduce:animate-none"
-              style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
-            >
-              <ResultsAccordionCard tournament={tournament} />
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-center pt-2">
-          <button
-            type="button"
-            onClick={onCollapse}
-            className="inline-flex w-full max-w-md items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted motion-reduce:transition-none"
-          >
-            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden />
-            折りたたむ
-          </button>
-        </div>
-      </div>
-    )
-  }
+  const [open, setOpen] = useState(false)
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={onExpand}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault()
-            onExpand()
-          }
-        }}
-        aria-expanded={false}
-        aria-label="活動記録を縦の一覧で表示する"
-        className="group relative w-full touch-manipulation rounded-2xl text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
-        style={{ height: stackHeight }}
-      >
-        {tournaments.map((tournament, index) => {
-          const depth = index
-          const z = 50 - depth
-          const top = 8 + depth * 14
-          const left = 6 + depth * 10
-          const rotate = -5 + depth * 2.2
-          return (
-            <div
-              key={tournament.id}
-              className="pointer-events-none absolute w-[calc(100%-12px)] max-w-[calc(100%-12px)] origin-top-left shadow-lg transition-[transform,box-shadow] duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:shadow-xl"
-              style={{
-                top,
-                left,
-                zIndex: z,
-                transform: `rotate(${rotate}deg)`,
-              }}
-            >
-              <ResultsAccordionCard tournament={tournament} />
-            </div>
-          )
-        })}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[60] flex justify-center rounded-b-2xl bg-gradient-to-t from-background via-background/90 to-transparent pb-3 pt-10"
-          aria-hidden
-        >
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-4 py-2 text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
-            <ChevronUp className="h-4 w-4 motion-safe:animate-bounce motion-reduce:animate-none" />
-            タップで一覧表示
-          </span>
+    <Collapsible open={open} onOpenChange={setOpen} className="mx-auto max-w-4xl md:hidden">
+      <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-4 py-4 text-center">
+        <p className="text-base font-bold text-foreground">活動記録一覧を開く</p>
+        <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="space-y-4 border-t border-border pt-4">
+          <div className="grid gap-4">
+            {visibleTournaments.map((tournament, index) => (
+              <AnimatedSection key={tournament.id} animation="fadeInUp" delay={100 + index * 100}>
+                <ResultsAccordionCard tournament={tournament} />
+              </AnimatedSection>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+          >
+            <ChevronDown className="h-4 w-4 rotate-180" aria-hidden />
+            活動記録一覧を閉じる
+          </button>
+
+          {archivedTournaments.length > 0 ? (
+            <Collapsible className="rounded-2xl border border-border bg-card">
+              <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center">
+                <p className="text-base font-bold text-foreground">過去の活動記録を見る</p>
+                <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="border-t border-border px-4 py-4">
+                  <div className="grid gap-4">
+                    {archivedTournaments.map((tournament) => (
+                      <ResultsAccordionCard key={tournament.id} tournament={tournament} />
+                    ))}
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ) : null}
         </div>
-      </div>
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 
 export function Results({ initialTournaments }: ResultsProps) {
-  const [mobileMainDeckExpanded, setMobileMainDeckExpanded] = useState(false)
-  const [mobileArchivedDeckExpanded, setMobileArchivedDeckExpanded] = useState(false)
-
   const sortedNewestFirst: Tournament[] = useMemo(() => {
     const source =
       initialTournaments != null && initialTournaments.length > 0 ? initialTournaments : fallbackTournaments
 
-    // 表示直前に必ず日付基準でソート（大会の最新試合日が新しい順）
     return sortTournamentsNewestFirst(source).map((tournament) => ({
       ...tournament,
       matches: sortMatchesNewestFirst(
@@ -364,90 +298,64 @@ export function Results({ initialTournaments }: ResultsProps) {
     }))
   }, [initialTournaments])
 
-  // 先頭6件をメイン表示、7件目以降は「過去の活動記録」へ
   const visibleTournaments = sortedNewestFirst.slice(0, MAX_VISIBLE_RESULTS)
   const archivedTournaments = sortedNewestFirst.slice(MAX_VISIBLE_RESULTS)
 
   return (
-    <section id="results" className="py-24 md:py-32 bg-background relative overflow-hidden">
-      {/* Decorative elements with animation */}
-      <div className="absolute top-10 right-[5%] animate-spin-slow">
-        <BasketballIcon className="w-24 h-24 text-primary/10" />
-      </div>
-      <div className="absolute bottom-20 left-[3%] animate-bounce" style={{ animationDuration: "4s" }}>
-        <BasketballIcon className="w-16 h-16 text-primary/8" />
-      </div>
-      <div className="absolute top-1/2 right-[2%] animate-pulse">
-        <BasketballIcon className="w-12 h-12 text-primary/5" />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
-        <AnimatedSection className="text-center mb-16" animation="fadeInUp">
+    <section id="results" className="py-24 md:py-28 bg-background">
+      <div className="container mx-auto px-4">
+        <AnimatedSection className="mb-14 text-center" animation="fadeInUp">
           <span className="text-base md:text-lg font-semibold text-primary uppercase tracking-widest">
             Activity
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mt-3 mb-6">
+          <h2 className="mt-3 mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">
             活動記録
           </h2>
-        </AnimatedSection>
-
-        <AnimatedSection className="mx-auto mb-10 max-w-4xl text-center" animation="fadeInUp" delay={180}>
-          <p className="text-sm md:text-base leading-relaxed text-muted-foreground">
+          <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl">
             対戦していただいたチームの皆様、ありがとうございました。今後ともよろしくお願いいたします。
           </p>
         </AnimatedSection>
 
-        <div className="mx-auto max-w-6xl space-y-8">
-          {/* デスクトップ: 従来の3列グリッド */}
-          <div className="hidden md:grid md:grid-cols-3 md:gap-6">
-            {visibleTournaments.map((tournament, index) => (
-              <AnimatedSection key={tournament.id} animation="scaleIn" delay={100 + index * 50}>
-                <ResultsAccordionCard tournament={tournament} />
-              </AnimatedSection>
-            ))}
-          </div>
+        {/* デスクトップ: 1列リスト */}
+        <div className="mx-auto hidden max-w-4xl grid-cols-1 gap-4 md:grid md:gap-5">
+          {visibleTournaments.map((tournament, index) => (
+            <AnimatedSection key={tournament.id} animation="fadeInUp" delay={100 + index * 100}>
+              <ResultsAccordionCard tournament={tournament} />
+            </AnimatedSection>
+          ))}
 
-          {/* スマホ: トランプ風の重ね → タップで縦一覧 */}
-          <div className="md:hidden">
-            <MobileActivityDeck
-              tournaments={visibleTournaments}
-              expanded={mobileMainDeckExpanded}
-              onExpand={() => setMobileMainDeckExpanded(true)}
-              onCollapse={() => setMobileMainDeckExpanded(false)}
-            />
-          </div>
-
-          {archivedTournaments.length > 0 ? (
-            <AnimatedSection animation="fadeInUp" delay={180}>
+          <AnimatedSection animation="fadeInUp" delay={100 + visibleTournaments.length * 100}>
+            <div className="space-y-4">
               <Collapsible className="rounded-2xl border border-border bg-card">
                 <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center md:gap-4 md:px-6 md:py-5">
                   <p className="text-base font-bold text-foreground md:text-lg">過去の活動記録を見る</p>
                   <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="border-t border-border px-4 py-5 md:px-6">
-                    <div className="hidden md:grid md:grid-cols-3 md:gap-6">
-                      {archivedTournaments.map((tournament, index) => (
-                        <AnimatedSection key={tournament.id} animation="fadeInUp" delay={80 + index * 40}>
-                          <ResultsAccordionCard tournament={tournament} />
-                        </AnimatedSection>
-                      ))}
-                    </div>
-                    <div className="md:hidden">
-                      <MobileActivityDeck
-                        tournaments={archivedTournaments}
-                        expanded={mobileArchivedDeckExpanded}
-                        onExpand={() => setMobileArchivedDeckExpanded(true)}
-                        onCollapse={() => setMobileArchivedDeckExpanded(false)}
-                      />
-                    </div>
+                  <div className="border-t border-border px-4 py-4 md:px-5">
+                    {archivedTournaments.length > 0 ? (
+                      <div className="grid gap-4">
+                        {archivedTournaments.map((tournament) => (
+                          <ResultsAccordionCard key={tournament.id} tournament={tournament} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="px-2 py-3 text-sm text-muted-foreground">
+                        まだ過去の活動記録はありません。
+                      </p>
+                    )}
                   </div>
                 </CollapsibleContent>
               </Collapsible>
-            </AnimatedSection>
-          ) : null}
+            </div>
+          </AnimatedSection>
         </div>
+
+        {/* モバイル: お知らせと同じ Collapsible */}
+        <MobileResultsList
+          visibleTournaments={visibleTournaments}
+          archivedTournaments={archivedTournaments}
+        />
       </div>
     </section>
   )
