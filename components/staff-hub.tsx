@@ -27,7 +27,7 @@ export function StaffHub() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 トップページのお知らせを追加・修正・削除します（ローカルでは data/news.json に保存）。
               </p>
-              <Button asChild variant="secondary" className="w-full sm:w-auto">
+              <Button asChild className="w-full sm:w-auto">
                 <Link href="/staff/news">お知らせの管理ページへ</Link>
               </Button>
             </CardContent>
@@ -44,7 +44,7 @@ export function StaffHub() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 トップの活動記録に載せる記録を追加・削除します（開始日・終了日・data/activities.json）。
               </p>
-              <Button asChild variant="secondary" className="w-full sm:w-auto">
+              <Button asChild className="w-full sm:w-auto">
                 <Link href="/staff/activities">活動記録の管理ページへ</Link>
               </Button>
             </CardContent>
@@ -78,7 +78,7 @@ export function StaffHub() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 チーム紹介セクションに表示する写真のアップロードと削除を行います。
               </p>
-              <Button asChild variant="secondary" className="w-full sm:w-auto">
+              <Button asChild className="w-full sm:w-auto">
                 <Link href="/admin/team-images">画像管理ページへ</Link>
               </Button>
             </CardContent>
@@ -96,7 +96,7 @@ export function StaffHub() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               サイト訪問状況（Vercel Web Analytics）への導線です。試合データの編集は含みません。
             </p>
-            <Button asChild variant="secondary" className="w-full sm:w-auto">
+            <Button asChild className="w-full sm:w-auto">
               <Link href="/staff/dashboard">ダッシュボードのページへ</Link>
             </Button>
           </CardContent>
