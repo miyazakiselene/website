@@ -143,22 +143,39 @@ export function Header() {
                 <span className="text-lg font-bold text-foreground">宮崎 SELENE</span>
               </div>
               <nav className="flex flex-col gap-2">
-                {navItems.map((item, index) => (
-                  <SheetClose asChild key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "text-lg font-medium py-3 px-4 rounded-lg transition-all duration-300 hover:bg-primary/10 hover:translate-x-2",
-                        activeSection === item.href.replace("#", "")
-                          ? "text-primary bg-primary/5"
-                          : "text-foreground"
-                      )}
-                      style={{ transitionDelay: `${index * 50}ms` }}
-                    >
-                      {item.label}
-                    </Link>
-                  </SheetClose>
-                ))}
+                {navItems.map((item) => {
+                  const itemClass = cn(
+                    "w-full text-left text-lg font-medium py-3 px-4 rounded-lg transition-colors hover:bg-primary/10",
+                    activeSection === item.href.replace("#", "")
+                      ? "text-primary bg-primary/5"
+                      : "text-foreground"
+                  )
+                  if (item.href.startsWith("#")) {
+                    return (
+                      <SheetClose key={item.href} asChild>
+                        <button
+                          type="button"
+                          className={itemClass}
+                          onClick={() => {
+                            const id = item.href.slice(1)
+                            setTimeout(() => {
+                              document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
+                            }, 300)
+                          }}
+                        >
+                          {item.label}
+                        </button>
+                      </SheetClose>
+                    )
+                  }
+                  return (
+                    <SheetClose key={item.href} asChild>
+                      <Link href={item.href} className={itemClass}>
+                        {item.label}
+                      </Link>
+                    </SheetClose>
+                  )
+                })}
               </nav>
             </SheetContent>
           </Sheet>
