@@ -5,13 +5,23 @@ import { rename, unlink } from "node:fs/promises"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import {
+  appendActivityRecordSupabase,
+  deleteActivityRecordByIdSupabase,
+  isActivitiesSupabaseEnabled,
+  readActivitiesFromSupabase,
+  updateActivityRecordSupabase,
+} from "@/lib/activities-supabase"
+import {
   dedupeActivitiesByIdFirstWins,
   normalizeActivityRecord,
+  sortActivitiesNewestFirst,
   type ActivityRecord,
 } from "@/lib/activities-model"
 import { ACTIVITIES_MAX_ITEMS } from "@/lib/activities-validation"
 
 export type { ActivityRecord } from "@/lib/activities-model"
+export { sortActivitiesNewestFirst } from "@/lib/activities-model"
+export { isActivitiesSupabaseEnabled } from "@/lib/activities-supabase"
 
 const ACTIVITIES_FILE = path.join(process.cwd(), "data", "activities.json")
 
@@ -28,17 +38,6 @@ function runExclusiveActivitiesWrite<T>(task: () => Promise<T>): Promise<T> {
 
 function finalizeRecords(raw: ActivityRecord[]): ActivityRecord[] {
   return dedupeActivitiesByIdFirstWins(raw)
-}
-
-/** 終了日が新しい順（同日なら開始日→ id） */
-export function sortActivitiesNewestFirst(items: ActivityRecord[]): ActivityRecord[] {
-  return [...items].sort((a, b) => {
-    const c = b.endDate.localeCompare(a.endDate)
-    if (c !== 0) return c
-    const s = b.startDate.localeCompare(a.startDate)
-    if (s !== 0) return s
-    return b.id.localeCompare(a.id)
-  })
 }
 
 async function parseActivitiesFile(raw: string): Promise<ActivityRecord[]> {
@@ -70,6 +69,9 @@ async function writeActivitiesRecordsAtomic(items: ActivityRecord[]): Promise<vo
 }
 
 export async function readActivityRecords(): Promise<ActivityRecord[]> {
+  if (isActivitiesSupabaseEnabled()) {
+    return readActivitiesFromSupabase()
+  }
   try {
     const raw = await fs.readFile(ACTIVITIES_FILE, "utf-8")
     const list = await parseActivitiesFile(raw)
@@ -82,12 +84,18 @@ export async function readActivityRecords(): Promise<ActivityRecord[]> {
 }
 
 export async function writeActivityRecords(items: ActivityRecord[]): Promise<void> {
+  if (isActivitiesSupabaseEnabled()) {
+    throw new Error("writeActivityRecords は Supabase モードでは未対応です。")
+  }
   await runExclusiveActivitiesWrite(async () => {
     await writeActivitiesRecordsAtomic(sortActivitiesNewestFirst(finalizeRecords(items)))
   })
 }
 
 export async function appendActivityRecord(record: ActivityRecord): Promise<ActivityRecord[]> {
+  if (isActivitiesSupabaseEnabled()) {
+    return runExclusiveActivitiesWrite(() => appendActivityRecordSupabase(record))
+  }
   return runExclusiveActivitiesWrite(async () => {
     const raw = await fs.readFile(ACTIVITIES_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
       if (e.code === "ENOENT") return "[]"
@@ -108,6 +116,9 @@ export async function appendActivityRecord(record: ActivityRecord): Promise<Acti
 }
 
 export async function deleteActivityRecordById(id: string): Promise<ActivityRecord[]> {
+  if (isActivitiesSupabaseEnabled()) {
+    return runExclusiveActivitiesWrite(() => deleteActivityRecordByIdSupabase(id))
+  }
   return runExclusiveActivitiesWrite(async () => {
     const raw = await fs.readFile(ACTIVITIES_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
       if (e.code === "ENOENT") return "[]"
@@ -124,6 +135,9 @@ export async function deleteActivityRecordById(id: string): Promise<ActivityReco
 }
 
 export async function updateActivityRecord(record: ActivityRecord): Promise<ActivityRecord[]> {
+  if (isActivitiesSupabaseEnabled()) {
+    return runExclusiveActivitiesWrite(() => updateActivityRecordSupabase(record))
+  }
   return runExclusiveActivitiesWrite(async () => {
     const raw = await fs.readFile(ACTIVITIES_FILE, "utf-8").catch((e: NodeJS.ErrnoException) => {
       if (e.code === "ENOENT") return "[]"

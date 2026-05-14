@@ -126,3 +126,14 @@ export function dedupeActivitiesByIdFirstWins(items: ActivityRecord[]): Activity
   }
   return out
 }
+
+/** 終了日が新しい順（同日なら開始日→ id） */
+export function sortActivitiesNewestFirst(items: ActivityRecord[]): ActivityRecord[] {
+  return [...items].sort((a, b) => {
+    const c = b.endDate.localeCompare(a.endDate)
+    if (c !== 0) return c
+    const s = b.startDate.localeCompare(a.startDate)
+    if (s !== 0) return s
+    return b.id.localeCompare(a.id)
+  })
+}

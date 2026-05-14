@@ -9,6 +9,8 @@ import {
   STAFF_RECORDS_STORAGE_KEY,
   type TournamentRecord,
 } from "@/lib/staff-records"
+import { isNewsSupabaseUrlConfigured } from "@/lib/news-storage-env"
+import { getStaffApiAccessCode } from "@/lib/staff-session"
 import { Lock, Plus, Save, Search, ShieldCheck, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -148,6 +150,14 @@ function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+/** *.vercel.app かつファイル保存のみのときは PUT を送らない（Supabase URL があれば本番保存を許可） */
+function shouldBlockStaffResultsSaveOnVercelPreview(): boolean {
+  if (typeof window === "undefined") return false
+  if (isNewsSupabaseUrlConfigured()) return false
+  const h = window.location.hostname
+  return h === "vercel.app" || h.endsWith(".vercel.app")
+}
+
 function defaultRecordsNormalized(): TournamentRecord[] {
   const normalized = defaultRecords.map((tournament) => ({
     ...tournament,
@@ -212,9 +222,11 @@ type StaffResultsManagerProps = {
   /** 認証済みルート（/staff/results）では true。認証 UI を出さない */
   skipAuth?: boolean
   initialRecords?: TournamentRecord[]
+  /** サーバー側の isStaffResultsSupabaseEnabled() の値。空レコード判定に使う */
+  supabaseEnabled?: boolean
 }
 
-export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffResultsManagerProps) {
+export function StaffResultsManager({ skipAuth = false, initialRecords, supabaseEnabled = false }: StaffResultsManagerProps) {
   const [isUnlocked, setIsUnlocked] = useState(() => skipAuth === true)
   const [codeInput, setCodeInput] = useState("")
   const [authError, setAuthError] = useState("")
@@ -256,7 +268,12 @@ export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffR
         const res = await fetch("/api/staff-records", { cache: "no-store" })
         if (!res.ok) return
         const data = (await res.json()) as { records?: TournamentRecord[] }
-        if (!cancelled && Array.isArray(data.records) && data.records.length > 0) {
+        if (cancelled || !Array.isArray(data.records)) return
+        if (supabaseEnabled && data.records.length === 0) {
+          setRecords([])
+          return
+        }
+        if (data.records.length > 0) {
           setRecords((prev) =>
             sortStaffRecordsNewestFirst(mergeStaffRecordsFromServerAndLocal(data.records!, prev)),
           )
@@ -272,12 +289,17 @@ export function StaffResultsManager({ skipAuth = false, initialRecords }: StaffR
 
   useEffect(() => {
     if (!isUnlocked) return
+    if (shouldBlockStaffResultsSaveOnVercelPreview()) {
+      setSyncStatus("error")
+      return
+    }
     void (async () => {
       try {
+        const accessCode = getStaffApiAccessCode() ?? expectedCode
         const res = await fetch("/api/staff-records", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ records: recordsOrdered }),
+          body: JSON.stringify({ accessCode, records: recordsOrdered }),
         })
         setSyncStatus(res.ok ? "ok" : "error")
       } catch {

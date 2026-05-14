@@ -154,9 +154,13 @@ export function AdminTeamImagesManager({
       {!storageReady ? (
         <Alert variant="destructive">
           <AlertTriangle />
-          <AlertTitle>Blob の設定が未完了です</AlertTitle>
+          <AlertTitle>画像ストレージの設定が未完了です</AlertTitle>
           <AlertDescription>
-            `BLOB_READ_WRITE_TOKEN` が未設定のため、アップロードと削除はまだ使えません。環境変数を設定するとこの画面から管理できます。
+            Supabase（<code className="rounded bg-muted px-1">NEXT_PUBLIC_SUPABASE_URL</code> と{" "}
+            <code className="rounded bg-muted px-1">SUPABASE_SERVICE_ROLE_KEY</code>）または Vercel Blob（
+            <code className="rounded bg-muted px-1">BLOB_READ_WRITE_TOKEN</code>
+            ）のいずれかが必要です。Supabase を有効にすると、画像は Storage バケット{" "}
+            <code className="rounded bg-muted px-1">team-gallery</code> に保存されます。
           </AlertDescription>
         </Alert>
       ) : null}

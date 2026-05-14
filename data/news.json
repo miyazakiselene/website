@@ -4,7 +4,6 @@
     "date": "2026年5月24日",
     "title": "大分遠征",
     "venue": "詳細未定",
-    "content": "",
     "eventStartDate": "2026-05-24",
     "eventEndDate": "2026-05-24"
   },
@@ -13,7 +12,6 @@
     "date": "2026年5月30日",
     "title": "大宮中学校との練習試合",
     "venue": "大宮中学校",
-    "content": "",
     "eventStartDate": "2026-05-30",
     "eventEndDate": "2026-05-30"
   },
@@ -22,26 +20,31 @@
     "date": "2026年5月31日",
     "title": "赤江東中学校・日向中学校との練習試合",
     "venue": "赤江東中学校",
-    "content": "",
     "eventStartDate": "2026-05-31",
     "eventEndDate": "2026-05-31"
   },
   {
     "id": "2026-06-06-07",
-    "date": "2026年6月6日〜7日",
+    "date": "2026年6月6日〜6月7日",
     "title": "アーリーサマーチャレンジ鹿児島2026",
     "venue": "鹿児島県郡山体育館等",
-    "content": "",
     "eventStartDate": "2026-06-06",
     "eventEndDate": "2026-06-07"
   },
   {
     "id": "2026-06-20-21",
-    "date": "2026年6月20日〜21日",
+    "date": "2026年6月20日〜6月21日",
     "title": "令和8年度第3回宮崎県U15クラブバスケットボール夏季大会",
     "venue": "詳細未定",
-    "content": "",
     "eventStartDate": "2026-06-20",
     "eventEndDate": "2026-06-21"
+  },
+  {
+    "id": "news-0b711267-9d50-475b-bcc3-c1803e7ed02b",
+    "date": "2026年5月16日",
+    "title": "大塚中学校との練習試合",
+    "venue": "大塚中学校",
+    "eventStartDate": "2026-05-16",
+    "eventEndDate": "2026-05-16"
   }
 ]

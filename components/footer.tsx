@@ -61,7 +61,7 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-base text-muted-foreground leading-relaxed">
-              宮崎県の女子中学生バスケットボールクラブ。
+              宮崎県の女子中学生バスケットボールクラブ「SELENE（セレーネ）」。
               <br />
               全国大会出場を目指して活動中。
             </p>

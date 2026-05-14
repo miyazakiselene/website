@@ -1,26 +1,14 @@
 import "server-only"
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import { dedupeNewsRecordsByIdFirstWins, normalizeNewsRecord, type NewsRecord } from "@/lib/news-model"
 import { NEWS_MAX_ITEMS } from "@/lib/news-validation"
+import { getSupabaseServiceClient } from "@/lib/supabase-admin-client"
+import { isSupabaseServiceConfigured } from "@/lib/supabase-service-env"
 
 const TABLE = "news_items"
 
 export function isNewsSupabaseEnabled(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
-  )
-}
-
-function getAdminClient(): SupabaseClient {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
-  if (!url || !key) {
-    throw new Error("Supabase が未設定です。NEXT_PUBLIC_SUPABASE_URL と SUPABASE_SERVICE_ROLE_KEY を設定してください。")
-  }
-  return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  })
+  return isSupabaseServiceConfigured()
 }
 
 type NewsItemRow = {
@@ -48,7 +36,7 @@ function finalizeRecords(raw: NewsRecord[]): NewsRecord[] {
 }
 
 export async function readNewsFromSupabase(): Promise<NewsRecord[]> {
-  const supabase = getAdminClient()
+  const supabase = getSupabaseServiceClient()
   const { data, error } = await supabase
     .from(TABLE)
     .select("id,title,venue,content,event_start_date,event_end_date")
@@ -75,7 +63,7 @@ export async function appendNewsRecordSupabase(record: NewsRecord): Promise<News
     throw new Error(`NEWS_LIMIT: お知らせは最大 ${NEWS_MAX_ITEMS} 件までです。`)
   }
 
-  const supabase = getAdminClient()
+  const supabase = getSupabaseServiceClient()
   const { error } = await supabase.from(TABLE).insert({
     id: normalized.id,
     title: normalized.title,
@@ -101,7 +89,7 @@ export async function updateNewsRecordSupabase(record: NewsRecord): Promise<News
     throw new Error("NEWS_INVALID")
   }
 
-  const supabase = getAdminClient()
+  const supabase = getSupabaseServiceClient()
   const { data, error } = await supabase
     .from(TABLE)
     .update({
@@ -124,7 +112,7 @@ export async function updateNewsRecordSupabase(record: NewsRecord): Promise<News
 }
 
 export async function deleteNewsRecordByIdSupabase(id: string): Promise<NewsRecord[]> {
-  const supabase = getAdminClient()
+  const supabase = getSupabaseServiceClient()
   const { data, error } = await supabase.from(TABLE).delete().eq("id", id).select("id")
 
   if (error) throw error

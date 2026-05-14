@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { readActivityRecords } from "@/lib/activities"
 import { formatActivityDateRangeJa, formatOpponentsDisplayJa } from "@/lib/activities-model"
+import { siteDescriptionBrandPrefix, siteNameTemplate } from "@/lib/site-seo"
 
 export const dynamic = "force-dynamic"
 
@@ -22,17 +23,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "活動記録", robots: { index: false, follow: false } }
   }
   const opponents = formatOpponentsDisplayJa(item.opponent)
-  const description =
+  const rawDesc =
     item.content.trim().length > 0
-      ? item.content.trim().slice(0, 160)
+      ? item.content.trim()
       : [formatActivityDateRangeJa(item.startDate, item.endDate), item.location, opponents]
           .filter((s) => s.length > 0)
           .join(" — ")
+  const description = `${siteDescriptionBrandPrefix}${rawDesc || "活動記録"}`.slice(0, 160)
+  const fullTitle = `${item.title} | ${siteNameTemplate}`
   return {
     title: item.title,
-    description: description.length > 0 ? description : "活動記録",
+    description,
     alternates: { canonical: `/activities/${id}` },
     robots: { index: true, follow: true },
+    openGraph: {
+      title: fullTitle,
+      description,
+      type: "article",
+      locale: "ja_JP",
+    },
   }
 }
 
@@ -45,8 +54,51 @@ export default async function ActivityDetailPage({ params }: PageProps) {
   const opponents = formatOpponentsDisplayJa(item.opponent)
   const dateLine = formatActivityDateRangeJa(item.startDate, item.endDate)
 
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "宮崎SELENE（セレーネ）", item: "/" },
+      { "@type": "ListItem", position: 2, name: "活動記録・試合結果", item: "/#results" },
+      { "@type": "ListItem", position: 3, name: item.title, item: `/activities/${id}` },
+    ],
+  }
+
+  const sportsEvent = {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    name: item.title,
+    startDate: item.startDate,
+    endDate: item.endDate,
+    sport: "Basketball",
+    location: {
+      "@type": "Place",
+      name: item.location || "宮崎県宮崎市",
+      address: {
+        "@type": "PostalAddress",
+        addressRegion: "宮崎県",
+        addressCountry: "JP",
+      },
+    },
+    organizer: {
+      "@type": "SportsTeam",
+      name: "宮崎SELENE",
+      url: "/",
+    },
+    ...(opponents.length > 0 ? { competitor: opponents } : {}),
+    description: item.content.trim() || `宮崎SELENE（セレーネ）の活動記録 — ${dateLine}`,
+  }
+
   return (
     <main className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(sportsEvent) }}
+      />
       <ClientOnly>
         <Header />
       </ClientOnly>

@@ -32,7 +32,7 @@ const staff = [
   },
   {
     name: "久留 伸一",
-    role: "アシスタントコーチ / 代表 (AC)",
+    role: "アシスタントコーチ(AC) / 代表",
     description: "チーム運営と選手のサポートを担当。保護者との連携を重視しています。",
   },
 ]
@@ -54,7 +54,7 @@ export function TeamAbout({ galleryPhotos }: TeamAboutProps) {
             チーム紹介
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            宮崎県のバスケットボールファンに応援されるチームを目指し、
+            宮崎のバスケファンに応援されるチームを目指し、
             <br />
             選手の心身の健全な育成に取り組んでいます。
           </p>

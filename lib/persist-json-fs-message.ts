@@ -11,7 +11,7 @@ export function persistJsonFilesystemUserMessage(error: unknown): string | null 
     return "ディスクの空き容量が不足しているため保存できません。"
   }
   if (code === "EROFS" || code === "EACCES" || code === "EPERM") {
-    return "この実行環境ではデータファイルへ書き込めません。お知らせ・活動記録の追加は、手元の PC でプロジェクトを開き `pnpm dev` を起動してから行うか、リポジトリ内の JSON を直接編集してコミットしてください。"
+    return "この実行環境ではデータファイルへ書き込めません。お知らせ・活動記録・試合結果の追加は、手元の PC でプロジェクトを開き `pnpm dev` を起動してから行うか、リポジトリ内の JSON を直接編集してコミットしてください。"
   }
   return null
 }

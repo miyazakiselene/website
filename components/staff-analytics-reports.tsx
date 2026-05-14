@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatReportDateJp } from "@/lib/format-report-date"
 import type { AnalyticsReportJson } from "@/lib/analytics-series"
-import reportsJson from "@/data/vercel-analytics-reports.json"
 import { StaffAnalyticsSeriesInsights } from "@/components/staff-analytics-series-insights"
 
 type MetricRow = {
@@ -42,10 +41,12 @@ type AnalyticsReport = {
   notes?: string[]
 }
 
-function parseReports(): AnalyticsReport[] {
-  const raw = reportsJson as unknown as { reports?: AnalyticsReport[] }
-  if (!Array.isArray(raw.reports)) return []
-  return raw.reports
+type StaffAnalyticsReportsProps = {
+  reports: AnalyticsReportJson[]
+}
+
+function asAnalyticsReports(reports: AnalyticsReportJson[]): AnalyticsReport[] {
+  return reports as unknown as AnalyticsReport[]
 }
 
 function sortBySnapshotDesc(a: AnalyticsReport, b: AnalyticsReport): number {
@@ -88,15 +89,18 @@ function TwoColTable({
   )
 }
 
-export function StaffAnalyticsReports() {
-  const reports = [...parseReports()].sort(sortBySnapshotDesc)
+export function StaffAnalyticsReports({ reports: reportsInput }: StaffAnalyticsReportsProps) {
+  const reports = [...asAnalyticsReports(reportsInput)].sort(sortBySnapshotDesc)
 
   if (reports.length === 0) {
     return (
       <Card className="border-dashed border-border bg-muted/20">
         <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/vercel-analytics-reports.json</code>
-          にレポートを追加すると、ここに掲載されます。
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/vercel-analytics-reports.json</code>{" "}
+          にレポートを追加するか、Supabase の{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">analytics_reports_snapshot</code>{" "}
+          テーブルに <code className="rounded bg-muted px-1.5 py-0.5 text-xs">reports</code>{" "}
+          配列を保存すると、ここに掲載されます。
         </CardContent>
       </Card>
     )
@@ -114,7 +118,7 @@ export function StaffAnalyticsReports() {
         </p>
       </div>
 
-      <StaffAnalyticsSeriesInsights reports={reports as AnalyticsReportJson[]} />
+      <StaffAnalyticsSeriesInsights reports={reportsInput} />
 
       {reports.map((report, index) => (
         <Card key={`${report.snapshotDate}-${index}`} className="border-border overflow-hidden">

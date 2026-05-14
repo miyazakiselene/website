@@ -46,7 +46,7 @@ export function StaffAnalyticsSeriesInsights({ reports }: Props) {
         <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
           {multi
             ? "掲載日が新しい順に、前回の PDF からの伸び率と、ページビュー目安の累積合計を出しています。グラフは時系列（古い→新しい）です。"
-            : "2回目以降の PDF を `data/vercel-analytics-reports.json` の先頭に追加すると、前回比・累積・グラフが自動で埋まります。各レポートに `stats` があると計算が安定します。"}
+            : "2回目以降の PDF を `data/vercel-analytics-reports.json` の先頭に追加するか、Supabase の `analytics_reports_snapshot.reports` に配列を保存すると、前回比・累積・グラフが自動で埋まります。各レポートに `stats` があると計算が安定します。"}
         </p>
       </div>
 

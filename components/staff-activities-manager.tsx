@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ClipboardList, Pencil, Trash2 } from "lucide-react"
 import {
@@ -8,15 +8,16 @@ import {
   formatOpponentsDisplayJa,
   joinOpponentLinesForStorage,
   opponentStoredToFormLines,
+  sortActivitiesNewestFirst,
   type ActivityRecord,
 } from "@/lib/activities-model"
 import {
   ACTIVITIES_CONTENT_MAX,
   ACTIVITIES_LOCATION_MAX,
   ACTIVITIES_OPPONENT_LINE_MAX,
-  ACTIVITIES_STAFF_RECENT_MANAGE_COUNT,
   ACTIVITIES_TITLE_MAX,
 } from "@/lib/activities-validation"
+import { isNewsSupabaseUrlConfigured } from "@/lib/news-storage-env"
 import { getStaffApiAccessCode } from "@/lib/staff-session"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -27,26 +28,37 @@ import { Textarea } from "@/components/ui/textarea"
 
 type StaffActivitiesManagerProps = {
   initialItems: ActivityRecord[]
+  /** サーバー側の isActivitiesSupabaseEnabled() の値。説明文の出し分けに使う */
+  supabaseEnabled: boolean
 }
 
 const fetchJsonTimeoutMs = 30_000
 
 type StaffActivitiesApiErrorBody = { error?: string; detail?: string; items?: ActivityRecord[] }
 
-function formatStaffActivitiesApiError(
+function sortStaffActivitiesList(items: ActivityRecord[]): ActivityRecord[] {
+  return sortActivitiesNewestFirst(items)
+}
+
+function buildStaffActivitiesSaveError(
+  response: Response,
   data: StaffActivitiesApiErrorBody,
   fallback: string,
-  httpStatus?: number,
 ): string {
-  const main = data.error ?? fallback
+  const lines: string[] = [`[HTTP ${response.status}]`, data.error ?? fallback]
   const d = data.detail
   if (d != null && String(d).trim() !== "") {
-    return `${main}\n\n（詳細）${String(d)}`
+    lines.push(`（詳細）${String(d).trim()}`)
   }
-  if (httpStatus != null) {
-    return `${main}\n\n（HTTP ${httpStatus}・詳細なし）`
-  }
-  return main
+  return lines.join("\n\n")
+}
+
+/** *.vercel.app かつファイル保存のみのときはブロック（Supabase URL があれば本番保存を許可） */
+function shouldBlockStaffActivitiesSaveOnVercelPreview(): boolean {
+  if (typeof window === "undefined") return false
+  if (isNewsSupabaseUrlConfigured()) return false
+  const h = window.location.hostname
+  return h === "vercel.app" || h.endsWith(".vercel.app")
 }
 
 function updateOpponentLines(lines: string[], index: number, value: string): string[] {
@@ -59,13 +71,9 @@ function updateOpponentLines(lines: string[], index: number, value: string): str
   return next
 }
 
-export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerProps) {
+export function StaffActivitiesManager({ initialItems, supabaseEnabled }: StaffActivitiesManagerProps) {
   const router = useRouter()
-  const [items, setItems] = useState<ActivityRecord[]>(initialItems)
-  const recentManaged = useMemo(
-    () => items.slice(0, ACTIVITIES_STAFF_RECENT_MANAGE_COUNT),
-    [items],
-  )
+  const [items, setItems] = useState<ActivityRecord[]>(() => sortStaffActivitiesList(initialItems))
 
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
@@ -88,8 +96,27 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
   const [pendingEdit, setPendingEdit] = useState(false)
 
   useEffect(() => {
-    setItems(initialItems)
+    setItems(sortStaffActivitiesList(initialItems))
   }, [initialItems])
+
+  /** 関係者ガードの内側でマウントされるため、サーバーからの props が空のことがある。トップと同じ GET /api/activities で一覧を揃える */
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch("/api/activities", { cache: "no-store" })
+        if (!res.ok || cancelled) return
+        const data = (await res.json()) as { items?: ActivityRecord[] }
+        if (cancelled || !Array.isArray(data.items)) return
+        setItems(sortStaffActivitiesList(data.items))
+      } catch {
+        // initialItems を維持
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const beginEdit = (row: ActivityRecord) => {
     setError("")
@@ -137,6 +164,13 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       return
     }
 
+    if (shouldBlockStaffActivitiesSaveOnVercelPreview()) {
+      setError(
+        "[このホストでは保存不可]\n\nVercel のプレビュー URL では data/activities.json へ書き込めません。Supabase を設定するか、手元で `pnpm dev` を起動した URL から登録するか、GitHub の data/activities.json を編集してください。",
+      )
+      return
+    }
+
     setPending(true)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -163,10 +197,10 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         return
       }
       if (!response.ok) {
-        setError(formatStaffActivitiesApiError(data, "保存に失敗しました。", response.status))
+        setError(buildStaffActivitiesSaveError(response, data, "保存に失敗しました。"))
         return
       }
-      if (Array.isArray(data.items)) setItems(data.items)
+      if (Array.isArray(data.items)) setItems(sortStaffActivitiesList(data.items))
       setMessage("活動記録を保存しました。")
       setStartDate("")
       setEndDate("")
@@ -212,6 +246,13 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       return
     }
 
+    if (shouldBlockStaffActivitiesSaveOnVercelPreview()) {
+      setError(
+        "[このホストでは保存不可]\n\nVercel のプレビュー URL では data/activities.json へ書き込めません。Supabase を設定するか、手元で `pnpm dev` を起動した URL から登録するか、GitHub の data/activities.json を編集してください。",
+      )
+      return
+    }
+
     setPendingEdit(true)
     const controller = new AbortController()
     const timeoutId = window.setTimeout(() => controller.abort(), fetchJsonTimeoutMs)
@@ -239,10 +280,10 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         return
       }
       if (!response.ok) {
-        setError(formatStaffActivitiesApiError(data, "更新に失敗しました。", response.status))
+        setError(buildStaffActivitiesSaveError(response, data, "更新に失敗しました。"))
         return
       }
-      if (Array.isArray(data.items)) setItems(data.items)
+      if (Array.isArray(data.items)) setItems(sortStaffActivitiesList(data.items))
       setMessage("活動記録を更新しました。")
       cancelEdit()
       router.refresh()
@@ -266,6 +307,12 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
       setError("セッションにアクセスコードがありません。")
       return
     }
+    if (shouldBlockStaffActivitiesSaveOnVercelPreview()) {
+      setError(
+        "[このホストでは保存不可]\n\nVercel のプレビュー URL では data/activities.json へ書き込めません。Supabase を設定するか、手元で `pnpm dev` を起動した URL から登録するか、GitHub の data/activities.json を編集してください。",
+      )
+      return
+    }
     setError("")
     setMessage("")
     setDeletingId(id)
@@ -286,10 +333,10 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         return
       }
       if (!response.ok) {
-        setError(formatStaffActivitiesApiError(data, "削除に失敗しました。", response.status))
+        setError(buildStaffActivitiesSaveError(response, data, "削除に失敗しました。"))
         return
       }
-      if (Array.isArray(data.items)) setItems(data.items)
+      if (Array.isArray(data.items)) setItems(sortStaffActivitiesList(data.items))
       setMessage("削除しました。")
       if (editingId === id) cancelEdit()
       router.refresh()
@@ -316,8 +363,18 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
         </CardHeader>
         <CardContent className="space-y-5">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            入力内容は <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/activities.json</code>{" "}
-            に保存され、トップの活動記録セクションに反映されます。複数日にまたがる場合は終了日を指定してください（1日のみのときは終了日は空欄で構いません）。
+            {supabaseEnabled ? (
+              <>
+                入力内容は <strong className="font-semibold text-foreground">Supabase</strong>{" "}
+                に保存され、トップの活動記録セクションに反映されます。複数日にまたがる場合は終了日を指定してください（1日のみのときは終了日は空欄で構いません）。
+              </>
+            ) : (
+              <>
+                入力内容は{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 text-xs">data/activities.json</code>{" "}
+                に保存され、トップの活動記録セクションに反映されます。複数日にまたがる場合は終了日を指定してください（1日のみのときは終了日は空欄で構いません）。
+              </>
+            )}
           </p>
           <p className="text-xs text-muted-foreground">現在の登録件数: {items.length} 件</p>
 
@@ -416,25 +473,17 @@ export function StaffActivitiesManager({ initialItems }: StaffActivitiesManagerP
 
       <Card className="border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-xl md:text-2xl">登録済みの活動記録（直近{ACTIVITIES_STAFF_RECENT_MANAGE_COUNT}件）</CardTitle>
+          <CardTitle className="text-xl md:text-2xl">登録済みの活動記録（修正・削除）</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            終了日が新しい順の先頭 {ACTIVITIES_STAFF_RECENT_MANAGE_COUNT}{" "}
-            件だけ、ここから修正・削除できます。
-            {items.length > ACTIVITIES_STAFF_RECENT_MANAGE_COUNT ? (
-              <span className="block pt-1">
-                それ以外（{items.length - ACTIVITIES_STAFF_RECENT_MANAGE_COUNT}{" "}
-                件）は <code className="rounded bg-muted px-1 py-0.5 text-xs">data/activities.json</code>{" "}
-                を直接編集するか、不要なものを削除してからこの一覧に載せてください。
-              </span>
-            ) : null}
+            トップの活動記録と同じ一覧です（終了日が新しい順）。ここから修正・削除できます。
           </p>
           {items.length === 0 ? (
             <p className="text-sm text-muted-foreground">まだ登録がありません。</p>
           ) : (
             <ul className="space-y-3">
-              {recentManaged.map((row) => (
+              {items.map((row) => (
                 <li
                   key={row.id}
                   className="rounded-xl border border-border/80 bg-secondary/20 p-4 md:p-5"

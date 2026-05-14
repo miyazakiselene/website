@@ -120,6 +120,12 @@ export async function POST(request: Request) {
     if (message === "ACTIVITIES_INVALID") {
       return NextResponse.json({ error: "保存内容が無効です。日付・対戦相手・タイトルを確認してください。" }, { status: 400 })
     }
+    if (message === "ACTIVITIES_DUPLICATE_ID") {
+      return NextResponse.json(
+        { error: "同じ ID の活動記録が既に存在します。ページを再読み込みしてから再度お試しください。" },
+        { status: 409 },
+      )
+    }
     const fsMsg = persistJsonFilesystemUserMessage(error)
     if (fsMsg) {
       console.error("[api/activities POST]", error)

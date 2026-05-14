@@ -3,7 +3,7 @@
 import { Trophy } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
-import { primaryBrandImageAlt } from "@/lib/site-seo"
+import { heroSeoKicker, primaryBrandImageAlt } from "@/lib/site-seo"
 
 function BasketballIcon({ className }: { className?: string }) {
   return (
@@ -118,6 +118,14 @@ export function Hero() {
             </div>
           </div>
 
+          {/* 検索・スニペット用に「宮崎」「バスケ」を近接させた短い説明（表示あり） */}
+          <p
+            className={`mb-6 text-sm font-medium leading-snug text-muted-foreground md:text-base transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
+            style={{ transitionDelay: "0.15s" }}
+          >
+            {heroSeoKicker}
+          </p>
+
           {/* Badge with Animation */}
           <div 
             className={`transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
@@ -136,7 +144,7 @@ export function Hero() {
             className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground mb-8 leading-tight text-balance transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             style={{ transitionDelay: "0.4s" }}
           >
-            バスケで
+            宮崎のバスケで
             <br />
             <span className="text-primary relative">
               宮崎を元気に！
@@ -149,7 +157,7 @@ export function Hero() {
             className={`text-xl md:text-2xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty leading-relaxed transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             style={{ transitionDelay: "0.6s" }}
           >
-            宮崎県の女子中学生バスケットボールクラブ「SELENE」。
+            宮崎のバスケ（中学女子）クラブチーム「SELENE（セレーネ）」。
             <br />
             <span className="md:whitespace-nowrap">
               心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。

@@ -7,7 +7,7 @@ import {
   siteDescriptionDefault,
   siteNameTemplate,
   siteTitleDefault,
-} from '@/lib/site-seo'
+} from "@/lib/site-seo"
 import './globals.css'
 
 const geistSans = Geist({
@@ -37,7 +37,13 @@ export const metadata: Metadata = {
   },
   description: siteDescriptionDefault,
   keywords: [
-    '宮崎 中学 バスケ',
+    "宮崎 バスケ",
+    "宮崎のバスケ",
+    "宮崎　バスケ",
+    "宮崎バスケ",
+    "宮崎市 バスケ",
+    "宮崎県 バスケ",
+    "宮崎 中学 バスケ",
     '宮崎市 中学女子バスケ',
     '宮崎 中学女子バスケットボール',
     '宮崎SELENE',
@@ -118,31 +124,86 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const baseHref = siteUrl.toString().replace(/\/$/, "")
+  const sportsTeamId = `${baseHref}/#sports-team`
+  const websiteId = `${baseHref}/#website`
+
   const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'SportsTeam',
-    name: '宮崎SELENE',
-    alternateName: ['セレーネ', 'セレネ'],
-    description: siteDescriptionDefault,
-    sport: 'Basketball',
-    url: siteUrl.toString(),
-    logo: logoImageUrl,
-    image: [ogImageUrl],
-    sameAs: [instagramUrl],
-    areaServed: {
-      '@type': 'AdministrativeArea',
-      name: '宮崎県',
-    },
-    location: {
-      '@type': 'Place',
-      name: '宮崎県宮崎市',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: '宮崎市',
-        addressRegion: '宮崎県',
-        addressCountry: 'JP',
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SportsTeam",
+        "@id": sportsTeamId,
+        name: "宮崎SELENE",
+        alternateName: [
+          "セレーネ",
+          "セレネ",
+          "SELENE",
+          "宮崎セレーネ",
+          "宮崎のバスケ（中学女子）チーム",
+          "宮崎 バスケ 中学女子",
+          "宮崎 セレーネ",
+        ],
+        description: siteDescriptionDefault,
+        keywords: "宮崎 バスケ,宮崎のバスケ,セレーネ,SELENE,中学女子,バスケットボール,宮崎市,宮崎県,クラブチーム,中学女子バスケ",
+        sport: "Basketball",
+        url: siteUrl.toString(),
+        logo: {
+          "@type": "ImageObject",
+          url: logoImageUrl,
+          width: 512,
+          height: 512,
+        },
+        image: [
+          {
+            "@type": "ImageObject",
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+          },
+        ],
+        sameAs: [instagramUrl, siteUrl.toString()],
+        areaServed: {
+          "@type": "AdministrativeArea",
+          name: "宮崎県",
+          containedInPlace: {
+            "@type": "State",
+            name: "宮崎県",
+            addressCountry: "JP",
+          },
+        },
+        location: {
+          "@type": "Place",
+          name: "宮崎県宮崎市",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "宮崎市",
+            addressRegion: "宮崎県",
+            addressCountry: "JP",
+          },
+        },
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          url: `${siteUrl.toString()}#contact`,
+          availableLanguage: "Japanese",
+        },
+        gender: "Female",
+        athlete: {
+          "@type": "Person",
+          description: "宮崎県の中学女子バスケットボール選手",
+        },
       },
-    },
+      {
+        "@type": "WebSite",
+        "@id": websiteId,
+        url: siteUrl.toString(),
+        name: siteTitleDefault,
+        description: siteDescriptionDefault,
+        inLanguage: "ja-JP",
+        publisher: { "@id": sportsTeamId },
+      },
+    ],
   }
 
   return (

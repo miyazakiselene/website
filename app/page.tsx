@@ -1,10 +1,9 @@
-import { promises as fs } from "node:fs"
-import path from "node:path"
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
 import { TeamAbout } from "@/components/team-about"
 import { News } from "@/components/news"
 import { Results } from "@/components/results"
+import { FaqSection } from "@/components/faq-section"
 import { RelatedLinks } from "@/components/related-links"
 import { InstagramFeed } from "@/components/instagram-feed"
 import { ContactForm } from "@/components/contact-form"
@@ -19,6 +18,7 @@ import { mapActivitiesToTournaments } from "@/lib/map-activities-to-tournaments"
 import { filterStaffTournamentsForPublicTop } from "@/lib/public-results-dedupe"
 import { getPublicTeamGallery } from "@/lib/team-images"
 import { readNewsRecords } from "@/lib/news"
+import { readStaffTournamentRecords } from "@/lib/staff-results-storage"
 
 /** 本番で環境変数を更新しても反映されやすいよう、リクエスト時に読む */
 export const dynamic = "force-dynamic"
@@ -33,46 +33,27 @@ const defaultInstagramEmbedPostUrls = [
 
 const MAX_VISIBLE_INSTAGRAM_POSTS = 9
 
-type StaffRecord = {
-  id: string
-  year: string
-  name: string
-  venue?: string
-  matches?: {
-    id: string
-    date: string
-    opponent: string
-  }[]
-}
-
 async function readStaffRecordsAsTournaments(): Promise<Tournament[]> {
-  const dataFile = path.join(process.cwd(), "data", "staff-records.json")
+  const parsed = await readStaffTournamentRecords()
+  if (parsed.length === 0) return []
 
-  try {
-    const raw = await fs.readFile(dataFile, "utf-8")
-    const parsed = JSON.parse(raw) as StaffRecord[]
-    if (!Array.isArray(parsed) || parsed.length === 0) return []
-
-    return parsed.map((record) => ({
-      id: record.id,
-      period: record.year,
-      year: record.year,
-      name: record.name,
-      venue: record.venue ?? "",
-      matches: Array.isArray(record.matches)
-        ? record.matches.map((match) => ({
-            id: match.id,
-            date: match.date,
-            opponent: match.opponent,
-          }))
-        : [],
-    }))
-  } catch {
-    return []
-  }
+  return parsed.map((record) => ({
+    id: record.id,
+    period: record.year,
+    year: record.year,
+    name: record.name,
+    venue: record.venue ?? "",
+    matches: Array.isArray(record.matches)
+      ? record.matches.map((match) => ({
+          id: match.id,
+          date: match.date,
+          opponent: match.opponent,
+        }))
+      : [],
+  }))
 }
 
-/** staff-records.json と data/activities.json を統合し、日付の新しい順で整列したうえで Results に渡す */
+/** 試合結果（staff-records.json または Supabase）と data/activities.json を統合し、日付の新しい順で整列したうえで Results に渡す */
 async function readMergedPublicResults(): Promise<Tournament[] | undefined> {
   const [staff, activityRecords] = await Promise.all([readStaffRecordsAsTournaments(), readActivityRecords()])
   const staffForTop = filterStaffTournamentsForPublicTop(staff)
@@ -114,6 +95,7 @@ export default async function HomePage() {
       <News initialItems={newsItems} />
       <TeamAbout galleryPhotos={teamGalleryPhotos} />
       <Results initialTournaments={initialPublicResults} />
+      <FaqSection />
       <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
       <RelatedLinks />
       <ClientOnly>

@@ -1,25 +1,27 @@
-import { promises as fs } from "node:fs"
-import path from "node:path"
+import { timingSafeEqual } from "node:crypto"
 import { NextResponse } from "next/server"
+import { errorToDetailString, persistJsonFilesystemUserMessage } from "@/lib/persist-json-fs-message"
+import { revalidatePathsSafe } from "@/lib/safe-revalidate"
 import { normalizeTournamentRecords, type TournamentRecord } from "@/lib/staff-records"
+import { readStaffTournamentRecords, writeStaffTournamentRecords } from "@/lib/staff-results-storage"
 
 export const runtime = "nodejs"
 
-const DATA_DIR = path.join(process.cwd(), "data")
-const DATA_FILE = path.join(DATA_DIR, "staff-records.json")
-
-function normalizeRecords(records: TournamentRecord[]): TournamentRecord[] {
-  return normalizeTournamentRecords(records)
+function getExpectedStaffCode(): string {
+  return (process.env.NEXT_PUBLIC_STAFF_ACCESS_CODE ?? "123456").trim()
 }
 
-async function readRecordsFile(): Promise<TournamentRecord[]> {
+function staffCodeMatches(input: string): boolean {
+  const expected = getExpectedStaffCode()
+  const candidate = input.trim()
+  if (expected.length === 0 || candidate.length === 0) return false
   try {
-    const raw = await fs.readFile(DATA_FILE, "utf-8")
-    const parsed = JSON.parse(raw) as TournamentRecord[]
-    if (!Array.isArray(parsed)) return []
-    return normalizeRecords(parsed)
+    const a = Buffer.from(expected, "utf8")
+    const b = Buffer.from(candidate, "utf8")
+    if (a.length !== b.length) return false
+    return timingSafeEqual(a, b)
   } catch {
-    return []
+    return false
   }
 }
 
@@ -31,21 +33,43 @@ function stripVideoUrls(records: TournamentRecord[]): TournamentRecord[] {
 }
 
 export async function GET() {
-  const records = await readRecordsFile()
-  return NextResponse.json({ records: stripVideoUrls(records) })
+  const records = await readStaffTournamentRecords()
+  return NextResponse.json(
+    { records: stripVideoUrls(records) },
+    {
+      headers: {
+        "Cache-Control": "private, no-store, max-age=0",
+      },
+    },
+  )
 }
 
 export async function PUT(request: Request) {
   try {
-    const body = (await request.json()) as { records?: TournamentRecord[] }
-    const records = Array.isArray(body.records) ? normalizeRecords(body.records) : null
+    const body = (await request.json()) as { accessCode?: string; records?: TournamentRecord[] }
+    if (!staffCodeMatches(typeof body.accessCode === "string" ? body.accessCode : "")) {
+      return NextResponse.json({ error: "認証に失敗しました。" }, { status: 401 })
+    }
+    const records = Array.isArray(body.records) ? normalizeTournamentRecords(body.records) : null
     if (!records) {
       return NextResponse.json({ error: "records is required" }, { status: 400 })
     }
-    await fs.mkdir(DATA_DIR, { recursive: true })
-    await fs.writeFile(DATA_FILE, JSON.stringify(records, null, 2), "utf-8")
+    await writeStaffTournamentRecords(records)
+    revalidatePathsSafe(["/", "/staff/results"])
     return NextResponse.json({ ok: true })
-  } catch {
-    return NextResponse.json({ error: "failed to save records" }, { status: 500 })
+  } catch (error) {
+    const fsMsg = persistJsonFilesystemUserMessage(error)
+    if (fsMsg) {
+      console.error("[api/staff-records PUT]", error)
+      return NextResponse.json({ error: fsMsg, detail: errorToDetailString(error) }, { status: 503 })
+    }
+    console.error("[api/staff-records PUT]", error)
+    return NextResponse.json(
+      {
+        error: "試合結果の保存に失敗しました。しばらくしてから再度お試しください。",
+        detail: errorToDetailString(error),
+      },
+      { status: 500 },
+    )
   }
 }

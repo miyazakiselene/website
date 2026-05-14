@@ -6,6 +6,13 @@ import {
   DEFAULT_TEAM_GALLERY_PHOTOS,
   type TeamGalleryPhoto,
 } from "@/lib/team-gallery-defaults"
+import {
+  deleteTeamGalleryObjectsFromSupabase,
+  isTeamGallerySupabaseEnabled,
+  readTeamGalleryManifestPayloadFromSupabase,
+  uploadTeamGalleryObjectToSupabase,
+  writeTeamGalleryManifestPayloadToSupabase,
+} from "@/lib/team-gallery-supabase"
 
 const TEAM_IMAGE_MANIFEST_PATH = "team-gallery/manifest.json"
 const TEAM_IMAGE_UPLOAD_PREFIX = "team-gallery/uploads"
@@ -34,8 +41,13 @@ export type ManagedTeamImageState = {
   visibleDefaultPhotos: TeamGalleryPhoto[]
 }
 
-export function isTeamImageStorageConfigured(): boolean {
+function isBlobTeamGalleryConfigured(): boolean {
   return (process.env.BLOB_READ_WRITE_TOKEN ?? "").trim().length > 0
+}
+
+/** Supabase または Vercel Blob のどちらかが使えるとき true（関係者の画像管理を開ける） */
+export function isTeamImageStorageConfigured(): boolean {
+  return isTeamGallerySupabaseEnabled() || isBlobTeamGalleryConfigured()
 }
 
 function getBlobReadWriteToken(): string {
@@ -130,7 +142,7 @@ function buildDescriptions(files: File[], rawInput: string): string[] {
   return lines
 }
 
-async function writeManifest(
+async function writeManifestToBlob(
   images: ManagedTeamImage[],
   hiddenDefaultImageIds: string[] = [],
 ): Promise<void> {
@@ -145,15 +157,36 @@ async function writeManifest(
   })
 }
 
-export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
-  if (!isTeamImageStorageConfigured()) {
-    return {
-      storageReady: false,
-      hasManagedImages: false,
-      images: [],
-      hiddenDefaultImageIds: [],
-      visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
-    }
+async function persistManifest(
+  images: ManagedTeamImage[],
+  hiddenDefaultImageIds: string[] = [],
+): Promise<void> {
+  const manifest = buildManifest(images, hiddenDefaultImageIds)
+  if (isTeamGallerySupabaseEnabled()) {
+    await writeTeamGalleryManifestPayloadToSupabase({
+      version: 1,
+      updatedAt: manifest.updatedAt,
+      images: manifest.images,
+      hiddenDefaultImageIds: manifest.hiddenDefaultImageIds,
+    })
+    return
+  }
+  await writeManifestToBlob(images, hiddenDefaultImageIds)
+}
+
+function emptyState(storageReady: boolean): ManagedTeamImageState {
+  return {
+    storageReady,
+    hasManagedImages: false,
+    images: [],
+    hiddenDefaultImageIds: [],
+    visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
+  }
+}
+
+async function readManagedTeamImagesFromBlob(): Promise<ManagedTeamImageState> {
+  if (!isBlobTeamGalleryConfigured()) {
+    return emptyState(false)
   }
 
   try {
@@ -165,24 +198,12 @@ export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
     const manifestBlob = blobs.find((blob) => blob.pathname === TEAM_IMAGE_MANIFEST_PATH)
 
     if (manifestBlob == null) {
-      return {
-        storageReady: true,
-        hasManagedImages: false,
-        images: [],
-        hiddenDefaultImageIds: [],
-        visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
-      }
+      return emptyState(true)
     }
 
     const response = await fetch(manifestBlob.url, { cache: "no-store" })
     if (!response.ok) {
-      return {
-        storageReady: true,
-        hasManagedImages: false,
-        images: [],
-        hiddenDefaultImageIds: [],
-        visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
-      }
+      return emptyState(true)
     }
 
     const parsed = (await response.json()) as Partial<TeamImageManifest>
@@ -201,14 +222,43 @@ export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
       visibleDefaultPhotos: visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds),
     }
   } catch {
-    return {
-      storageReady: true,
-      hasManagedImages: false,
-      images: [],
-      hiddenDefaultImageIds: [],
-      visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
+    return emptyState(true)
+  }
+}
+
+export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
+  if (!isTeamImageStorageConfigured()) {
+    return emptyState(false)
+  }
+
+  if (isTeamGallerySupabaseEnabled()) {
+    try {
+      const payload = await readTeamGalleryManifestPayloadFromSupabase()
+      if (payload === null) {
+        return emptyState(true)
+      }
+      const images = payload.images
+        .map((value) => normalizeManagedTeamImage(value))
+        .filter((value): value is ManagedTeamImage => value !== null)
+      const hiddenDefaultImageIds = normalizeHiddenDefaultImageIds(payload.hiddenDefaultImageIds)
+
+      return {
+        storageReady: true,
+        hasManagedImages: images.length > 0,
+        images,
+        hiddenDefaultImageIds,
+        visibleDefaultPhotos: visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds),
+      }
+    } catch (e) {
+      console.error("[readManagedTeamImages] Supabase read failed", e)
+      if (isBlobTeamGalleryConfigured()) {
+        return readManagedTeamImagesFromBlob()
+      }
+      return emptyState(true)
     }
   }
+
+  return readManagedTeamImagesFromBlob()
 }
 
 export async function getPublicTeamGallery(): Promise<{
@@ -230,7 +280,11 @@ export async function getPublicTeamGallery(): Promise<{
 }
 
 export async function uploadManagedTeamImages(files: File[], rawDescriptions: string): Promise<number> {
-  const token = getBlobReadWriteToken()
+  if (!isTeamImageStorageConfigured()) {
+    throw new Error(
+      "画像ストレージが未設定です。NEXT_PUBLIC_SUPABASE_URL と SUPABASE_SERVICE_ROLE_KEY を設定するか、BLOB_READ_WRITE_TOKEN を設定してください。",
+    )
+  }
 
   if (files.length === 0) {
     throw new Error("アップロードする画像を1枚以上選択してください。")
@@ -250,31 +304,52 @@ export async function uploadManagedTeamImages(files: File[], rawDescriptions: st
         throw new Error("1枚あたり10MB以下の画像を選択してください。")
       }
 
-      const blob = await put(
-        `${TEAM_IMAGE_UPLOAD_PREFIX}/${Date.now()}-${sanitizeFileName(file.name)}`,
-        file,
-        {
-          access: "public",
-          addRandomSuffix: true,
-          contentType: file.type,
-          token,
-        },
-      )
+      if (isTeamGallerySupabaseEnabled()) {
+        const objectPath = `${TEAM_IMAGE_UPLOAD_PREFIX}/${Date.now()}-${sanitizeFileName(file.name)}`
+        const bytes = new Uint8Array(await file.arrayBuffer())
+        const { publicUrl, pathname } = await uploadTeamGalleryObjectToSupabase(objectPath, bytes, file.type)
+        uploadedImages.push({
+          id: randomUUID(),
+          url: publicUrl,
+          pathname,
+          description: descriptions[index],
+          uploadedAt: new Date().toISOString(),
+        })
+      } else {
+        const token = getBlobReadWriteToken()
+        const blob = await put(
+          `${TEAM_IMAGE_UPLOAD_PREFIX}/${Date.now()}-${sanitizeFileName(file.name)}`,
+          file,
+          {
+            access: "public",
+            addRandomSuffix: true,
+            contentType: file.type,
+            token,
+          },
+        )
 
-      uploadedImages.push({
-        id: randomUUID(),
-        url: blob.url,
-        pathname: blob.pathname,
-        description: descriptions[index],
-        uploadedAt: new Date().toISOString(),
-      })
+        uploadedImages.push({
+          id: randomUUID(),
+          url: blob.url,
+          pathname: blob.pathname,
+          description: descriptions[index],
+          uploadedAt: new Date().toISOString(),
+        })
+      }
     }
 
-    await writeManifest([...uploadedImages.reverse(), ...state.images], state.hiddenDefaultImageIds)
+    await persistManifest([...uploadedImages.reverse(), ...state.images], state.hiddenDefaultImageIds)
     return uploadedImages.length
   } catch (error) {
     if (uploadedImages.length > 0) {
-      await Promise.allSettled(uploadedImages.map((image) => del(image.url, { token })))
+      if (isTeamGallerySupabaseEnabled()) {
+        await deleteTeamGalleryObjectsFromSupabase(uploadedImages.map((image) => image.pathname)).catch(
+          () => undefined,
+        )
+      } else {
+        const token = getBlobReadWriteToken()
+        await Promise.allSettled(uploadedImages.map((image) => del(image.url, { token })))
+      }
     }
     throw error
   }
@@ -296,7 +371,7 @@ export async function updateManagedTeamImageDescription(
     throw new Error("更新対象の画像が見つかりませんでした。")
   }
 
-  await writeManifest(
+  await persistManifest(
     state.images.map((image) =>
       image.id === imageId
         ? {
@@ -310,8 +385,6 @@ export async function updateManagedTeamImageDescription(
 }
 
 export async function deleteManagedTeamImage(imageId: string): Promise<void> {
-  const token = getBlobReadWriteToken()
-
   const state = await readManagedTeamImages()
   if (imageId.startsWith("default:")) {
     const defaultImageId = imageId.slice("default:".length)
@@ -321,7 +394,7 @@ export async function deleteManagedTeamImage(imageId: string): Promise<void> {
       throw new Error("削除対象の初期画像が見つかりませんでした。")
     }
 
-    await writeManifest(state.images, [...state.hiddenDefaultImageIds, defaultImageId])
+    await persistManifest(state.images, [...state.hiddenDefaultImageIds, defaultImageId])
     return
   }
 
@@ -331,8 +404,14 @@ export async function deleteManagedTeamImage(imageId: string): Promise<void> {
     throw new Error("削除対象の画像が見つかりませんでした。")
   }
 
-  await del(target.url, { token })
-  await writeManifest(
+  if (isTeamGallerySupabaseEnabled()) {
+    await deleteTeamGalleryObjectsFromSupabase([target.pathname])
+  } else {
+    const token = getBlobReadWriteToken()
+    await del(target.url, { token })
+  }
+
+  await persistManifest(
     state.images.filter((image) => image.id !== imageId),
     state.hiddenDefaultImageIds,
   )
