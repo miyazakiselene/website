@@ -1,3 +1,12 @@
+"use client"
+
+import { ChevronDown } from "lucide-react"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+
 const faqs = [
   {
     question: "宮崎SELENEとはどのようなチームですか？",
@@ -7,17 +16,16 @@ const faqs = [
   {
     question: "どこで練習・活動していますか？",
     answer:
-      "宮崎市内の体育館を中心に練習・活動しています。練習試合や大会はおもに宮崎県内で行われています。最新の練習日程・お知らせは公式サイトのお知らせセクションでご確認ください。",
+      "宮崎市内の体育館を中心に練習・活動しています。最新の試合・大会・お知らせは公式サイトのお知らせセクションでご確認ください。",
   },
   {
     question: "新メンバーの募集はしていますか？",
-    answer:
-      "本年度のクラブ生の募集は終了しました。次年度以降の募集については公式 Instagram（@2026.selene）でお知らせします。練習試合・合同練習・大会のお誘いなどのご相談は Instagram のDMよりお気軽にどうぞ。",
+    answer: "本年度のクラブ生の募集は終了しました。",
   },
   {
     question: "どんな大会に出場していますか？",
     answer:
-      "宮崎県クラブ選手権・U15ジュニアウィンターカップ予選などの公式大会や、県内外チームとの練習試合に参加しています。最新の試合結果は「試合結果」セクションでご確認ください。",
+      "宮崎県クラブ選手権・U15ジュニアウィンターカップ予選などの公式大会や、県内外チームとの練習試合に参加しています。最新の試合情報は「活動記録」セクションでご確認ください。",
   },
   {
     question: "セレーネ（SELENE）という名前の由来は？",
@@ -25,6 +33,29 @@ const faqs = [
       "SELENEはギリシャ神話の月の女神「セレーネ」に由来します。夜空に輝く月のように、宮崎のバスケ界を照らす存在を目指してチーム名に採用されました。",
   },
 ]
+
+function FaqList() {
+  return (
+    <dl className="space-y-4">
+      {faqs.map((faq, i) => (
+        <div
+          key={i}
+          className="rounded-xl border border-border bg-card px-6 py-5 space-y-2"
+        >
+          <dt className="font-bold text-foreground text-base md:text-lg leading-snug">
+            <span className="text-primary mr-2" aria-hidden>
+              Q.
+            </span>
+            {faq.question}
+          </dt>
+          <dd className="text-muted-foreground text-sm md:text-base leading-relaxed pl-6">
+            {faq.answer}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
 
 export function FaqSection() {
   const faqSchema = {
@@ -66,22 +97,21 @@ export function FaqSection() {
           </p>
         </div>
 
-        <dl className="space-y-4">
-          {faqs.map((faq, i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-border bg-card px-6 py-5 space-y-2"
-            >
-              <dt className="font-bold text-foreground text-base md:text-lg leading-snug">
-                <span className="text-primary mr-2" aria-hidden>Q.</span>
-                {faq.question}
-              </dt>
-              <dd className="text-muted-foreground text-sm md:text-base leading-relaxed pl-6">
-                {faq.answer}
-              </dd>
+        <div className="hidden md:block">
+          <FaqList />
+        </div>
+
+        <Collapsible defaultOpen={false} className="md:hidden">
+          <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-4 py-4 text-center">
+            <p className="text-base font-bold text-foreground">よくある質問を開く</p>
+            <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="border-t border-border pt-4">
+              <FaqList />
             </div>
-          ))}
-        </dl>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </section>
   )
