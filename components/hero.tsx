@@ -3,7 +3,7 @@
 import { Trophy } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
-import { heroSeoKicker, primaryBrandImageAlt } from "@/lib/site-seo"
+import { heroTaglinePrimary, heroTaglineSecondary, primaryBrandImageAlt } from "@/lib/site-seo"
 
 function BasketballIcon({ className }: { className?: string }) {
   return (
@@ -118,13 +118,18 @@ export function Hero() {
             </div>
           </div>
 
-          {/* 検索・スニペット用に「宮崎」「バスケ」を近接させた短い説明（表示あり） */}
-          <p
-            className={`mb-6 text-sm font-medium leading-snug text-muted-foreground md:text-base transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
+          {/* サイト名（やや大）＋補足（薄色）でロゴと競合しない階層 */}
+          <div
+            className={`mb-6 flex flex-col items-center gap-1.5 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
             style={{ transitionDelay: "0.15s" }}
           >
-            {heroSeoKicker}
-          </p>
+            <p className="text-base font-semibold leading-snug text-foreground md:text-lg">
+              {heroTaglinePrimary}
+            </p>
+            <p className="text-sm font-normal leading-snug text-muted-foreground md:text-base">
+              {heroTaglineSecondary}
+            </p>
+          </div>
 
           {/* Badge with Animation */}
           <div 
@@ -141,7 +146,7 @@ export function Hero() {
 
           {/* Main Headline with Animation */}
           <h1 
-            className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground mb-8 leading-tight text-balance transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground mb-12 leading-tight text-balance transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             style={{ transitionDelay: "0.4s" }}
           >
             バスケで
@@ -151,18 +156,6 @@ export function Hero() {
               <span className="absolute -inset-1 bg-primary/10 blur-lg -z-10" />
             </span>
           </h1>
-
-          {/* Sub Headline with Animation */}
-          <p
-            className={`text-xl md:text-2xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty leading-relaxed transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: "0.6s" }}
-          >
-            宮崎のバスケ（中学女子）クラブチーム「SELENE（セレーネ）」。
-            <br />
-            <span className="md:whitespace-nowrap">
-              心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。
-            </span>
-          </p>
         </div>
       </div>
 
