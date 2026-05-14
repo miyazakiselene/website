@@ -74,53 +74,57 @@
       ]
     },
     {
-      "snapshotDate": "2026-05-18",
+      "snapshotDate": "2026-05-14",
       "exportTitle": "サイトの訪問状況（やさしいまとめ）・2回目",
-      "dataSourceNote": "1回目の PDF から1週間後に再出力した Vercel Web Analytics の値を反映しています（デモ用の目安）。",
-      "analysisPeriod": "直近7日間（PDF: Last 7 Days）",
+      "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/05/14 17:09 出力）に書き出したデータを読み取り整理しています。",
+      "analysisPeriod": "直近7日間（PDF: Last 7 Days、5/7〜5/14 ごろ）",
       "deployment": "Production（本番の公開サイト）",
       "targetSite": "miyazaki-selene.vercel.app",
       "stats": {
-        "uniqueVisitors": 12,
-        "bouncePercent": 8,
-        "pageViewsEstimate": 34
+        "uniqueVisitors": 55,
+        "bouncePercent": 36,
+        "pageViewsEstimate": 524
       },
       "metrics": [
         {
           "title": "訪問した人の数",
           "subtitle": "同じ人が何回きても「1人」と数えます（Visitors）",
-          "value": "12",
+          "value": "55",
           "unit": "人"
         },
         {
           "title": "直帰率",
           "subtitle": "1ページだけ見てすぐ離脱した割合（Bounce Rate）",
-          "value": "8",
+          "value": "36",
           "unit": "%"
         },
         {
           "title": "ページビュー（全体）",
-          "subtitle": "PDFのチャートとページ別の合計を突き合わせた目安です",
-          "value": "34",
-          "unit": "回（目安）"
+          "subtitle": "7日間のページ読み込み合計（Page Views）",
+          "value": "524",
+          "unit": "回"
         }
       ],
       "pageTable": {
-        "caption": "ページ別の「閲覧」回数（2回目の PDF に基づく）",
-        "columnLabels": ["ページの説明", "パス", "回数"],
+        "caption": "ページ別の閲覧人数（PDFの Pages / Routes の VISITORS 列）",
+        "columnLabels": ["ページの説明", "パス", "人数"],
         "rows": [
-          { "label": "トップページ", "path": "/", "count": "14" },
-          { "label": "関係者ページ（入り口）", "path": "/staff", "count": "10" },
-          { "label": "関係者ダッシュボード", "path": "/staff/dashboard", "count": "6" },
-          { "label": "試合結果の管理", "path": "/staff/results", "count": "4" }
+          { "label": "トップページ", "path": "/", "count": "55" },
+          { "label": "関係者ページ（入り口）", "path": "/staff", "count": "24" },
+          { "label": "試合結果の管理", "path": "/staff/results", "count": "15" },
+          { "label": "管理画面（チーム画像）", "path": "/admin/team-images", "count": "9" },
+          { "label": "関係者ダッシュボード", "path": "/staff/dashboard", "count": "8" },
+          { "label": "お知らせ管理", "path": "/staff/news", "count": "6" },
+          { "label": "活動記録の管理", "path": "/staff/activities", "count": "4" }
         ]
       },
       "referrers": {
         "caption": "どのサイトから来たか（参照元）",
         "columnLabels": ["参照元", "人数"],
         "rows": [
-          { "label": "vercel.com", "value": "2" },
-          { "label": "直接入力・ブックマーク", "value": "3" }
+          { "label": "Google 検索", "value": "4" },
+          { "label": "Yahoo! 検索", "value": "3" },
+          { "label": "vercel.com", "value": "1" }
         ]
       },
       "countries": {
@@ -132,21 +136,24 @@
         "caption": "使われた端末の種類",
         "columnLabels": ["端末", "割合"],
         "rows": [
-          { "label": "パソコン（デスクトップ）", "value": "42%" },
-          { "label": "スマートフォンなど（モバイル）", "value": "58%" }
+          { "label": "スマートフォン（モバイル）", "value": "76%" },
+          { "label": "パソコン（デスクトップ）", "value": "24%" }
         ]
       },
       "operatingSystems": {
         "caption": "OSの種類",
         "columnLabels": ["OS", "割合"],
         "rows": [
-          { "label": "Mac", "value": "33%" },
-          { "label": "Windows", "value": "25%" },
-          { "label": "iOS（iPhone など）", "value": "42%" }
+          { "label": "iOS（iPhone など）", "value": "71%" },
+          { "label": "Mac", "value": "24%" },
+          { "label": "Android", "value": "5%" }
         ]
       },
       "notes": [
-        "2回目以降は `stats` とページ別行を揃えると、ダッシュボードの前回比・累積・グラフが安定します。"
+        "Google・Yahoo! 検索からの自然流入が合計7人。SEO 効果が出始めています。",
+        "訪問者の76%がスマートフォン（iOS 71%）。モバイル最適化の継続が重要です。",
+        "関係者ページ（/staff 系）が上位を占めており、スタッフが積極的に利用しています。",
+        "直帰率36%は初期サイトとして標準的。コンテンツ充実で改善が見込めます。"
       ]
     }
   ]
