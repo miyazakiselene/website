@@ -34,16 +34,6 @@ export function ContactForm() {
         {/* Contact Actions */}
         <div className="max-w-2xl mx-auto space-y-6">
           <AnimatedSection animation="fadeInUp" delay={200}>
-            <Card className="bg-background border-primary/30">
-              <CardContent className="p-6 md:p-7">
-                <p className="text-base md:text-lg text-foreground leading-relaxed">
-                  本年度のクラブ生の募集は終了しました。
-                </p>
-              </CardContent>
-            </Card>
-          </AnimatedSection>
-
-          <AnimatedSection animation="fadeInUp" delay={260}>
             <Card className="bg-background border-border hover:border-primary/30 transition-colors duration-300">
               <CardContent className="p-8 md:p-10">
                 <div className="space-y-6">
