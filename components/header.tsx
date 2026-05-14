@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet"
 import { primaryBrandImageAlt } from "@/lib/site-seo"
 import { cn } from "@/lib/utils"
+import { SiteSearch } from "@/components/site-search"
 
 const navItems = [
   { label: "ホーム", href: "#hero" },
@@ -89,26 +90,29 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "relative px-4 py-2 text-sm font-medium transition-colors rounded-full",
-                  activeSection === item.href.replace("#", "")
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {item.label}
-                {activeSection === item.href.replace("#", "") && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
-                )}
-              </Link>
-            ))}
-          </nav>
+          {/* Desktop Navigation + 検索 + Mobile controls */}
+          <div className="flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "relative px-4 py-2 text-sm font-medium transition-colors rounded-full",
+                    activeSection === item.href.replace("#", "")
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {item.label}
+                  {activeSection === item.href.replace("#", "") && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
+                  )}
+                </Link>
+              ))}
+            </nav>
+
+            <SiteSearch />
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -179,6 +183,7 @@ export function Header() {
               </nav>
             </SheetContent>
           </Sheet>
+          </div>
         </div>
       </div>
     </header>
