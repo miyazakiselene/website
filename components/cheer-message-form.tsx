@@ -96,7 +96,7 @@ export function CheerMessageForm() {
                       value={nickname}
                       onChange={(e) => setNickname(e.target.value)}
                       maxLength={NICKNAME_MAX}
-                      placeholder="例: Kさんの保護者"
+                      placeholder="例: バスケファン"
                       disabled={status === "submitting"}
                       required
                     />
