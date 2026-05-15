@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { BarChart3, ClipboardList, History, Images, Megaphone, ScrollText } from "lucide-react"
+import { BarChart3, ClipboardList, Heart, History, Images, Megaphone, ScrollText } from "lucide-react"
 import { StaffAreaNav } from "@/components/staff-area-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -80,6 +80,23 @@ export function StaffHub() {
               </p>
               <Button asChild className="w-full sm:w-auto">
                 <Link href="/admin/team-images">画像管理ページへ</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-xl md:text-2xl">
+                <Heart className="h-6 w-6 text-primary" />
+                応援メッセージ
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                公開ページから送信された応援メッセージの確認・削除・承認を行います。
+              </p>
+              <Button asChild className="w-full sm:w-auto">
+                <Link href="/staff/messages">応援メッセージの管理ページへ</Link>
               </Button>
             </CardContent>
           </Card>
