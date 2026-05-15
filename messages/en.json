@@ -1,0 +1,191 @@
+{
+  "metadata": {
+    "titleDefault": "MIYAZAKI SELENE Official Site | Girls Basketball Club in Miyazaki",
+    "description": "Official site of MIYAZAKI SELENE (セレーネ), a girls' junior high basketball club based in Miyazaki City, Japan. Activity records and practice match inquiries welcome.",
+    "siteNameTemplate": "MIYAZAKI SELENE（セレーネ）"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "news": "News",
+    "results": "Activities",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "instagram": "Instagram",
+    "relatedLinks": "Links",
+    "staffOnly": "Staff"
+  },
+  "hero": {
+    "taglinePrimary": "MIYAZAKI SELENE Official Site",
+    "taglineSecondary": "Girls Basketball Club in Miyazaki, Japan",
+    "imageAlt": "MIYAZAKI SELENE (セレーネ) — Girls Basketball Club in Miyazaki",
+    "badge": "Aiming for the National Championship",
+    "headline1": "Basketball in Miyazaki,",
+    "headline2": "Energizing Our City!",
+    "subheadline1": "SELENE (セレーネ) — a girls' junior high basketball club in Miyazaki.",
+    "subheadline2": "We train daily to develop our players holistically and aim for the national stage."
+  },
+  "about": {
+    "sectionLabel": "About Us",
+    "title": "About the Team",
+    "description": "We aim to be a team cheered on by basketball fans across Miyazaki,\nfocusing on the healthy development of every player.",
+    "galleryAria": "Team photo gallery (swipe horizontally on mobile)",
+    "galleryPlaceholderTitle": "Team photos coming soon",
+    "galleryPlaceholderBody": "Photos will appear here once uploaded from the admin panel.",
+    "mission": {
+      "label": "Mission",
+      "heading": "Our Philosophy",
+      "title": "Our Purpose",
+      "body1": "MIYAZAKI SELENE (セレーネ) is a club dedicated to the",
+      "bold": "healthy physical and mental development",
+      "body2": "of junior high school girls in Miyazaki through basketball.\nBeyond technical skills, we strive to cultivate teamwork, respect, and perseverance in every player."
+    },
+    "goals": {
+      "title": "Goals",
+      "items": [
+        { "title": "Win the Miyazaki Club Championship", "description": "Aiming to be No. 1 in the prefecture" },
+        { "title": "Reach the National Championship", "description": "Compete on the national stage" },
+        { "title": "U15 Junior Winter Cup", "description": "Win the prefectural qualifier" }
+      ]
+    },
+    "staff": {
+      "title": "Staff",
+      "members": [
+        {
+          "name": "Rina Tokushige",
+          "role": "Head Coach (HC)",
+          "description": "Dedicated to each player's individual growth with careful, fundamental coaching."
+        },
+        {
+          "name": "Shinichi Hisatome",
+          "role": "Assistant Coach / Representative (AC)",
+          "description": "Oversees team operations and player support, with a strong focus on parent communication."
+        }
+      ]
+    }
+  },
+  "news": {
+    "sectionLabel": "News",
+    "title": "News",
+    "description": "Upcoming schedules and match announcements.",
+    "openList": "View News",
+    "closeList": "Close News",
+    "pastNews": "Past News",
+    "noPastNews": "No past news yet. Items will appear here automatically after their scheduled date.",
+    "instagramLink": "DM us on Instagram for practice match, joint practice, or tournament invitations"
+  },
+  "results": {
+    "sectionLabel": "Activity",
+    "title": "Activity Records",
+    "description": "Thank you to all the teams we have competed against. We look forward to future matches.",
+    "openList": "View Records",
+    "closeList": "Close Records",
+    "pastResults": "Past Records",
+    "noPastResults": "No past records yet.",
+    "matchCount": "{count} match(es)",
+    "matches": "{count} match(es)",
+    "preparingOpponents": "Opponent information coming soon."
+  },
+  "faq": {
+    "sectionLabel": "FAQ",
+    "title": "Frequently Asked Questions",
+    "description": "Common questions about MIYAZAKI SELENE (セレーネ).",
+    "openList": "View FAQ",
+    "items": [
+      {
+        "question": "What kind of team is MIYAZAKI SELENE?",
+        "answer": "MIYAZAKI SELENE (セレーネ) is a girls' junior high basketball club based in Miyazaki City, Miyazaki Prefecture. We train daily to develop players holistically and aim for the Miyazaki Club Championship and national championship."
+      },
+      {
+        "question": "Where do you practice and play?",
+        "answer": "We primarily practice and compete at gymnasiums in Miyazaki City. Please check the News section for the latest match schedules and announcements."
+      },
+      {
+        "question": "Are you recruiting new members?",
+        "answer": "Recruitment for the current school year has ended."
+      },
+      {
+        "question": "What tournaments do you participate in?",
+        "answer": "We compete in official tournaments such as the Miyazaki Club Championship and the U15 Junior Winter Cup qualifier, as well as practice matches against teams throughout the region. See the Activity Records section for the latest results."
+      },
+      {
+        "question": "What is the origin of the name SELENE?",
+        "answer": "SELENE comes from Selene, the goddess of the moon in Greek mythology. Just as the moon illuminates the night sky, the name was chosen to represent our aspiration to shine in the Miyazaki basketball community."
+      }
+    ]
+  },
+  "contact": {
+    "sectionLabel": "Contact",
+    "title": "Contact Us",
+    "matchInviteText": "For practice match invitations, joint practice sessions, tournaments, or other inquiries,",
+    "instagramPrompt": "please reach out via Instagram DM.",
+    "instagramButton": "DM @2026.selene",
+    "replyNote": "We will respond as promptly as possible, but please allow time for a reply."
+  },
+  "relatedLinks": {
+    "sectionLabel": "Related Links",
+    "title": "Related Links",
+    "description": "Useful external sites for tournament information, player registration, and official rules.",
+    "openList": "View Links",
+    "closeList": "Close Links",
+    "items": [
+      {
+        "name": "Miyazaki Basketball Association U15 Division",
+        "description": "Tournament brackets and match results."
+      },
+      {
+        "name": "Miyazaki Basketball Association",
+        "description": "Official site for Miyazaki basketball, referees, and 3×3 information."
+      },
+      {
+        "name": "TeamJBA (JBA Member Registration System)",
+        "description": "Player registration, coach registration, and tournament entries."
+      },
+      {
+        "name": "Japan Basketball Association (JBA)",
+        "description": "Official competition rules and national news."
+      }
+    ]
+  },
+  "sponsors": {
+    "sectionLabel": "Sponsor",
+    "title": "Sponsors",
+    "description": "Our sponsors who generously support our activities",
+    "thankYou": "Thank you for your generous support",
+    "newSponsor": "Companies and organizations interested in sponsoring us are welcome to reach out via Instagram DM.",
+    "instagramButton": "DM @2026.selene"
+  },
+  "footer": {
+    "tagline": "Girls Basketball Club",
+    "description": "SELENE (セレーネ) — a girls' junior high basketball club in Miyazaki, Japan. Aiming for the national championship.",
+    "copyright": "© 2026 宮崎 SELENE (セレーネ). All rights reserved.",
+    "scrollToTop": "Back to Top",
+    "nav": {
+      "home": "Home",
+      "about": "About",
+      "news": "News",
+      "results": "Activities",
+      "faq": "FAQ",
+      "contact": "Contact",
+      "instagram": "Instagram",
+      "relatedLinks": "Links"
+    },
+    "navHeading": "Navigation",
+    "contactHeading": "Contact",
+    "instagramLabel": "@2026.selene (DM here)",
+    "staffLink": "Staff Area"
+  },
+  "search": {
+    "placeholder": "Search...",
+    "emptyResult": "No results found.",
+    "sections": {
+      "pages": "Pages",
+      "news": "News",
+      "activities": "Activities",
+      "faq": "FAQ"
+    },
+    "ariaLabel": "Site search",
+    "desktopLabel": "Search...",
+    "dialogDescription": "Search news, activities, and FAQ"
+  }
+}

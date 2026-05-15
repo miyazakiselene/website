@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Calendar, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -140,6 +141,7 @@ function groupMatchesByDate(
 }
 
 function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
+  const t = useTranslations("results")
   const groupedMatches = groupMatchesByDate(tournament.matches, tournament)
 
   return (
@@ -166,7 +168,7 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
                   </div>
                 ) : null}
                 <p className="mt-1.5 text-xs text-muted-foreground md:mt-2 md:text-sm">
-                  {tournament.matches.length}試合を表示
+                  {t("matchCount", { count: tournament.matches.length })}
                 </p>
               </div>
             </div>
@@ -187,7 +189,7 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
                           {date}
                         </Badge>
                         <span className="text-xs text-muted-foreground md:text-sm">
-                          {matches.length}試合
+                          {t("matches", { count: matches.length })}
                         </span>
                       </div>
                       <ul className="grid gap-2 md:gap-3">
@@ -210,7 +212,7 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-border/70 px-4 py-5 text-sm text-muted-foreground">
-                  対戦情報を準備中です。
+                  {t("preparingOpponents")}
                 </div>
               )}
             </div>
@@ -232,12 +234,13 @@ function MobileResultsList({
   visibleTournaments: Tournament[]
   archivedTournaments: Tournament[]
 }) {
+  const t = useTranslations("results")
   const [open, setOpen] = useState(false)
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="mx-auto max-w-4xl md:hidden">
       <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-4 py-4 text-center">
-        <p className="text-base font-bold text-foreground">活動記録一覧を開く</p>
+        <p className="text-base font-bold text-foreground">{t("openList")}</p>
         <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -256,13 +259,13 @@ function MobileResultsList({
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
           >
             <ChevronDown className="h-4 w-4 rotate-180" aria-hidden />
-            活動記録一覧を閉じる
+            {t("closeList")}
           </button>
 
           {archivedTournaments.length > 0 ? (
             <Collapsible className="rounded-2xl border border-border bg-card">
               <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center">
-                <p className="text-base font-bold text-foreground">過去の活動記録を見る</p>
+                <p className="text-base font-bold text-foreground">{t("pastResults")}</p>
                 <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CollapsibleTrigger>
               <CollapsibleContent>
@@ -283,6 +286,7 @@ function MobileResultsList({
 }
 
 export function Results({ initialTournaments }: ResultsProps) {
+  const t = useTranslations("results")
   const sortedNewestFirst: Tournament[] = useMemo(() => {
     const source =
       initialTournaments != null && initialTournaments.length > 0 ? initialTournaments : fallbackTournaments
@@ -306,13 +310,13 @@ export function Results({ initialTournaments }: ResultsProps) {
       <div className="container mx-auto px-4">
         <AnimatedSection className="mb-14 text-center" animation="fadeInUp">
           <span className="text-base md:text-lg font-semibold text-primary uppercase tracking-widest">
-            Activity
+            {t("sectionLabel")}
           </span>
           <h2 className="mt-3 mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">
-            活動記録
+            {t("title")}
           </h2>
           <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl">
-            対戦していただいたチームの皆様、ありがとうございました。今後ともよろしくお願いいたします。
+            {t("description")}
           </p>
         </AnimatedSection>
 
@@ -328,7 +332,7 @@ export function Results({ initialTournaments }: ResultsProps) {
             <div className="space-y-4">
               <Collapsible className="rounded-2xl border border-border bg-card">
                 <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center md:gap-4 md:px-6 md:py-5">
-                  <p className="text-base font-bold text-foreground md:text-lg">過去の活動記録を見る</p>
+                  <p className="text-base font-bold text-foreground md:text-lg">{t("pastResults")}</p>
                   <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -341,7 +345,7 @@ export function Results({ initialTournaments }: ResultsProps) {
                       </div>
                     ) : (
                       <p className="px-2 py-3 text-sm text-muted-foreground">
-                        まだ過去の活動記録はありません。
+                        {t("noPastResults")}
                       </p>
                     )}
                   </div>

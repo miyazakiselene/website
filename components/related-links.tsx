@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { ChevronDown, ExternalLink, Link2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedSection } from "@/components/animated-section"
 import {
@@ -11,34 +12,18 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 
+const linkUrls = [
+  "https://miyachugaku.hp-ez.com/",
+  "http://miyazaki.japanbasketball.jp/",
+  "https://team-jba.jp/",
+  "http://www.japanbasketball.jp/",
+]
+
 type RelatedLinkItem = {
   name: string
   url: string
   description: string
 }
-
-const relatedLinks: RelatedLinkItem[] = [
-  {
-    name: "一般社団法人 宮崎県バスケットボール協会 U15部会",
-    url: "https://miyachugaku.hp-ez.com/",
-    description: "県大会の組み合わせ・試合結果の確認はこちら。",
-  },
-  {
-    name: "(一社)宮崎県バスケットボール協会",
-    url: "http://miyazaki.japanbasketball.jp/",
-    description: "宮崎県全体のバスケ情報・審判・3x3に関する公式サイト。",
-  },
-  {
-    name: "TeamJBA (日本バスケットボール協会 会員登録管理システム)",
-    url: "https://team-jba.jp/",
-    description: "選手登録、指導者登録、大会エントリーのためのシステム。",
-  },
-  {
-    name: "公益財団法人 日本バスケットボール協会 (JBA)",
-    url: "http://www.japanbasketball.jp/",
-    description: "公式競技規則（ルール）や全国の最新ニュース。",
-  },
-]
 
 function RelatedLinkCard({ item }: { item: RelatedLinkItem }) {
   return (
@@ -63,13 +48,13 @@ function RelatedLinkCard({ item }: { item: RelatedLinkItem }) {
   )
 }
 
-function MobileRelatedLinksList({ items }: { items: RelatedLinkItem[] }) {
+function MobileRelatedLinksList({ items, openLabel, closeLabel }: { items: RelatedLinkItem[]; openLabel: string; closeLabel: string }) {
   const [open, setOpen] = useState(false)
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="mx-auto max-w-4xl md:hidden">
       <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-background px-4 py-4 text-center">
-        <p className="text-base font-bold text-foreground">関連リンク一覧を開く</p>
+        <p className="text-base font-bold text-foreground">{openLabel}</p>
         <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -88,7 +73,7 @@ function MobileRelatedLinksList({ items }: { items: RelatedLinkItem[] }) {
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
           >
             <ChevronDown className="h-4 w-4 rotate-180" aria-hidden />
-            関連リンク一覧を閉じる
+            {closeLabel}
           </button>
         </div>
       </CollapsibleContent>
@@ -97,6 +82,13 @@ function MobileRelatedLinksList({ items }: { items: RelatedLinkItem[] }) {
 }
 
 export function RelatedLinks() {
+  const t = useTranslations("relatedLinks")
+  const rawItems = t.raw("items") as Array<{ name: string; description: string }>
+  const items: RelatedLinkItem[] = rawItems.map((item, i) => ({
+    ...item,
+    url: linkUrls[i] ?? "#",
+  }))
+
   return (
     <section id="related-links" className="bg-card py-24 md:py-28">
       <div className="container mx-auto px-4">
@@ -104,28 +96,28 @@ export function RelatedLinks() {
           <div className="mb-5 inline-flex items-center gap-2 text-primary">
             <Link2 className="h-5 w-5" />
             <span className="text-base font-semibold uppercase tracking-widest md:text-lg">
-              Related Links
+              {t("sectionLabel")}
             </span>
           </div>
           <h2 className="mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">
-            関連リンク
+            {t("title")}
           </h2>
           <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-            大会情報や登録手続き、公式ルールの確認に便利な外部サイトをまとめています。
+            {t("description")}
           </p>
         </AnimatedSection>
 
-        {/* デスクトップ: 1列リスト */}
+        {/* Desktop: 1-column list */}
         <div className="mx-auto hidden max-w-4xl grid-cols-1 gap-4 md:grid md:gap-5">
-          {relatedLinks.map((item, index) => (
+          {items.map((item, index) => (
             <AnimatedSection key={item.url} animation="fadeInUp" delay={100 + index * 80}>
               <RelatedLinkCard item={item} />
             </AnimatedSection>
           ))}
         </div>
 
-        {/* モバイル: 折りたたみ */}
-        <MobileRelatedLinksList items={relatedLinks} />
+        {/* Mobile: collapsible */}
+        <MobileRelatedLinksList items={items} openLabel={t("openList")} closeLabel={t("closeList")} />
       </div>
     </section>
   )

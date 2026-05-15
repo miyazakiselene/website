@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Calendar, HelpCircle, LayoutGrid, Newspaper, Search } from "lucide-react"
 import {
   CommandDialog,
@@ -13,33 +14,40 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 
-const sections = [
-  { id: "about",         label: "チーム紹介" },
-  { id: "news",          label: "お知らせ" },
-  { id: "results",       label: "活動記録" },
-  { id: "faq",           label: "よくある質問" },
-  { id: "contact",       label: "お問い合わせ" },
-  { id: "related-links", label: "関連リンク" },
-]
-
-const faqItems = [
-  { id: "faq-0", question: "宮崎SELENEとはどのようなチームですか？" },
-  { id: "faq-1", question: "どこで練習・活動していますか？" },
-  { id: "faq-2", question: "新メンバーの募集はしていますか？" },
-  { id: "faq-3", question: "どんな大会に出場していますか？" },
-  { id: "faq-4", question: "セレーネ（SELENE）という名前の由来は？" },
-]
+const sectionIds = [
+  { id: "about",         key: "pages.about" },
+  { id: "news",          key: "pages.news" },
+  { id: "results",       key: "pages.results" },
+  { id: "faq",           key: "pages.faq" },
+  { id: "contact",       key: "pages.contact" },
+  { id: "related-links", key: "pages.relatedLinks" },
+] as const
 
 type NewsItem     = { id: string; title: string; date: string; venue: string }
 type ActivityItem = { id: string; title: string; startDate: string; endDate: string; opponent: string; location: string }
 
 export function SiteSearch() {
+  const t      = useTranslations("search")
+  const tNav   = useTranslations("nav")
+  const tFaq   = useTranslations("faq")
   const [open, setOpen] = useState(false)
   const [newsItems, setNewsItems]         = useState<NewsItem[]>([])
   const [activityItems, setActivityItems] = useState<ActivityItem[]>([])
   const router = useRouter()
 
-  // ⌘K / Ctrl+K でダイアログを開閉
+  const sections = [
+    { id: "about",         label: tNav("about") },
+    { id: "news",          label: tNav("news") },
+    { id: "results",       label: tNav("results") },
+    { id: "faq",           label: tNav("faq") },
+    { id: "contact",       label: tNav("contact") },
+    { id: "related-links", label: tNav("relatedLinks") },
+  ]
+
+  const faqItems = (tFaq.raw("items") as Array<{ question: string; answer: string }>).map(
+    (item, i) => ({ id: `faq-${i}`, question: item.question }),
+  )
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -51,7 +59,6 @@ export function SiteSearch() {
     return () => document.removeEventListener("keydown", onKey)
   }, [])
 
-  // ダイアログを開いたときにデータ取得
   useEffect(() => {
     if (!open) return
     let cancelled = false
@@ -80,25 +87,25 @@ export function SiteSearch() {
 
   return (
     <>
-      {/* デスクトップ: 検索バー風ボタン */}
+      {/* Desktop: search bar button */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="サイト内検索"
+        aria-label={t("ariaLabel")}
         className="hidden md:flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
       >
         <Search className="h-4 w-4 shrink-0" />
-        <span>検索...</span>
+        <span>{t("desktopLabel")}</span>
         <span className="ml-1 flex items-center gap-px rounded border border-border bg-background px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
           ⌘K
         </span>
       </button>
 
-      {/* スマホ: アイコンのみ */}
+      {/* Mobile: icon only */}
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="検索"
+        aria-label={t("ariaLabel")}
         className="md:hidden flex h-11 w-11 items-center justify-center rounded-lg hover:bg-primary/10 transition-colors"
       >
         <Search className="h-5 w-5 text-foreground" />
@@ -107,16 +114,16 @@ export function SiteSearch() {
       <CommandDialog
         open={open}
         onOpenChange={setOpen}
-        title="サイト内検索"
-        description="お知らせ・活動記録・FAQ を検索できます"
+        title={t("ariaLabel")}
+        description={t("dialogDescription")}
         showCloseButton={false}
         className="max-w-[95vw] md:max-w-lg"
       >
-        <CommandInput placeholder="キーワードを入力..." />
+        <CommandInput placeholder={t("placeholder")} />
         <CommandList className="max-h-[60vh]">
-          <CommandEmpty>一致する項目が見つかりませんでした。</CommandEmpty>
+          <CommandEmpty>{t("emptyResult")}</CommandEmpty>
 
-          <CommandGroup heading="ページ">
+          <CommandGroup heading={t("sections.pages")}>
             {sections.map((s) => (
               <CommandItem key={s.id} value={s.label} onSelect={() => handleSelect(`#${s.id}`)}>
                 <LayoutGrid className="text-muted-foreground" />
@@ -128,7 +135,7 @@ export function SiteSearch() {
           {newsItems.length > 0 && (
             <>
               <CommandSeparator />
-              <CommandGroup heading="お知らせ">
+              <CommandGroup heading={t("sections.news")}>
                 {newsItems.map((item) => (
                   <CommandItem
                     key={item.id}
@@ -151,7 +158,7 @@ export function SiteSearch() {
           {activityItems.length > 0 && (
             <>
               <CommandSeparator />
-              <CommandGroup heading="活動記録">
+              <CommandGroup heading={t("sections.activities")}>
                 {activityItems.map((item) => (
                   <CommandItem
                     key={item.id}
@@ -174,7 +181,7 @@ export function SiteSearch() {
           )}
 
           <CommandSeparator />
-          <CommandGroup heading="よくある質問">
+          <CommandGroup heading={t("sections.faq")}>
             {faqItems.map((faq) => (
               <CommandItem
                 key={faq.id}

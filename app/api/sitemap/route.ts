@@ -30,30 +30,27 @@ export async function GET() {
   const [newsItems, activityItems] = await Promise.all([readNewsRecords(), readActivityRecords()])
 
   type Row = { loc: string; lastmod: string; changefreq: string; priority: string }
+  const now = formatLastmod(new Date())
   const rows: Row[] = [
-    {
-      loc: `${base}/`,
-      lastmod: formatLastmod(new Date()),
-      changefreq: "weekly",
-      priority: "1.0",
-    },
-    ...newsItems.map((item) => {
+    { loc: `${base}/`,    lastmod: now, changefreq: "weekly", priority: "1.0" },
+    { loc: `${base}/en/`, lastmod: now, changefreq: "weekly", priority: "1.0" },
+    ...newsItems.flatMap((item) => {
       const d = lastModFromIsoDate(item.eventEndDate)
-      return {
-        loc: `${base}/news/${encodeURIComponent(item.id)}`,
-        lastmod: formatLastmod(d ?? new Date()),
-        changefreq: "weekly",
-        priority: "0.8",
-      }
+      const lastmod = formatLastmod(d ?? new Date())
+      const id = encodeURIComponent(item.id)
+      return [
+        { loc: `${base}/news/${id}`,    lastmod, changefreq: "weekly", priority: "0.8" },
+        { loc: `${base}/en/news/${id}`, lastmod, changefreq: "weekly", priority: "0.8" },
+      ]
     }),
-    ...activityItems.map((item) => {
+    ...activityItems.flatMap((item) => {
       const d = lastModFromIsoDate(item.endDate)
-      return {
-        loc: `${base}/activities/${encodeURIComponent(item.id)}`,
-        lastmod: formatLastmod(d ?? new Date()),
-        changefreq: "weekly",
-        priority: "0.75",
-      }
+      const lastmod = formatLastmod(d ?? new Date())
+      const id = encodeURIComponent(item.id)
+      return [
+        { loc: `${base}/activities/${id}`,    lastmod, changefreq: "weekly", priority: "0.75" },
+        { loc: `${base}/en/activities/${id}`, lastmod, changefreq: "weekly", priority: "0.75" },
+      ]
     }),
   ]
 

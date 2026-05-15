@@ -3,7 +3,7 @@
 import { Trophy } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
-import { heroTaglinePrimary, heroTaglineSecondary, primaryBrandImageAlt } from "@/lib/site-seo"
+import { useTranslations } from "next-intl"
 
 function BasketballIcon({ className }: { className?: string }) {
   return (
@@ -34,16 +34,14 @@ function BasketballRing({ className }: { className?: string }) {
 
 function FloatingBall({ delay, className }: { delay: number; className: string }) {
   return (
-    <div 
-      className={`absolute animate-bounce ${className}`}
-      style={{ animationDelay: `${delay}s`, animationDuration: "3s" }}
-    >
+    <div className={`absolute animate-bounce ${className}`} style={{ animationDelay: `${delay}s`, animationDuration: "3s" }}>
       <BasketballIcon className="w-full h-full text-primary/20" />
     </div>
   )
 }
 
 export function Hero() {
+  const t = useTranslations("hero")
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
@@ -52,47 +50,29 @@ export function Hero() {
   }, [])
 
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden"
-    >
-      {/* Background Image with Overlay */}
+    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
       <div className="absolute inset-0">
         <Image
           src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1920&q=80"
-          alt={primaryBrandImageAlt}
-          fill
-          className="object-cover opacity-20"
-          priority
+          alt={t("imageAlt")}
+          fill className="object-cover opacity-20" priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(218,165,32,0.15),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(74,85,104,0.2),transparent_50%)]" />
       </div>
 
-      {/* Animated Basketball Court Lines */}
       <div className="absolute inset-0 opacity-10">
-        <div 
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border-2 border-primary rounded-full transition-all duration-1000 ${isLoaded ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
-          style={{ transitionDelay: "0.3s" }}
-        />
-        <div 
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] border-2 border-primary rounded-full transition-all duration-1000 ${isLoaded ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
-          style={{ transitionDelay: "0.5s" }}
-        />
-        <div 
-          className={`absolute top-1/2 left-0 right-0 h-[2px] bg-primary transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-          style={{ transitionDelay: "0.7s" }}
-        />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border-2 border-primary rounded-full transition-all duration-1000 ${isLoaded ? "scale-100 opacity-100" : "scale-50 opacity-0"}`} style={{ transitionDelay: "0.3s" }} />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] border-2 border-primary rounded-full transition-all duration-1000 ${isLoaded ? "scale-100 opacity-100" : "scale-50 opacity-0"}`} style={{ transitionDelay: "0.5s" }} />
+        <div className={`absolute top-1/2 left-0 right-0 h-[2px] bg-primary transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: "0.7s" }} />
       </div>
 
-      {/* Floating Basketball Elements */}
-      <FloatingBall delay={0} className="top-20 right-[10%] w-16 h-16" />
+      <FloatingBall delay={0}   className="top-20 right-[10%] w-16 h-16" />
       <FloatingBall delay={0.5} className="bottom-32 left-[8%] w-12 h-12" />
-      <FloatingBall delay={1} className="top-[40%] right-[5%] w-8 h-8" />
+      <FloatingBall delay={1}   className="top-[40%] right-[5%] w-8 h-8" />
       <FloatingBall delay={1.5} className="top-[60%] left-[5%] w-10 h-10" />
-      
-      {/* Animated Basketball Ring */}
+
       <div className="absolute top-[15%] left-[12%] animate-pulse" style={{ animationDuration: "4s" }}>
         <BasketballRing className="w-20 h-16 text-primary/20" />
       </div>
@@ -102,64 +82,49 @@ export function Hero() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Logo with Animation */}
-          <div 
-            className={`flex justify-center mb-10 transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-          >
+          <div className={`flex justify-center mb-10 transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
             <div className="relative h-[200px] w-[200px] transition-transform duration-300 hover:scale-105">
               <div className="absolute inset-0 bg-primary/30 rounded-full blur-xl animate-pulse" />
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                alt={primaryBrandImageAlt}
-                fill
-                sizes="200px"
+                alt={t("imageAlt")}
+                fill sizes="200px"
                 className="z-10 rounded-full object-cover shadow-2xl shadow-primary/30"
               />
             </div>
           </div>
 
-          {/* サイト名（やや大）＋補足（薄色）でロゴと競合しない階層 */}
-          <div
-            className={`mb-6 flex flex-col items-center gap-1.5 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
-            style={{ transitionDelay: "0.15s" }}
-          >
-            <p className="text-base font-semibold leading-snug text-foreground md:text-lg">
-              {heroTaglinePrimary}
-            </p>
-            <p className="text-sm font-normal leading-snug text-muted-foreground md:text-base">
-              {heroTaglineSecondary}
-            </p>
-          </div>
+          <p className={`mb-1 text-sm font-bold leading-snug text-primary md:text-base transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`} style={{ transitionDelay: "0.1s" }}>
+            {t("taglinePrimary")}
+          </p>
+          <p className={`mb-6 text-sm leading-snug text-muted-foreground md:text-base transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`} style={{ transitionDelay: "0.15s" }}>
+            {t("taglineSecondary")}
+          </p>
 
-          {/* Badge with Animation */}
-          <div 
-            className={`transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-            style={{ transitionDelay: "0.2s" }}
-          >
+          <div className={`transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`} style={{ transitionDelay: "0.2s" }}>
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/30 mb-10 hover:bg-primary/20 transition-colors">
               <Trophy className="h-5 w-5 text-primary animate-pulse" />
-              <span className="text-base font-semibold text-primary">
-                全国大会出場を目指して
-              </span>
+              <span className="text-base font-semibold text-primary">{t("badge")}</span>
             </div>
           </div>
 
-          {/* Main Headline with Animation */}
-          <h1 
-            className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground mb-12 leading-tight text-balance transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ transitionDelay: "0.4s" }}
-          >
-            バスケで
+          <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground mb-8 leading-tight text-balance transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`} style={{ transitionDelay: "0.4s" }}>
+            {t("headline1")}
             <br />
             <span className="text-primary relative">
-              宮崎を元気に！
+              {t("headline2")}
               <span className="absolute -inset-1 bg-primary/10 blur-lg -z-10" />
             </span>
           </h1>
+
+          <p className={`text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto text-pretty leading-relaxed transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`} style={{ transitionDelay: "0.6s" }}>
+            {t("subheadline1")}
+            <br />
+            <span className="md:whitespace-nowrap">{t("subheadline2")}</span>
+          </p>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
         <span className="text-sm text-muted-foreground animate-pulse">Scroll</span>
         <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/50 flex justify-center p-1">

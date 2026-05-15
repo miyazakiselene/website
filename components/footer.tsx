@@ -3,22 +3,24 @@
 import { Instagram, ArrowUp } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { AnimatedSection } from "@/components/animated-section"
-import { primaryBrandImageAlt } from "@/lib/site-seo"
-
-const navLinks = [
-  { label: "ホーム", href: "#hero" },
-  { label: "チーム紹介", href: "#about" },
-  { label: "お知らせ", href: "#news" },
-  { label: "活動記録", href: "#results" },
-  { label: "FAQ", href: "#faq" },
-  { label: "お問い合わせ", href: "#contact" },
-  { label: "Instagram", href: "#instagram" },
-  { label: "関連リンク", href: "#related-links" },
-]
 
 export function Footer() {
+  const t = useTranslations("footer")
+
+  const navLinks = [
+    { label: t("nav.home"),         href: "#hero" },
+    { label: t("nav.about"),        href: "#about" },
+    { label: t("nav.news"),         href: "#news" },
+    { label: t("nav.results"),      href: "#results" },
+    { label: t("nav.faq"),          href: "#faq" },
+    { label: t("nav.contact"),      href: "#contact" },
+    { label: t("nav.instagram"),    href: "#instagram" },
+    { label: t("nav.relatedLinks"), href: "#related-links" },
+  ]
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -33,7 +35,7 @@ export function Footer() {
           className="rounded-full shadow-lg hover:scale-110 transition-transform w-14 h-14"
         >
           <ArrowUp className="h-6 w-6" />
-          <span className="sr-only">トップへ戻る</span>
+          <span className="sr-only">{t("scrollToTop")}</span>
         </Button>
       </AnimatedSection>
 
@@ -46,7 +48,7 @@ export function Footer() {
                 <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 transition-opacity group-hover:opacity-100" />
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eXDGmvyWRf4K2shMMCmWbrlTBM5TWt.png"
-                  alt={primaryBrandImageAlt}
+                  alt="宮崎SELENE（セレーネ）ロゴ"
                   fill
                   sizes="56px"
                   className="z-10 rounded-full object-cover"
@@ -57,20 +59,18 @@ export function Footer() {
                   宮崎 SELENE
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  Girls Basketball Club
+                  {t("tagline")}
                 </span>
               </div>
             </Link>
-            <p className="text-base text-muted-foreground leading-relaxed">
-              宮崎県の女子中学生バスケットボールクラブ「SELENE（セレーネ）」。
-              <br />
-              全国大会出場を目指して活動中。
+            <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-line">
+              {t("description")}
             </p>
           </AnimatedSection>
 
           {/* Navigation */}
           <AnimatedSection animation="fadeInUp" delay={200}>
-            <h4 className="font-bold text-lg text-foreground mb-5">ナビゲーション</h4>
+            <h4 className="font-bold text-lg text-foreground mb-5">{t("navHeading")}</h4>
             <nav className="grid grid-cols-2 gap-3">
               {navLinks.map((link) => (
                 <Link
@@ -86,7 +86,7 @@ export function Footer() {
 
           {/* Contact */}
           <AnimatedSection animation="fadeInUp" delay={300}>
-            <h4 className="font-bold text-lg text-foreground mb-5">お問い合わせ</h4>
+            <h4 className="font-bold text-lg text-foreground mb-5">{t("contactHeading")}</h4>
             <div className="space-y-3">
               <a
                 href="https://www.instagram.com/2026.selene/"
@@ -95,13 +95,13 @@ export function Footer() {
                 className="flex items-center gap-3 text-base text-muted-foreground hover:text-primary transition-colors group"
               >
                 <Instagram className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                @2026.selene（DMはこちら）
+                {t("instagramLabel")}
               </a>
               <Link
                 href="/staff"
                 className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
               >
-                チーム関係者専用ページ
+                {t("staffLink")}
               </Link>
             </div>
           </AnimatedSection>
@@ -111,7 +111,7 @@ export function Footer() {
         <AnimatedSection animation="fadeIn" delay={400}>
           <div className="border-t border-border pt-10">
             <p className="text-center text-base text-muted-foreground">
-              &copy; {new Date().getFullYear()} 宮崎 SELENE (セレーネ). All rights reserved.
+              {t("copyright")}
             </p>
           </div>
         </AnimatedSection>

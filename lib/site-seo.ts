@@ -14,7 +14,7 @@ export const siteTitleDefault =
 
 /** サイト共通の meta description */
 export const siteDescriptionDefault =
-  "宮崎の中学女子バスケットボールクラブ「宮崎SELENE（セレーネ）」の公式サイトです。宮崎県宮崎市を拠点に、練習日程・活動記録・入会案内などを掲載しています。" as const
+  "宮崎の中学女子バスケットボールクラブ「宮崎SELENE（セレーネ）」の公式サイトです。宮崎県宮崎市を拠点に、活動記録・練習試合のお問い合わせを掲載しています。" as const
 
 /** 子ページの title テンプレート末尾・applicationName など */
 export const siteNameTemplate = "宮崎SELENE（セレーネ）" as const

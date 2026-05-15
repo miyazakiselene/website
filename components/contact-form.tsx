@@ -1,12 +1,15 @@
 "use client"
 
 import { Instagram, MessageCircle } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedSection } from "@/components/animated-section"
 import Image from "next/image"
 
 export function ContactForm() {
+  const t = useTranslations("contact")
+
   return (
     <section id="contact" className="py-24 md:py-32 bg-card relative overflow-hidden">
       {/* Background Decoration */}
@@ -24,10 +27,10 @@ export function ContactForm() {
         {/* Section Header */}
         <AnimatedSection className="text-center mb-16" animation="fadeInUp">
           <span className="text-base md:text-lg font-semibold text-primary uppercase tracking-widest">
-            Contact
+            {t("sectionLabel")}
           </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mt-3 mb-6">
-            お問い合わせ
+            {t("title")}
           </h2>
         </AnimatedSection>
 
@@ -40,8 +43,8 @@ export function ContactForm() {
                   <AnimatedSection animation="fadeInUp" delay={320}>
                     <div className="rounded-xl border border-border bg-card/60 p-5 md:p-6">
                       <p className="text-base md:text-lg text-foreground leading-relaxed">
-                        練習試合・合同練習・大会のお誘い等々、その他のご相談は、
-                        <span className="block mt-1">Instagram のDMをご利用ください。</span>
+                        {t("matchInviteText")}
+                        <span className="block mt-1">{t("instagramPrompt")}</span>
                       </p>
                     </div>
                   </AnimatedSection>
@@ -58,7 +61,7 @@ export function ContactForm() {
                         rel="noopener noreferrer"
                       >
                         <Instagram className="h-5 w-5 mr-2" />
-                        @2026.selene にDMする
+                        {t("instagramButton")}
                       </a>
                     </Button>
                   </AnimatedSection>
@@ -66,7 +69,7 @@ export function ContactForm() {
                   <AnimatedSection animation="fadeInUp" delay={420}>
                     <div className="text-center text-base text-muted-foreground flex items-center justify-center gap-2">
                       <MessageCircle className="h-4 w-4" />
-                      なるべく早急に対応いたしますが、返信が遅れる場合はご了承ください
+                      {t("replyNote")}
                     </div>
                   </AnimatedSection>
                 </div>

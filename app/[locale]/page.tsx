@@ -20,7 +20,6 @@ import { getPublicTeamGallery } from "@/lib/team-images"
 import { readNewsRecords } from "@/lib/news"
 import { readStaffTournamentRecords } from "@/lib/staff-results-storage"
 
-/** 本番で環境変数を更新しても反映されやすいよう、リクエスト時に読む */
 export const dynamic = "force-dynamic"
 
 const defaultInstagramEmbedPostUrls = [
@@ -36,7 +35,6 @@ const MAX_VISIBLE_INSTAGRAM_POSTS = 9
 async function readStaffRecordsAsTournaments(): Promise<Tournament[]> {
   const parsed = await readStaffTournamentRecords()
   if (parsed.length === 0) return []
-
   return parsed.map((record) => ({
     id: record.id,
     period: record.year,
@@ -44,23 +42,17 @@ async function readStaffRecordsAsTournaments(): Promise<Tournament[]> {
     name: record.name,
     venue: record.venue ?? "",
     matches: Array.isArray(record.matches)
-      ? record.matches.map((match) => ({
-          id: match.id,
-          date: match.date,
-          opponent: match.opponent,
-        }))
+      ? record.matches.map((match) => ({ id: match.id, date: match.date, opponent: match.opponent }))
       : [],
   }))
 }
 
-/** 試合結果（staff-records.json または Supabase）と data/activities.json を統合し、日付の新しい順で整列したうえで Results に渡す */
 async function readMergedPublicResults(): Promise<Tournament[] | undefined> {
   const [staff, activityRecords] = await Promise.all([readStaffRecordsAsTournaments(), readActivityRecords()])
   const staffForTop = filterStaffTournamentsForPublicTop(staff)
   const fromActivities = mapActivitiesToTournaments(activityRecords)
   const combined = [...staffForTop, ...fromActivities]
   if (combined.length === 0) return undefined
-
   const sortedTournaments = sortTournamentsNewestFirst(combined)
   return sortedTournaments.map((tournament) => ({
     ...tournament,
@@ -74,14 +66,10 @@ async function readMergedPublicResults(): Promise<Tournament[] | undefined> {
 }
 
 export default async function HomePage() {
-  const embedRaw =
-    process.env.NEXT_PUBLIC_INSTAGRAM_EMBED_URLS ?? process.env.INSTAGRAM_EMBED_URLS ?? ""
+  const embedRaw = process.env.NEXT_PUBLIC_INSTAGRAM_EMBED_URLS ?? process.env.INSTAGRAM_EMBED_URLS ?? ""
   const instagramEmbedPostUrls = parseInstagramEmbedPostUrlsFromEnv(embedRaw)
   const effectiveInstagramEmbedPostUrls =
-    (instagramEmbedPostUrls.length > 0 ? instagramEmbedPostUrls : defaultInstagramEmbedPostUrls).slice(
-      0,
-      MAX_VISIBLE_INSTAGRAM_POSTS,
-    )
+    (instagramEmbedPostUrls.length > 0 ? instagramEmbedPostUrls : defaultInstagramEmbedPostUrls).slice(0, MAX_VISIBLE_INSTAGRAM_POSTS)
   const initialPublicResults = await readMergedPublicResults()
   const { photos: teamGalleryPhotos } = await getPublicTeamGallery()
   const newsItems = await readNewsRecords()

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { CalendarDays, ChevronDown, MapPin } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedSection } from "@/components/animated-section"
 import {
@@ -46,12 +47,13 @@ function MobileNewsList({
   currentNews: NewsRecord[]
   pastNews: NewsRecord[]
 }) {
+  const t = useTranslations("news")
   const [open, setOpen] = useState(false)
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="mx-auto max-w-4xl md:hidden">
       <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-background px-4 py-4 text-center">
-        <p className="text-base font-bold text-foreground">お知らせ一覧を開く</p>
+        <p className="text-base font-bold text-foreground">{t("openList")}</p>
         <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -70,7 +72,7 @@ function MobileNewsList({
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
           >
             <ChevronDown className="h-4 w-4 rotate-180" aria-hidden />
-            お知らせ一覧を閉じる
+            {t("closeList")}
           </button>
 
           <AnimatedSection animation="fadeInUp" delay={100 + currentNews.length * 100}>
@@ -78,7 +80,7 @@ function MobileNewsList({
               <Collapsible className="rounded-2xl border border-border bg-background">
                 <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center">
                   <div>
-                    <p className="text-base font-bold text-foreground">過去のお知らせを見る</p>
+                    <p className="text-base font-bold text-foreground">{t("pastNews")}</p>
                   </div>
                   <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
@@ -91,9 +93,7 @@ function MobileNewsList({
                         ))}
                       </div>
                     ) : (
-                      <p className="px-2 py-3 text-sm text-muted-foreground">
-                        まだ過去のお知らせはありません。予定日の翌日以降に自動でここへ表示されます。
-                      </p>
+                      <p className="px-2 py-3 text-sm text-muted-foreground">{t("noPastNews")}</p>
                     )}
                   </div>
                 </CollapsibleContent>
@@ -106,7 +106,7 @@ function MobileNewsList({
                   rel="noopener noreferrer"
                   className="inline-block text-base font-semibold text-primary underline-offset-4 hover:underline md:text-lg"
                 >
-                  練習試合・合同練習・大会のお誘いはこちらにDMを下さい
+                  {t("instagramLink")}
                 </Link>
               </p>
             </div>
@@ -122,6 +122,7 @@ type NewsProps = {
 }
 
 export function News({ initialItems }: NewsProps) {
+  const t = useTranslations("news")
   const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
@@ -139,12 +140,10 @@ export function News({ initialItems }: NewsProps) {
       <div className="container mx-auto px-4">
         <AnimatedSection className="mb-14 text-center" animation="fadeInUp">
           <span className="text-base font-semibold uppercase tracking-widest text-primary md:text-lg">
-            News
+            {t("sectionLabel")}
           </span>
-          <h2 className="mt-3 mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">お知らせ</h2>
-          <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl">
-            今後の活動予定（試合予定）を掲載します。
-          </p>
+          <h2 className="mt-3 mb-6 text-4xl font-black text-foreground md:text-5xl lg:text-6xl">{t("title")}</h2>
+          <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl">{t("description")}</p>
         </AnimatedSection>
 
         <div className="mx-auto hidden max-w-4xl grid-cols-1 gap-4 md:grid md:gap-5">
@@ -159,7 +158,7 @@ export function News({ initialItems }: NewsProps) {
               <Collapsible className="rounded-2xl border border-border bg-background">
                 <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 px-4 py-4 text-center md:gap-4 md:px-6 md:py-5">
                   <div>
-                    <p className="text-base font-bold text-foreground md:text-lg">過去のお知らせを見る</p>
+                    <p className="text-base font-bold text-foreground md:text-lg">{t("pastNews")}</p>
                   </div>
                   <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
@@ -172,9 +171,7 @@ export function News({ initialItems }: NewsProps) {
                         ))}
                       </div>
                     ) : (
-                      <p className="px-2 py-3 text-sm text-muted-foreground">
-                        まだ過去のお知らせはありません。予定日の翌日以降に自動でここへ表示されます。
-                      </p>
+                      <p className="px-2 py-3 text-sm text-muted-foreground">{t("noPastNews")}</p>
                     )}
                   </div>
                 </CollapsibleContent>
@@ -187,7 +184,7 @@ export function News({ initialItems }: NewsProps) {
                   rel="noopener noreferrer"
                   className="inline-block text-base font-semibold text-primary underline-offset-4 hover:underline md:text-lg"
                 >
-                  練習試合・合同練習・大会のお誘いはこちらにDMを下さい
+                  {t("instagramLink")}
                 </Link>
               </p>
             </div>

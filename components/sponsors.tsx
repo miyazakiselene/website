@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Heart, Instagram } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { AnimatedSection } from "@/components/animated-section"
 
 const sponsors = [
@@ -33,6 +34,8 @@ const sponsors = [
 ]
 
 export function Sponsors() {
+  const t = useTranslations("sponsors")
+
   return (
     <section className="py-20 md:py-24 bg-card border-t border-border overflow-hidden">
       <div className="container mx-auto px-4">
@@ -41,15 +44,15 @@ export function Sponsors() {
           <div className="inline-flex items-center gap-3 text-primary mb-5">
             <Heart className="h-6 w-6 animate-pulse" />
             <span className="text-base md:text-lg font-semibold uppercase tracking-widest">
-              Sponsors
+              {t("sectionLabel")}
             </span>
             <Heart className="h-6 w-6 animate-pulse" />
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4">
-            スポンサー
+            {t("title")}
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
-            私たちの活動を支援してくださっているスポンサー企業様
+            {t("description")}
           </p>
         </AnimatedSection>
 
@@ -85,19 +88,14 @@ export function Sponsors() {
         {/* Thank you message */}
         <AnimatedSection animation="fadeIn" delay={500}>
           <p className="text-center text-base md:text-lg text-muted-foreground mt-12">
-            ご支援いただきありがとうございます
+            {t("thankYou")}
           </p>
         </AnimatedSection>
 
         <AnimatedSection animation="fadeInUp" delay={600} className="mt-10 max-w-2xl mx-auto">
           <div className="rounded-xl border border-primary/30 bg-primary/5 px-5 py-6 md:px-8 md:py-7 text-center space-y-4">
-            <p className="text-base md:text-lg text-foreground leading-relaxed">
-              <span className="block">
-                新たにご支援いただける法人・団体様は、お気軽にご連絡ください。
-              </span>
-              <span className="block mt-1">
-                InstagramのDMよりお問い合わせをお待ちしております。
-              </span>
+            <p className="text-base md:text-lg text-foreground leading-relaxed whitespace-pre-line">
+              {t("newSponsor")}
             </p>
             <Link
               href="https://www.instagram.com/2026.selene/"
@@ -106,7 +104,7 @@ export function Sponsors() {
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               <Instagram className="h-5 w-5 shrink-0" />
-              @2026.selene にDMする
+              {t("instagramButton")}
             </Link>
           </div>
         </AnimatedSection>

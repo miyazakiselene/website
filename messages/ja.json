@@ -1,0 +1,191 @@
+{
+  "metadata": {
+    "titleDefault": "宮崎SELENE（セレーネ）公式サイト｜宮崎の中学女子バスケットボールクラブ",
+    "description": "宮崎の中学女子バスケットボールクラブ「宮崎SELENE（セレーネ）」の公式サイトです。宮崎県宮崎市を拠点に、活動記録・練習試合のお問い合わせを掲載しています。",
+    "siteNameTemplate": "宮崎SELENE（セレーネ）"
+  },
+  "nav": {
+    "home": "ホーム",
+    "about": "チーム紹介",
+    "news": "お知らせ",
+    "results": "活動記録",
+    "faq": "よくある質問",
+    "contact": "お問い合わせ",
+    "instagram": "Instagram",
+    "relatedLinks": "関連リンク",
+    "staffOnly": "関係者専用"
+  },
+  "hero": {
+    "taglinePrimary": "宮崎SELENE（セレーネ）公式サイト",
+    "taglineSecondary": "宮崎の中学女子バスケットボールクラブ",
+    "imageAlt": "宮崎SELENE（セレーネ）公式サイト 宮崎の中学女子バスケットボールクラブ",
+    "badge": "全国大会出場を目指して",
+    "headline1": "宮崎のバスケで",
+    "headline2": "宮崎を元気に！",
+    "subheadline1": "宮崎のバスケ（中学女子）クラブチーム「SELENE（セレーネ）」。",
+    "subheadline2": "心身の健全な育成と、全国大会出場を目指して日々練習に励んでいます。"
+  },
+  "about": {
+    "sectionLabel": "About Us",
+    "title": "チーム紹介",
+    "description": "宮崎のバスケファンに応援されるチームを目指し、\n選手の心身の健全な育成に取り組んでいます。",
+    "galleryAria": "チーム写真ギャラリー（スマホは横にスワイプできます）",
+    "galleryPlaceholderTitle": "チーム紹介画像を準備中です",
+    "galleryPlaceholderBody": "管理画面からアップロードするとここに表示されます。",
+    "mission": {
+      "label": "Mission",
+      "heading": "チームの想い",
+      "title": "私たちの目的",
+      "body1": "宮崎SELENE（セレーネ）は、バスケットボールを通じて宮崎県の女子中学生の",
+      "bold": "心身の健全な育成",
+      "body2": "を目指すクラブチームです。\n技術の向上だけでなく、チームワーク、礼儀、努力する姿勢など、人として大切なことを学ぶ場でありたいと考えています。"
+    },
+    "goals": {
+      "title": "目標",
+      "items": [
+        { "title": "宮崎県クラブ選手権優勝", "description": "県内No.1を目指して" },
+        { "title": "全国大会出場", "description": "全国の舞台へ挑戦" },
+        { "title": "U15ジュニアウィンターカップ", "description": "県予選優勝を目指す" }
+      ]
+    },
+    "staff": {
+      "title": "スタッフ紹介",
+      "members": [
+        {
+          "name": "徳重 里奈",
+          "role": "ヘッドコーチ (HC)",
+          "description": "選手一人ひとりの成長を大切に、基礎から丁寧に指導します。"
+        },
+        {
+          "name": "久留 伸一",
+          "role": "アシスタントコーチ / 代表 (AC)",
+          "description": "チーム運営と選手のサポートを担当。保護者との連携を重視しています。"
+        }
+      ]
+    }
+  },
+  "news": {
+    "sectionLabel": "News",
+    "title": "お知らせ",
+    "description": "今後の活動予定（試合予定）を掲載します。",
+    "openList": "お知らせ一覧を開く",
+    "closeList": "お知らせ一覧を閉じる",
+    "pastNews": "過去のお知らせを見る",
+    "noPastNews": "まだ過去のお知らせはありません。予定日の翌日以降に自動でここへ表示されます。",
+    "instagramLink": "練習試合・合同練習・大会のお誘いはこちらにDMを下さい"
+  },
+  "results": {
+    "sectionLabel": "Activity",
+    "title": "活動記録",
+    "description": "対戦していただいたチームの皆様、ありがとうございました。今後ともよろしくお願いいたします。",
+    "openList": "活動記録一覧を開く",
+    "closeList": "活動記録一覧を閉じる",
+    "pastResults": "過去の活動記録を見る",
+    "noPastResults": "まだ過去の活動記録はありません。",
+    "matchCount": "{count}試合を表示",
+    "matches": "{count}試合",
+    "preparingOpponents": "対戦情報を準備中です。"
+  },
+  "faq": {
+    "sectionLabel": "FAQ",
+    "title": "よくある質問",
+    "description": "宮崎SELENE（セレーネ）についてよくいただく質問をまとめました。",
+    "openList": "よくある質問を開く",
+    "items": [
+      {
+        "question": "宮崎SELENEとはどのようなチームですか？",
+        "answer": "宮崎SELENE（セレーネ）は、宮崎県宮崎市を拠点に活動する中学女子バスケットボールのクラブチームです。心身の健全な育成と、宮崎県クラブ選手権優勝・全国大会出場を目標に、日々練習に励んでいます。"
+      },
+      {
+        "question": "どこで練習・活動していますか？",
+        "answer": "宮崎市内の体育館を中心に練習・活動しています。最新の試合・大会・お知らせは公式サイトのお知らせセクションでご確認ください。"
+      },
+      {
+        "question": "新メンバーの募集はしていますか？",
+        "answer": "本年度のクラブ生の募集は終了しました。"
+      },
+      {
+        "question": "どんな大会に出場していますか？",
+        "answer": "宮崎県クラブ選手権・U15ジュニアウィンターカップ予選などの公式大会や、県内外チームとの練習試合に参加しています。最新の試合情報は「活動記録」セクションでご確認ください。"
+      },
+      {
+        "question": "セレーネ（SELENE）という名前の由来は？",
+        "answer": "SELENEはギリシャ神話の月の女神「セレーネ」に由来します。夜空に輝く月のように、宮崎のバスケ界を照らす存在を目指してチーム名に採用されました。"
+      }
+    ]
+  },
+  "contact": {
+    "sectionLabel": "Contact",
+    "title": "お問い合わせ",
+    "matchInviteText": "練習試合・合同練習・大会のお誘い等々、その他のご相談は、",
+    "instagramPrompt": "Instagram のDMをご利用ください。",
+    "instagramButton": "@2026.selene にDMする",
+    "replyNote": "なるべく早急に対応いたしますが、返信が遅れる場合はご了承ください"
+  },
+  "relatedLinks": {
+    "sectionLabel": "Related Links",
+    "title": "関連リンク",
+    "description": "大会情報や登録手続き、公式ルールの確認に便利な外部サイトをまとめています。",
+    "openList": "関連リンク一覧を開く",
+    "closeList": "関連リンク一覧を閉じる",
+    "items": [
+      {
+        "name": "一般社団法人 宮崎県バスケットボール協会 U15部会",
+        "description": "県大会の組み合わせ・試合結果の確認はこちら。"
+      },
+      {
+        "name": "(一社)宮崎県バスケットボール協会",
+        "description": "宮崎県全体のバスケ情報・審判・3x3に関する公式サイト。"
+      },
+      {
+        "name": "TeamJBA (日本バスケットボール協会 会員登録管理システム)",
+        "description": "選手登録、指導者登録、大会エントリーのためのシステム。"
+      },
+      {
+        "name": "公益財団法人 日本バスケットボール協会 (JBA)",
+        "description": "公式競技規則（ルール）や全国の最新ニュース。"
+      }
+    ]
+  },
+  "sponsors": {
+    "sectionLabel": "Sponsor",
+    "title": "スポンサー",
+    "description": "私たちの活動を支援してくださっているスポンサー企業様",
+    "thankYou": "ご支援いただきありがとうございます",
+    "newSponsor": "新たにご支援いただける法人・団体様は、お気軽にご連絡ください。\nInstagramのDMよりお問い合わせをお待ちしております。",
+    "instagramButton": "@2026.selene にDMする"
+  },
+  "footer": {
+    "tagline": "Girls Basketball Club",
+    "description": "宮崎県の女子中学生バスケットボールクラブ「SELENE（セレーネ）」。全国大会出場を目指して活動中。",
+    "copyright": "© 2026 宮崎 SELENE (セレーネ). All rights reserved.",
+    "scrollToTop": "トップへ戻る",
+    "nav": {
+      "home": "ホーム",
+      "about": "チーム紹介",
+      "news": "お知らせ",
+      "results": "活動記録",
+      "faq": "FAQ",
+      "contact": "お問い合わせ",
+      "instagram": "Instagram",
+      "relatedLinks": "関連リンク"
+    },
+    "navHeading": "ナビゲーション",
+    "contactHeading": "お問い合わせ",
+    "instagramLabel": "@2026.selene（DMはこちら）",
+    "staffLink": "チーム関係者専用ページ"
+  },
+  "search": {
+    "placeholder": "キーワードを入力...",
+    "emptyResult": "一致する項目が見つかりませんでした。",
+    "sections": {
+      "pages": "ページ",
+      "news": "お知らせ",
+      "activities": "活動記録",
+      "faq": "よくある質問"
+    },
+    "ariaLabel": "サイト内検索",
+    "desktopLabel": "検索...",
+    "dialogDescription": "お知らせ・活動記録・FAQ を検索できます"
+  }
+}
