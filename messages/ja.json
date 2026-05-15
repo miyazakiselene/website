@@ -181,6 +181,7 @@
     "sectionLabel": "Cheer",
     "title": "応援メッセージ",
     "description": "選手たちへの応援メッセージをお寄せください。",
+    "openForm": "メッセージを頂ける方はこちら",
     "nicknameLabel": "ニックネーム",
     "nicknameHint": "（{max}文字以内）",
     "nicknamePlaceholder": "例: バスケファン",

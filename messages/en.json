@@ -181,6 +181,7 @@
     "sectionLabel": "Cheer",
     "title": "Cheer Messages",
     "description": "Send a message of support to our players.",
+    "openForm": "Leave a message for our players",
     "nicknameLabel": "Nickname",
     "nicknameHint": "(max {max} characters)",
     "nicknamePlaceholder": "e.g. Basketball Fan",
