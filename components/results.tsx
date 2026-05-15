@@ -1,7 +1,9 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
+import { format, parseISO } from "date-fns"
+import { enUS } from "date-fns/locale"
 import { Calendar, ChevronDown, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -24,6 +26,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-spring-cup",
     period: "2026年4月4日-5日",
+    startIso: "2026-04-04",
+    endIso: "2026-04-05",
     name: "日の出ホルモンスプリングカップ",
     venue: "生目中学校",
     matches: [
@@ -48,6 +52,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-04-18",
     period: "2026年4月18日",
+    startIso: "2026-04-18",
+    endIso: "2026-04-18",
     name: "練習試合",
     venue: "木花中学校",
     matches: [{ id: "2026-04-18-1", date: "4/18", opponent: "木花中学校" }],
@@ -55,6 +61,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-04-25",
     period: "2026年4月25日",
+    startIso: "2026-04-25",
+    endIso: "2026-04-25",
     name: "練習試合",
     venue: "日向学院高校",
     matches: [
@@ -65,6 +73,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-04-29",
     period: "2026年4月29日",
+    startIso: "2026-04-29",
+    endIso: "2026-04-29",
     name: "練習試合",
     venue: "国光春中学校",
     matches: [
@@ -80,6 +90,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-05-02",
     period: "2026年5月2日",
+    startIso: "2026-05-02",
+    endIso: "2026-05-02",
     name: "練習試合",
     venue: "宮商高校",
     matches: [{ id: "2026-05-02-1", date: "5/2", opponent: "宮商高校" }],
@@ -87,6 +99,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-05-04",
     period: "2026年5月4日",
+    startIso: "2026-05-04",
+    endIso: "2026-05-04",
     name: "練習試合",
     venue: "祝吉中学校",
     matches: [
@@ -100,6 +114,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-05-06",
     period: "2026年5月6日",
+    startIso: "2026-05-06",
+    endIso: "2026-05-06",
     name: "練習試合",
     venue: "宮崎市総合体育館",
     matches: [{ id: "2026-05-06-1", date: "5/6", opponent: "CRISIS" }],
@@ -107,6 +123,8 @@ const fallbackTournaments: Tournament[] = [
   {
     id: "2026-05-09",
     period: "2026年5月9日",
+    startIso: "2026-05-09",
+    endIso: "2026-05-09",
     name: "練習試合",
     venue: "生目台中学校",
     matches: [
@@ -140,8 +158,36 @@ function groupMatchesByDate(
   }))
 }
 
+function formatPeriodEn(startIso: string, endIso: string): string {
+  const s = parseISO(startIso)
+  const e = parseISO(endIso)
+  if (startIso === endIso) return format(s, "MMM d, yyyy", { locale: enUS })
+  const sy = format(s, "yyyy")
+  const ey = format(e, "yyyy")
+  if (sy === ey) {
+    if (format(s, "MM") === format(e, "MM")) {
+      return `${format(s, "MMM d", { locale: enUS })}–${format(e, "d, yyyy", { locale: enUS })}`
+    }
+    return `${format(s, "MMM d", { locale: enUS })} – ${format(e, "MMM d, yyyy", { locale: enUS })}`
+  }
+  return `${format(s, "MMM d, yyyy", { locale: enUS })} – ${format(e, "MMM d, yyyy", { locale: enUS })}`
+}
+
+/** "2025年度" → "2025 Season" for English; other strings returned as-is */
+function localizeYearLabel(period: string, locale: string): string {
+  if (locale !== "en") return period
+  const m = period.match(/^(\d{4})年度$/)
+  if (m) return `${m[1]} Season`
+  return period
+}
+
 function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
-  const t = useTranslations("results")
+  const t      = useTranslations("results")
+  const locale = useLocale()
+  const period =
+    locale === "en" && tournament.startIso && tournament.endIso
+      ? formatPeriodEn(tournament.startIso, tournament.endIso)
+      : localizeYearLabel(tournament.period, locale)
   const groupedMatches = groupMatchesByDate(tournament.matches, tournament)
 
   return (
@@ -156,7 +202,7 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
               <div className="min-w-0 flex-1">
                 <div className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground md:mb-2 md:text-sm">
                   <Calendar className="h-3.5 w-3.5 shrink-0 md:h-4 md:w-4" />
-                  <span>{tournament.period}</span>
+                  <span>{period}</span>
                 </div>
                 <h3 className="line-clamp-2 text-base font-bold leading-snug text-foreground md:text-xl">
                   {tournament.name}

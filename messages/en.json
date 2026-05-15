@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "titleDefault": "MIYAZAKI SELENE Official Site | Girls Basketball Club in Miyazaki",
-    "description": "Official site of MIYAZAKI SELENE (セレーネ), a girls' junior high basketball club based in Miyazaki City, Japan. Activity records and practice match inquiries welcome.",
-    "siteNameTemplate": "MIYAZAKI SELENE（セレーネ）"
+    "titleDefault": "Miyazaki SELENE Official Site | Girls Basketball Club in Miyazaki",
+    "description": "Official site of Miyazaki SELENE, a girls' junior high basketball club based in Miyazaki City, Japan. Activity records and practice match inquiries welcome.",
+    "siteNameTemplate": "Miyazaki SELENE"
   },
   "nav": {
     "home": "Home",
@@ -16,13 +16,13 @@
     "staffOnly": "Staff"
   },
   "hero": {
-    "taglinePrimary": "MIYAZAKI SELENE Official Site",
+    "taglinePrimary": "Miyazaki SELENE Official Site",
     "taglineSecondary": "Girls Basketball Club in Miyazaki, Japan",
-    "imageAlt": "MIYAZAKI SELENE (セレーネ) — Girls Basketball Club in Miyazaki",
+    "imageAlt": "Miyazaki SELENE — Girls Basketball Club in Miyazaki",
     "badge": "Aiming for the National Championship",
     "headline1": "Basketball in Miyazaki,",
     "headline2": "Energizing Our City!",
-    "subheadline1": "SELENE (セレーネ) — a girls' junior high basketball club in Miyazaki.",
+    "subheadline1": "SELENE — a girls' junior high basketball club in Miyazaki.",
     "subheadline2": "We train daily to develop our players holistically and aim for the national stage."
   },
   "about": {
@@ -36,7 +36,7 @@
       "label": "Mission",
       "heading": "Our Philosophy",
       "title": "Our Purpose",
-      "body1": "MIYAZAKI SELENE (セレーネ) is a club dedicated to the",
+      "body1": "Miyazaki SELENE is a club dedicated to the",
       "bold": "healthy physical and mental development",
       "body2": "of junior high school girls in Miyazaki through basketball.\nBeyond technical skills, we strive to cultivate teamwork, respect, and perseverance in every player."
     },
@@ -57,8 +57,8 @@
           "description": "Dedicated to each player's individual growth with careful, fundamental coaching."
         },
         {
-          "name": "Shinichi Hisatome",
-          "role": "Assistant Coach / Representative (AC)",
+          "name": "Shinichi Hisadome",
+          "role": "Assistant Coach (AC) / Representative",
           "description": "Oversees team operations and player support, with a strong focus on parent communication."
         }
       ]
@@ -82,19 +82,19 @@
     "closeList": "Close Records",
     "pastResults": "Past Records",
     "noPastResults": "No past records yet.",
-    "matchCount": "{count} match(es)",
-    "matches": "{count} match(es)",
+    "matchCount": "{count} game(s)",
+    "matches": "{count} game(s)",
     "preparingOpponents": "Opponent information coming soon."
   },
   "faq": {
     "sectionLabel": "FAQ",
     "title": "Frequently Asked Questions",
-    "description": "Common questions about MIYAZAKI SELENE (セレーネ).",
+    "description": "Common questions about Miyazaki SELENE.",
     "openList": "View FAQ",
     "items": [
       {
-        "question": "What kind of team is MIYAZAKI SELENE?",
-        "answer": "MIYAZAKI SELENE (セレーネ) is a girls' junior high basketball club based in Miyazaki City, Miyazaki Prefecture. We train daily to develop players holistically and aim for the Miyazaki Club Championship and national championship."
+        "question": "What kind of team is Miyazaki SELENE?",
+        "answer": "Miyazaki SELENE is a girls' junior high basketball club based in Miyazaki City, Miyazaki Prefecture. We train daily to develop players holistically and aim for the Miyazaki Club Championship and national championship."
       },
       {
         "question": "Where do you practice and play?",
@@ -157,8 +157,8 @@
   },
   "footer": {
     "tagline": "Girls Basketball Club",
-    "description": "SELENE (セレーネ) — a girls' junior high basketball club in Miyazaki, Japan. Aiming for the national championship.",
-    "copyright": "© 2026 宮崎 SELENE (セレーネ). All rights reserved.",
+    "description": "SELENE — a girls' junior high basketball club in Miyazaki, Japan. Aiming for the national championship.",
+    "copyright": "© 2026 Miyazaki SELENE. All rights reserved.",
     "scrollToTop": "Back to Top",
     "nav": {
       "home": "Home",

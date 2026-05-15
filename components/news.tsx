@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
+import { format, parseISO } from "date-fns"
+import { enUS } from "date-fns/locale"
 import { CalendarDays, ChevronDown, MapPin } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedSection } from "@/components/animated-section"
 import {
@@ -13,7 +15,28 @@ import {
 } from "@/components/ui/collapsible"
 import { partitionNewsByArchiveThreshold, type NewsRecord } from "@/lib/news-model"
 
+function formatNewsDateEn(startIso: string, endIso: string): string {
+  const s = parseISO(startIso)
+  const e = parseISO(endIso)
+  if (startIso === endIso) return format(s, "MMM d, yyyy", { locale: enUS })
+  const sy = format(s, "yyyy")
+  const ey = format(e, "yyyy")
+  if (sy === ey) {
+    if (format(s, "MM") === format(e, "MM")) {
+      return `${format(s, "MMM d", { locale: enUS })}–${format(e, "d, yyyy", { locale: enUS })}`
+    }
+    return `${format(s, "MMM d", { locale: enUS })} – ${format(e, "MMM d, yyyy", { locale: enUS })}`
+  }
+  return `${format(s, "MMM d, yyyy", { locale: enUS })} – ${format(e, "MMM d, yyyy", { locale: enUS })}`
+}
+
 function NewsCard({ item }: { item: NewsRecord }) {
+  const locale = useLocale()
+  const dateLabel =
+    locale === "en"
+      ? formatNewsDateEn(item.eventStartDate, item.eventEndDate)
+      : item.date
+
   return (
     <Card className="border-border bg-background transition-colors duration-300 hover:border-primary/40">
       <CardContent className="p-4 md:p-7">
@@ -21,7 +44,7 @@ function NewsCard({ item }: { item: NewsRecord }) {
           <div className="min-w-0 flex-1">
             <div className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-primary md:mb-2 md:text-base">
               <CalendarDays className="h-4 w-4 shrink-0 md:h-5 md:w-5" />
-              <span>{item.date}</span>
+              <span>{dateLabel}</span>
             </div>
             <h3 className="text-lg font-bold leading-snug text-foreground md:text-2xl">{item.title}</h3>
             {item.content != null && item.content.length > 0 ? (

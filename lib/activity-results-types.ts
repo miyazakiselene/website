@@ -9,7 +9,12 @@ export type Match = {
 
 export type Tournament = {
   id: string
+  /** 表示用期間文字列（日本語フォーマット済み、フォールバック用） */
   period: string
+  /** 期間の開始日（YYYY-MM-DD）。ロケール対応フォーマットに使用 */
+  startIso?: string
+  /** 期間の終了日（YYYY-MM-DD）。ロケール対応フォーマットに使用 */
+  endIso?: string
   year?: string
   name: string
   venue?: string

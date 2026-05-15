@@ -35,6 +35,8 @@ export function activityRecordToTournament(record: ActivityRecord): Tournament {
   return {
     id: record.id,
     period,
+    startIso: record.startDate,
+    endIso: record.endDate,
     year: format(yearSource, "yyyy'年度'", { locale: ja }),
     name: record.title,
     venue: record.location.trim() || undefined,

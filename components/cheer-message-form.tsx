@@ -123,7 +123,7 @@ export function CheerMessageForm() {
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       maxLength={CONTENT_MAX}
-                      placeholder="頑張ってください！全国を目指して！"
+                      placeholder="いつも応援しています！"
                       rows={4}
                       disabled={status === "submitting"}
                       required
