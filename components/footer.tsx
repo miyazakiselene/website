@@ -56,7 +56,7 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">
-                  宮崎 SELENE
+                  {t("brandName")}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   {t("tagline")}

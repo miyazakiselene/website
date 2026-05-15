@@ -5,6 +5,7 @@
     "siteNameTemplate": "宮崎SELENE（セレーネ）"
   },
   "nav": {
+    "brandName": "宮崎 SELENE",
     "home": "ホーム",
     "about": "チーム紹介",
     "news": "お知らせ",
@@ -156,6 +157,7 @@
     "instagramButton": "@2026.selene にDMする"
   },
   "footer": {
+    "brandName": "宮崎 SELENE",
     "tagline": "Girls Basketball Club",
     "description": "宮崎県の女子中学生バスケットボールクラブ「SELENE（セレーネ）」。全国大会出場を目指して活動中。",
     "copyright": "© 2026 宮崎 SELENE (セレーネ). All rights reserved.",
@@ -174,6 +176,23 @@
     "contactHeading": "お問い合わせ",
     "instagramLabel": "@2026.selene（DMはこちら）",
     "staffLink": "チーム関係者専用ページ"
+  },
+  "cheer": {
+    "sectionLabel": "Cheer",
+    "title": "応援メッセージ",
+    "description": "選手たちへの応援メッセージをお寄せください。",
+    "nicknameLabel": "ニックネーム",
+    "nicknameHint": "（{max}文字以内）",
+    "nicknamePlaceholder": "例: バスケファン",
+    "messageLabel": "メッセージ",
+    "messagePlaceholder": "いつも応援しています！",
+    "submitButton": "送信する",
+    "submitting": "送信中...",
+    "errorFallback": "送信に失敗しました。",
+    "networkError": "ネットワークエラーが発生しました。",
+    "successTitle": "ありがとうございます！",
+    "successBody": "メッセージを受け付けました。",
+    "sendAnother": "もう一件送る"
   },
   "search": {
     "placeholder": "キーワードを入力...",

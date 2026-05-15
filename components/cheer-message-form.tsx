@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { MessageCircle, Send } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { AnimatedSection } from "@/components/animated-section"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -15,6 +16,7 @@ const CONTENT_MAX  = 100
 type Status = "idle" | "submitting" | "success" | "error"
 
 export function CheerMessageForm() {
+  const t = useTranslations("cheer")
   const [nickname, setNickname] = useState("")
   const [content,  setContent]  = useState("")
   const [status,   setStatus]   = useState<Status>("idle")
@@ -33,7 +35,7 @@ export function CheerMessageForm() {
       })
       const json = await res.json()
       if (!res.ok) {
-        setErrorMsg(json.error ?? "送信に失敗しました。")
+        setErrorMsg(json.error ?? t("errorFallback"))
         setStatus("error")
         return
       }
@@ -41,7 +43,7 @@ export function CheerMessageForm() {
       setNickname("")
       setContent("")
     } catch {
-      setErrorMsg("ネットワークエラーが発生しました。")
+      setErrorMsg(t("networkError"))
       setStatus("error")
     }
   }
@@ -53,14 +55,14 @@ export function CheerMessageForm() {
           <div className="mb-4 inline-flex items-center gap-2 text-primary">
             <MessageCircle className="h-5 w-5" />
             <span className="text-base font-semibold uppercase tracking-widest md:text-lg">
-              Cheer
+              {t("sectionLabel")}
             </span>
           </div>
           <h2 className="mb-3 text-3xl font-black text-foreground md:text-4xl">
-            応援メッセージ
+            {t("title")}
           </h2>
           <p className="text-base text-muted-foreground md:text-lg">
-            選手たちへの応援メッセージをお寄せください。
+            {t("description")}
           </p>
         </AnimatedSection>
 
@@ -70,15 +72,15 @@ export function CheerMessageForm() {
               {status === "success" ? (
                 <div className="space-y-3 py-8 text-center">
                   <div className="text-5xl">🎉</div>
-                  <p className="text-lg font-bold text-foreground">ありがとうございます！</p>
-                  <p className="text-sm text-muted-foreground">メッセージを受け付けました。</p>
+                  <p className="text-lg font-bold text-foreground">{t("successTitle")}</p>
+                  <p className="text-sm text-muted-foreground">{t("successBody")}</p>
                   <Button
                     variant="outline"
                     size="sm"
                     className="mt-2"
                     onClick={() => setStatus("idle")}
                   >
-                    もう一件送る
+                    {t("sendAnother")}
                   </Button>
                 </div>
               ) : (
@@ -86,9 +88,9 @@ export function CheerMessageForm() {
                   {/* Nickname */}
                   <div className="space-y-1.5">
                     <Label htmlFor="cheer-nickname" className="text-sm font-semibold">
-                      ニックネーム
+                      {t("nicknameLabel")}
                       <span className="ml-1 text-xs font-normal text-muted-foreground">
-                        （{NICKNAME_MAX}文字以内）
+                        {t("nicknameHint", { max: NICKNAME_MAX })}
                       </span>
                     </Label>
                     <Input
@@ -96,17 +98,17 @@ export function CheerMessageForm() {
                       value={nickname}
                       onChange={(e) => setNickname(e.target.value)}
                       maxLength={NICKNAME_MAX}
-                      placeholder="例: バスケファン"
+                      placeholder={t("nicknamePlaceholder")}
                       disabled={status === "submitting"}
                       required
                     />
                   </div>
 
-                  {/* Content */}
+                  {/* Message */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="cheer-content" className="text-sm font-semibold">
-                        メッセージ
+                        {t("messageLabel")}
                       </Label>
                       <span
                         className={`text-xs tabular-nums ${
@@ -123,7 +125,7 @@ export function CheerMessageForm() {
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       maxLength={CONTENT_MAX}
-                      placeholder="いつも応援しています！"
+                      placeholder={t("messagePlaceholder")}
                       rows={4}
                       disabled={status === "submitting"}
                       required
@@ -148,11 +150,11 @@ export function CheerMessageForm() {
                     }
                   >
                     {status === "submitting" ? (
-                      "送信中..."
+                      t("submitting")
                     ) : (
                       <>
                         <Send className="mr-2 h-4 w-4" />
-                        送信する
+                        {t("submitButton")}
                       </>
                     )}
                   </Button>

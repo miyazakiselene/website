@@ -5,6 +5,7 @@
     "siteNameTemplate": "Miyazaki SELENE"
   },
   "nav": {
+    "brandName": "Miyazaki SELENE",
     "home": "Home",
     "about": "About",
     "news": "News",
@@ -156,6 +157,7 @@
     "instagramButton": "DM @2026.selene"
   },
   "footer": {
+    "brandName": "Miyazaki SELENE",
     "tagline": "Girls Basketball Club",
     "description": "SELENE — a girls' junior high basketball club in Miyazaki, Japan. Aiming for the national championship.",
     "copyright": "© 2026 Miyazaki SELENE. All rights reserved.",
@@ -174,6 +176,23 @@
     "contactHeading": "Contact",
     "instagramLabel": "@2026.selene (DM here)",
     "staffLink": "Staff Area"
+  },
+  "cheer": {
+    "sectionLabel": "Cheer",
+    "title": "Cheer Messages",
+    "description": "Send a message of support to our players.",
+    "nicknameLabel": "Nickname",
+    "nicknameHint": "(max {max} characters)",
+    "nicknamePlaceholder": "e.g. Basketball Fan",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Keep it up!",
+    "submitButton": "Send",
+    "submitting": "Sending...",
+    "errorFallback": "Failed to send. Please try again.",
+    "networkError": "A network error occurred. Please try again.",
+    "successTitle": "Thank you!",
+    "successBody": "Your message has been received.",
+    "sendAnother": "Send another"
   },
   "search": {
     "placeholder": "Search...",

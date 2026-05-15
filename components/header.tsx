@@ -77,7 +77,7 @@ export function Header() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">
-                宮崎 SELENE
+                {t("brandName")}
               </span>
               <span className="text-xs text-muted-foreground -mt-1">Girls Basketball Club</span>
             </div>
@@ -131,7 +131,7 @@ export function Header() {
                       className="rounded-full object-cover"
                     />
                   </div>
-                  <span className="text-lg font-bold text-foreground">宮崎 SELENE</span>
+                  <span className="text-lg font-bold text-foreground">{t("brandName")}</span>
                 </div>
                 <LocaleSwitcher />
               </div>
