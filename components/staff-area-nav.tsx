@@ -10,6 +10,7 @@ const links = [
   { href: "/staff/news", label: "お知らせ" },
   { href: "/staff/activities", label: "活動記録" },
   { href: "/staff/results", label: "試合結果" },
+  { href: "/staff/messages", label: "応援メッセージ" },
   { href: "/admin/team-images", label: "チーム紹介画像" },
   { href: "/staff/dashboard", label: "ダッシュボード" },
   { href: "/staff/update-log", label: "更新ログ" },

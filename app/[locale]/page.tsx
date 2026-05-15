@@ -3,6 +3,7 @@ import { Hero } from "@/components/hero"
 import { TeamAbout } from "@/components/team-about"
 import { News } from "@/components/news"
 import { Results } from "@/components/results"
+import { CheerMessageForm } from "@/components/cheer-message-form"
 import { FaqSection } from "@/components/faq-section"
 import { RelatedLinks } from "@/components/related-links"
 import { InstagramFeed } from "@/components/instagram-feed"
@@ -83,6 +84,7 @@ export default async function HomePage() {
       <TeamAbout galleryPhotos={teamGalleryPhotos} />
       <News initialItems={newsItems} />
       <Results initialTournaments={initialPublicResults} />
+      <CheerMessageForm />
       <FaqSection />
       <ClientOnly>
         <ContactForm />
