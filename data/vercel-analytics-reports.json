@@ -171,6 +171,104 @@
       ]
     },
     {
+      "snapshotDate": "2026-05-18",
+      "exportTitle": "サイトの訪問状況（やさしいまとめ）・4回目",
+      "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/05/18 22:57 出力）に書き出したデータを読み取り整理しています。",
+      "analysisPeriod": "直近7日間（PDF: Last 7 Days、5/12〜5/18 ごろ）",
+      "deployment": "Production（本番の公開サイト）",
+      "targetSite": "miyazaki-selene.vercel.app",
+      "stats": {
+        "uniqueVisitors": 125,
+        "bouncePercent": 56,
+        "pageViewsEstimate": 588
+      },
+      "metrics": [
+        {
+          "title": "訪問した人の数",
+          "subtitle": "同じ人が何回きても「1人」と数えます（Visitors）",
+          "value": "125",
+          "unit": "人"
+        },
+        {
+          "title": "直帰率",
+          "subtitle": "1ページだけ見てすぐ離脱した割合（Bounce Rate）",
+          "value": "56",
+          "unit": "%"
+        },
+        {
+          "title": "ページビュー（全体）",
+          "subtitle": "7日間のページ読み込み合計（Page Views）",
+          "value": "588",
+          "unit": "回"
+        }
+      ],
+      "pageTable": {
+        "caption": "ページ別の閲覧人数（PDFの Pages / Routes の VISITORS 列）",
+        "columnLabels": ["ページの説明", "パス", "人数"],
+        "rows": [
+          { "label": "トップページ（日本語）", "path": "/", "count": "108" },
+          { "label": "関係者ページ（入り口）", "path": "/staff", "count": "28" },
+          { "label": "トップページ（英語）", "path": "/en", "count": "25" },
+          { "label": "管理画面（チーム画像）", "path": "/admin/team-images", "count": "12" },
+          { "label": "試合結果の管理", "path": "/staff/results", "count": "11" },
+          { "label": "関係者ダッシュボード", "path": "/staff/dashboard", "count": "9" },
+          { "label": "お知らせ管理", "path": "/staff/news", "count": "9" }
+        ]
+      },
+      "referrers": {
+        "caption": "どのサイトから来たか（参照元）",
+        "columnLabels": ["参照元", "人数"],
+        "rows": [
+          { "label": "Facebook（PC）", "value": "14" },
+          { "label": "Google 検索", "value": "14" },
+          { "label": "Instagram", "value": "13" },
+          { "label": "Yahoo! 検索", "value": "9" },
+          { "label": "Facebook（モバイル）", "value": "6" },
+          { "label": "Bing 検索", "value": "2" },
+          { "label": "Facebook（リンク）", "value": "2" }
+        ]
+      },
+      "countries": {
+        "caption": "国・地域",
+        "columnLabels": ["地域", "割合"],
+        "rows": [
+          { "label": "日本", "value": "89%" },
+          { "label": "アメリカ合衆国", "value": "10%" },
+          { "label": "アイルランド", "value": "1%" },
+          { "label": "スウェーデン", "value": "1%" }
+        ]
+      },
+      "devices": {
+        "caption": "使われた端末の種類",
+        "columnLabels": ["端末", "割合"],
+        "rows": [
+          { "label": "スマートフォン（モバイル）", "value": "78%" },
+          { "label": "パソコン（デスクトップ）", "value": "21%" },
+          { "label": "タブレット", "value": "1%" }
+        ]
+      },
+      "operatingSystems": {
+        "caption": "OSの種類",
+        "columnLabels": ["OS", "割合"],
+        "rows": [
+          { "label": "iOS（iPhone など）", "value": "69%" },
+          { "label": "Mac", "value": "14%" },
+          { "label": "Android", "value": "10%" },
+          { "label": "Windows", "value": "6%" },
+          { "label": "GNU/Linux", "value": "1%" }
+        ]
+      },
+      "notes": [
+        "【前回比（5/16→5/18）】訪問者 108→125人（+17人, +16%）。着実に増加し過去最高を更新。",
+        "【Instagram急増】Instagram経由が4→13人（+3倍以上）。SNS投稿のタイミングと連動した効果が顕著。",
+        "【Facebook+Instagram合計35人】SNS全体で最大の流入源。継続的なシェアが有効。",
+        "【検索流入も好調】Google 14人・Yahoo! 9人・Bing 2人の計25人。前回（Google10人・Yahoo!6人）から着実に増加。SEO効果が継続して出ています。",
+        "【直帰率56%（+7%）】訪問者増加に伴い「一見さん」層が増えた影響。コンテンツをさらに充実させることで改善が期待できます。",
+        "【PV 588回】前回（659回）より減少しているのは、今週の7日間ウィンドウから先週高トラフィックだった日が外れたためと考えられます。",
+        "スマートフォン（78%・iOS 69%）が引き続き主流。モバイル最適化の継続が重要です。"
+      ]
+    },
+    {
       "snapshotDate": "2026-05-14",
       "exportTitle": "サイトの訪問状況（やさしいまとめ）・2回目",
       "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/05/14 21:51 出力）に書き出したデータを読み取り整理しています。同日 17:09 版から Instagram・Facebook シェア後の 3 時間分を上書き更新。",
