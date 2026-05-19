@@ -1,46 +1,53 @@
 import "server-only"
 
-import { Resend } from "resend"
+/**
+ * 応援メッセージを Google フォームへ転送する。
+ *
+ * 必要な環境変数:
+ *   GOOGLE_FORM_URL          - フォームの回答送信先 URL
+ *                              例: https://docs.google.com/forms/d/e/〈ID〉/formResponse
+ *   GOOGLE_FORM_ENTRY_NICKNAME - ニックネーム欄のエントリー ID（例: entry.123456789）
+ *   GOOGLE_FORM_ENTRY_CONTENT  - メッセージ欄のエントリー ID（例: entry.987654321）
+ *
+ * エントリー ID の調べ方:
+ *   Google フォームを開き「回答を送信」→ URL に含まれる entry.XXXXXXXXX を確認するか、
+ *   ブラウザの開発者ツールでフォームの <input name="entry.XXXXX"> を確認する。
+ */
 
-const TO_ADDRESS = "miyazakiselene@gmail.com"
+function getGoogleFormConfig(): { url: string; entryNickname: string; entryContent: string } | null {
+  const url = (process.env.GOOGLE_FORM_URL ?? "").trim()
+  const entryNickname = (process.env.GOOGLE_FORM_ENTRY_NICKNAME ?? "").trim()
+  const entryContent = (process.env.GOOGLE_FORM_ENTRY_CONTENT ?? "").trim()
 
-function getResend(): Resend | null {
-  const apiKey = (process.env.RESEND_API_KEY ?? "").trim()
-  if (apiKey.length === 0) return null
-  return new Resend(apiKey)
-}
+  if (url.length === 0 || entryNickname.length === 0 || entryContent.length === 0) {
+    return null
+  }
 
-function getFromAddress(): string {
-  return (process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev").trim()
+  return { url, entryNickname, entryContent }
 }
 
 export async function sendCheerMessageNotification(
   nickname: string,
   content: string,
 ): Promise<void> {
-  const resend = getResend()
-  if (resend === null) {
-    console.warn("[notification-email] RESEND_API_KEY が未設定のためメール通知をスキップします")
+  const config = getGoogleFormConfig()
+  if (config === null) {
+    console.warn("[notification] GOOGLE_FORM_URL / ENTRY_NICKNAME / ENTRY_CONTENT が未設定のため転送をスキップします")
     return
   }
 
-  const { error } = await resend.emails.send({
-    from: getFromAddress(),
-    to: TO_ADDRESS,
-    subject: `【応援メッセージ】${nickname}さんからのメッセージ`,
-    text: [
-      "公開サイトから応援メッセージが届きました。",
-      "",
-      `ニックネーム: ${nickname}`,
-      `メッセージ:`,
-      content,
-      "",
-      "---",
-      "宮崎SELENE 応援メッセージ通知",
-    ].join("\n"),
+  const body = new URLSearchParams({
+    [config.entryNickname]: nickname,
+    [config.entryContent]: content,
   })
 
-  if (error) {
-    console.error("[notification-email] メール送信エラー", error)
+  try {
+    await fetch(config.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+    })
+  } catch (error) {
+    console.error("[notification] Google フォームへの転送に失敗しました", error)
   }
 }
