@@ -2,7 +2,7 @@ import "server-only"
 
 import { Resend } from "resend"
 
-const TO_ADDRESS = "info@medirealize.jp"
+const TO_ADDRESS = "miyazakiselene@gmail.com"
 
 function getResend(): Resend | null {
   const apiKey = (process.env.RESEND_API_KEY ?? "").trim()
