@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto"
+import { after } from "next/server"
 import { NextResponse } from "next/server"
 import {
   insertMessage,
@@ -7,6 +8,7 @@ import {
   MESSAGE_CONTENT_MAX,
   MESSAGE_NICKNAME_MAX,
 } from "@/lib/messages-supabase"
+import { sendCheerMessageNotification } from "@/lib/notification-email"
 
 export const runtime = "nodejs"
 
@@ -74,6 +76,7 @@ export async function POST(request: Request) {
     }
 
     await insertMessage(nickname, content)
+    after(() => sendCheerMessageNotification(nickname, content))
     return NextResponse.json({ ok: true }, { status: 201 })
   } catch (error) {
     console.error("[POST /api/messages]", error)
