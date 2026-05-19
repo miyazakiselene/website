@@ -12,6 +12,7 @@ import {
   deleteManagedTeamImage,
   uploadManagedTeamImages,
   updateManagedTeamImageDescription,
+  reorderTeamGallery,
 } from "@/lib/team-images"
 
 function buildRedirectUrl(params: Record<string, string | undefined>): string {
@@ -90,6 +91,33 @@ export async function deleteTeamImageAction(formData: FormData): Promise<void> {
   revalidatePath("/")
   revalidatePath("/admin/team-images")
   redirectWithState({ message: "画像を削除しました。" })
+}
+
+export async function reorderTeamGalleryAction(formData: FormData): Promise<void> {
+  if (!(await isAdminSessionAuthenticated())) {
+    redirectWithState({ error: "再度ログインしてください。" })
+  }
+
+  const orderJson = String(formData.get("photoOrder") ?? "")
+  let order: string[]
+  try {
+    const parsed = JSON.parse(orderJson)
+    if (!Array.isArray(parsed)) throw new Error("not an array")
+    order = parsed
+  } catch {
+    redirectWithState({ error: "並び順のデータが不正です。" })
+  }
+
+  try {
+    await reorderTeamGallery(order)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "並び順の保存に失敗しました。"
+    redirectWithState({ error: message })
+  }
+
+  revalidatePath("/")
+  revalidatePath("/admin/team-images")
+  redirectWithState({ message: "並び順を保存しました。" })
 }
 
 export async function updateTeamImageDescriptionAction(formData: FormData): Promise<void> {

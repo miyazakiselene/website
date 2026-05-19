@@ -1,9 +1,13 @@
 "use client"
 
 import Image from "next/image"
+import { useState } from "react"
 import { useFormStatus } from "react-dom"
 import {
   AlertTriangle,
+  ArrowDownUp,
+  ChevronDown,
+  ChevronUp,
   ImagePlus,
   Image as ImageIcon,
   Images,
@@ -15,10 +19,11 @@ import {
 import {
   deleteTeamImageAction,
   logoutAdminAction,
+  reorderTeamGalleryAction,
   uploadTeamImagesAction,
   updateTeamImageDescriptionAction,
 } from "@/app/admin/team-images/actions"
-import type { ManagedTeamImage } from "@/lib/team-images"
+import type { ManagedTeamImage, OrderedPhoto } from "@/lib/team-images"
 import type { TeamGalleryPhoto } from "@/lib/team-gallery-defaults"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
@@ -46,6 +51,7 @@ type AdminTeamImagesManagerProps = {
   showingDefaultGallery: boolean
   showingManagedGallery: boolean
   fallbackImages: TeamGalleryPhoto[]
+  orderedPhotos: OrderedPhoto[]
 }
 
 function FormSubmitButton({
@@ -67,6 +73,71 @@ function FormSubmitButton({
     <Button type="submit" variant={variant} size={size} disabled={disabled || pending}>
       {pending ? pendingLabel : children}
     </Button>
+  )
+}
+
+function PhotoReorderManager({ initialPhotos }: { initialPhotos: OrderedPhoto[] }) {
+  const [photos, setPhotos] = useState(initialPhotos)
+
+  const move = (index: number, direction: -1 | 1) => {
+    const next = index + direction
+    if (next < 0 || next >= photos.length) return
+    setPhotos((prev) => {
+      const arr = [...prev]
+      ;[arr[index], arr[next]] = [arr[next], arr[index]]
+      return arr
+    })
+  }
+
+  return (
+    <form action={reorderTeamGalleryAction} className="space-y-4">
+      <input type="hidden" name="photoOrder" value={JSON.stringify(photos.map((p) => p.id))} />
+      <div className="space-y-2">
+        {photos.map((photo, index) => (
+          <div
+            key={photo.id}
+            className="flex items-center gap-3 rounded-xl border border-border/70 bg-background p-3 shadow-sm"
+          >
+            <span className="w-6 shrink-0 text-center text-sm font-semibold tabular-nums text-muted-foreground">
+              {index + 1}
+            </span>
+            <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-muted/40">
+              <Image src={photo.src} alt={photo.alt} fill className="object-cover" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-foreground">{photo.alt}</p>
+              {photo.isDefault && (
+                <p className="text-xs text-muted-foreground">初期画像</p>
+              )}
+            </div>
+            <div className="flex shrink-0 gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                disabled={index === 0}
+                onClick={() => move(index, -1)}
+              >
+                <ChevronUp className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                disabled={index === photos.length - 1}
+                onClick={() => move(index, 1)}
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <FormSubmitButton pendingLabel="保存中…" variant="secondary">
+        <Save className="h-4 w-4" />
+        並び順を保存
+      </FormSubmitButton>
+    </form>
   )
 }
 
@@ -117,6 +188,7 @@ export function AdminTeamImagesManager({
   showingDefaultGallery,
   showingManagedGallery,
   fallbackImages,
+  orderedPhotos,
 }: AdminTeamImagesManagerProps) {
   return (
     <div className="space-y-8">
@@ -231,6 +303,23 @@ export function AdminTeamImagesManager({
           </form>
         </CardContent>
       </Card>
+
+      {orderedPhotos.length >= 2 ? (
+        <Card className="border-border bg-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <ArrowDownUp className="h-5 w-5 text-primary" />
+              並び順の変更
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+              ↑↓ボタンで順番を入れ替えて「並び順を保存」を押すと、公開ページへ反映されます。
+            </p>
+            <PhotoReorderManager initialPhotos={orderedPhotos} />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card className="border-border bg-card">
         <CardHeader>

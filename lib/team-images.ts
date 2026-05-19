@@ -31,6 +31,7 @@ type TeamImageManifest = {
   updatedAt: string
   images: ManagedTeamImage[]
   hiddenDefaultImageIds?: string[]
+  photoOrder?: string[]
 }
 
 export type ManagedTeamImageState = {
@@ -39,6 +40,14 @@ export type ManagedTeamImageState = {
   images: ManagedTeamImage[]
   hiddenDefaultImageIds: string[]
   visibleDefaultPhotos: TeamGalleryPhoto[]
+  photoOrder: string[]
+}
+
+export type OrderedPhoto = {
+  id: string
+  src: string
+  alt: string
+  isDefault: boolean
 }
 
 function isBlobTeamGalleryConfigured(): boolean {
@@ -87,6 +96,28 @@ function normalizeHiddenDefaultImageIds(value: unknown): string[] {
     .filter((item, index, list) => list.indexOf(item) === index)
 }
 
+function normalizePhotoOrder(value: unknown, validIds: Set<string>): string[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .filter((item): item is string => typeof item === "string" && validIds.has(item))
+    .filter((item, index, list) => list.indexOf(item) === index)
+}
+
+export function buildOrderedPhotos(state: ManagedTeamImageState): OrderedPhoto[] {
+  const allPhotos: OrderedPhoto[] = [
+    ...state.visibleDefaultPhotos.map((p) => ({ id: p.id, src: p.src, alt: p.alt, isDefault: true })),
+    ...state.images.map((i) => ({ id: i.id, src: i.url, alt: i.description, isDefault: false })),
+  ]
+
+  if (state.photoOrder.length === 0) return allPhotos
+
+  const photoMap = new Map(allPhotos.map((p) => [p.id, p]))
+  const ordered = state.photoOrder.map((id) => photoMap.get(id)).filter((p): p is OrderedPhoto => p != null)
+  const orderedIds = new Set(state.photoOrder)
+  const unordered = allPhotos.filter((p) => !orderedIds.has(p.id))
+  return [...ordered, ...unordered]
+}
+
 function visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds: string[]): TeamGalleryPhoto[] {
   const hiddenSet = new Set(hiddenDefaultImageIds)
   return DEFAULT_TEAM_GALLERY_PHOTOS.filter((photo) => !hiddenSet.has(photo.id))
@@ -95,12 +126,14 @@ function visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds: string[]): Tea
 function buildManifest(
   images: ManagedTeamImage[],
   hiddenDefaultImageIds: string[] = [],
+  photoOrder?: string[],
 ): TeamImageManifest {
   return {
     version: 1,
     updatedAt: new Date().toISOString(),
     images,
     hiddenDefaultImageIds,
+    photoOrder,
   }
 }
 
@@ -145,10 +178,11 @@ function buildDescriptions(files: File[], rawInput: string): string[] {
 async function writeManifestToBlob(
   images: ManagedTeamImage[],
   hiddenDefaultImageIds: string[] = [],
+  photoOrder?: string[],
 ): Promise<void> {
   const token = getBlobReadWriteToken()
 
-  await put(TEAM_IMAGE_MANIFEST_PATH, JSON.stringify(buildManifest(images, hiddenDefaultImageIds), null, 2), {
+  await put(TEAM_IMAGE_MANIFEST_PATH, JSON.stringify(buildManifest(images, hiddenDefaultImageIds, photoOrder), null, 2), {
     access: "public",
     addRandomSuffix: false,
     allowOverwrite: true,
@@ -160,18 +194,20 @@ async function writeManifestToBlob(
 async function persistManifest(
   images: ManagedTeamImage[],
   hiddenDefaultImageIds: string[] = [],
+  photoOrder?: string[],
 ): Promise<void> {
-  const manifest = buildManifest(images, hiddenDefaultImageIds)
+  const manifest = buildManifest(images, hiddenDefaultImageIds, photoOrder)
   if (isTeamGallerySupabaseEnabled()) {
     await writeTeamGalleryManifestPayloadToSupabase({
       version: 1,
       updatedAt: manifest.updatedAt,
       images: manifest.images,
       hiddenDefaultImageIds: manifest.hiddenDefaultImageIds,
+      photoOrder: manifest.photoOrder,
     })
     return
   }
-  await writeManifestToBlob(images, hiddenDefaultImageIds)
+  await writeManifestToBlob(images, hiddenDefaultImageIds, photoOrder)
 }
 
 function emptyState(storageReady: boolean): ManagedTeamImageState {
@@ -181,6 +217,7 @@ function emptyState(storageReady: boolean): ManagedTeamImageState {
     images: [],
     hiddenDefaultImageIds: [],
     visibleDefaultPhotos: DEFAULT_TEAM_GALLERY_PHOTOS,
+    photoOrder: [],
   }
 }
 
@@ -213,13 +250,17 @@ async function readManagedTeamImagesFromBlob(): Promise<ManagedTeamImageState> {
           .filter((value): value is ManagedTeamImage => value !== null)
       : []
     const hiddenDefaultImageIds = normalizeHiddenDefaultImageIds(parsed.hiddenDefaultImageIds)
+    const visibleDefaultPhotos = visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds)
+    const validIds = new Set([...visibleDefaultPhotos.map((p) => p.id), ...images.map((i) => i.id)])
+    const photoOrder = normalizePhotoOrder(parsed.photoOrder, validIds)
 
     return {
       storageReady: true,
       hasManagedImages: images.length > 0,
       images,
       hiddenDefaultImageIds,
-      visibleDefaultPhotos: visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds),
+      visibleDefaultPhotos,
+      photoOrder,
     }
   } catch {
     return emptyState(true)
@@ -241,13 +282,17 @@ export async function readManagedTeamImages(): Promise<ManagedTeamImageState> {
         .map((value) => normalizeManagedTeamImage(value))
         .filter((value): value is ManagedTeamImage => value !== null)
       const hiddenDefaultImageIds = normalizeHiddenDefaultImageIds(payload.hiddenDefaultImageIds)
+      const visibleDefaultPhotos = visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds)
+      const validIds = new Set([...visibleDefaultPhotos.map((p) => p.id), ...images.map((i) => i.id)])
+      const photoOrder = normalizePhotoOrder(payload.photoOrder, validIds)
 
       return {
         storageReady: true,
         hasManagedImages: images.length > 0,
         images,
         hiddenDefaultImageIds,
-        visibleDefaultPhotos: visibleDefaultPhotosFromHiddenIds(hiddenDefaultImageIds),
+        visibleDefaultPhotos,
+        photoOrder,
       }
     } catch (e) {
       console.error("[readManagedTeamImages] Supabase read failed", e)
@@ -271,7 +316,18 @@ export async function getPublicTeamGallery(): Promise<{
     src: image.url,
     alt: image.description,
   }))
-  const photos = [...state.visibleDefaultPhotos, ...managedPhotos]
+
+  let photos: TeamGalleryPhoto[]
+  if (state.photoOrder.length > 0) {
+    const allPhotos = [...state.visibleDefaultPhotos, ...managedPhotos]
+    const photoMap = new Map(allPhotos.map((p) => [p.id, p]))
+    const ordered = state.photoOrder.map((id) => photoMap.get(id)).filter((p): p is TeamGalleryPhoto => p != null)
+    const orderedIds = new Set(state.photoOrder)
+    const unordered = allPhotos.filter((p) => !orderedIds.has(p.id))
+    photos = [...ordered, ...unordered]
+  } else {
+    photos = [...state.visibleDefaultPhotos, ...managedPhotos]
+  }
 
   return {
     photos,
@@ -338,7 +394,7 @@ export async function uploadManagedTeamImages(files: File[], rawDescriptions: st
       }
     }
 
-    await persistManifest([...uploadedImages.reverse(), ...state.images], state.hiddenDefaultImageIds)
+    await persistManifest([...uploadedImages.reverse(), ...state.images], state.hiddenDefaultImageIds, state.photoOrder)
     return uploadedImages.length
   } catch (error) {
     if (uploadedImages.length > 0) {
@@ -381,7 +437,23 @@ export async function updateManagedTeamImageDescription(
         : image,
     ),
     state.hiddenDefaultImageIds,
+    state.photoOrder,
   )
+}
+
+export async function reorderTeamGallery(newPhotoOrder: string[]): Promise<void> {
+  const state = await readManagedTeamImages()
+  const validIds = new Set([
+    ...state.visibleDefaultPhotos.map((p) => p.id),
+    ...state.images.map((i) => i.id),
+  ])
+  const seen = new Set<string>()
+  const sanitized = newPhotoOrder.filter((id) => {
+    if (!validIds.has(id) || seen.has(id)) return false
+    seen.add(id)
+    return true
+  })
+  await persistManifest(state.images, state.hiddenDefaultImageIds, sanitized)
 }
 
 export async function deleteManagedTeamImage(imageId: string): Promise<void> {
@@ -394,7 +466,11 @@ export async function deleteManagedTeamImage(imageId: string): Promise<void> {
       throw new Error("削除対象の初期画像が見つかりませんでした。")
     }
 
-    await persistManifest(state.images, [...state.hiddenDefaultImageIds, defaultImageId])
+    await persistManifest(
+      state.images,
+      [...state.hiddenDefaultImageIds, defaultImageId],
+      state.photoOrder.filter((id) => id !== defaultImageId),
+    )
     return
   }
 
@@ -414,5 +490,6 @@ export async function deleteManagedTeamImage(imageId: string): Promise<void> {
   await persistManifest(
     state.images.filter((image) => image.id !== imageId),
     state.hiddenDefaultImageIds,
+    state.photoOrder.filter((id) => id !== imageId),
   )
 }

@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { isAdminSessionAuthenticated } from "@/lib/admin-session"
-import { readManagedTeamImages } from "@/lib/team-images"
+import { buildOrderedPhotos, readManagedTeamImages } from "@/lib/team-images"
 
 export const metadata: Metadata = {
   title: "画像管理 | 宮崎SELENE（セレーネ）",
@@ -103,6 +103,7 @@ export default async function AdminTeamImagesPage({ searchParams }: PageProps) {
           showingDefaultGallery={(managedImagesState?.visibleDefaultPhotos.length ?? 0) > 0}
           showingManagedGallery={(managedImagesState?.images.length ?? 0) > 0}
           fallbackImages={managedImagesState?.visibleDefaultPhotos ?? []}
+          orderedPhotos={managedImagesState != null ? buildOrderedPhotos(managedImagesState) : []}
         />
       )}
     </div>

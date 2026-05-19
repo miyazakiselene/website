@@ -13,6 +13,7 @@ export type TeamGalleryManifestPayload = {
   updatedAt: string
   images: unknown[]
   hiddenDefaultImageIds?: string[]
+  photoOrder?: string[]
 }
 
 export function isTeamGallerySupabaseEnabled(): boolean {
@@ -39,6 +40,9 @@ export async function readTeamGalleryManifestPayloadFromSupabase(): Promise<Team
     updatedAt: obj.updatedAt,
     images: obj.images,
     hiddenDefaultImageIds: Array.isArray(obj.hiddenDefaultImageIds) ? obj.hiddenDefaultImageIds : undefined,
+    photoOrder: Array.isArray((obj as Partial<TeamGalleryManifestPayload>).photoOrder)
+      ? (obj as Partial<TeamGalleryManifestPayload>).photoOrder
+      : undefined,
   }
 }
 
