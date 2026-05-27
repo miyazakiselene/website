@@ -269,6 +269,106 @@
       ]
     },
     {
+      "snapshotDate": "2026-05-27",
+      "exportTitle": "サイトの訪問状況（やさしいまとめ）・5回目",
+      "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/05/27 12:08 出力）に書き出したデータを読み取り整理しています。",
+      "analysisPeriod": "直近7日間（PDF: Last 7 Days、5/20〜5/26 ごろ）",
+      "deployment": "Production（本番の公開サイト）",
+      "targetSite": "miyazaki-selene.vercel.app",
+      "stats": {
+        "uniqueVisitors": 253,
+        "bouncePercent": 79,
+        "pageViewsEstimate": 369
+      },
+      "metrics": [
+        {
+          "title": "訪問した人の数",
+          "subtitle": "同じ人が何回きても「1人」と数えます（Visitors）",
+          "value": "253",
+          "unit": "人",
+          "weekOverWeek": "+82%"
+        },
+        {
+          "title": "直帰率",
+          "subtitle": "1ページだけ見てすぐ離脱した割合（Bounce Rate）",
+          "value": "79",
+          "unit": "%",
+          "weekOverWeek": "+14%"
+        },
+        {
+          "title": "ページビュー（全体）",
+          "subtitle": "7日間のページ読み込み合計（Page Views）",
+          "value": "369",
+          "unit": "回",
+          "weekOverWeek": "-16%"
+        }
+      ],
+      "pageTable": {
+        "caption": "ページ別の閲覧人数（PDFの Pages / Routes の VISITORS 列）",
+        "columnLabels": ["ページの説明", "パス", "人数"],
+        "rows": [
+          { "label": "トップページ（日本語）", "path": "/", "count": "248" },
+          { "label": "関係者ページ（入り口）", "path": "/staff", "count": "15" },
+          { "label": "トップページ（英語）", "path": "/en", "count": "12" },
+          { "label": "応援メッセージ管理", "path": "/staff/messages", "count": "4" },
+          { "label": "活動記録の管理", "path": "/staff/activities", "count": "3" },
+          { "label": "お知らせ管理", "path": "/staff/news", "count": "3" },
+          { "label": "試合結果の管理", "path": "/staff/results", "count": "2" }
+        ]
+      },
+      "referrers": {
+        "caption": "どのサイトから来たか（参照元）",
+        "columnLabels": ["参照元", "人数"],
+        "rows": [
+          { "label": "Instagram", "value": "134" },
+          { "label": "Google 検索", "value": "35" },
+          { "label": "Yahoo! 検索", "value": "23" },
+          { "label": "Facebook", "value": "3" },
+          { "label": "Bing 検索", "value": "2" },
+          { "label": "Google 検索（.co.jp）", "value": "1" },
+          { "label": "Facebook（モバイル）", "value": "1" }
+        ]
+      },
+      "countries": {
+        "caption": "国・地域",
+        "columnLabels": ["地域", "割合"],
+        "rows": [
+          { "label": "日本", "value": "98%" },
+          { "label": "ドイツ", "value": "1%" },
+          { "label": "スウェーデン", "value": "<0.5%" },
+          { "label": "アメリカ合衆国", "value": "<0.5%" }
+        ]
+      },
+      "devices": {
+        "caption": "使われた端末の種類",
+        "columnLabels": ["端末", "割合"],
+        "rows": [
+          { "label": "スマートフォン（モバイル）", "value": "97%" },
+          { "label": "パソコン（デスクトップ）", "value": "3%" }
+        ]
+      },
+      "operatingSystems": {
+        "caption": "OSの種類",
+        "columnLabels": ["OS", "割合"],
+        "rows": [
+          { "label": "iOS（iPhone など）", "value": "84%" },
+          { "label": "Android", "value": "13%" },
+          { "label": "Windows", "value": "2%" },
+          { "label": "Mac", "value": "1%" }
+        ]
+      },
+      "notes": [
+        "【過去最高の訪問者数】253人（前回125人 → +128人, +102%）。週次比較でも+82%と急増。",
+        "【Instagram爆増が牽引】Instagram経由が13→134人（+10倍以上）。全流入の53%をInstagramが占め、この週に拡散力の高い投稿があったと推測されます。",
+        "【検索流入も過去最高】Google 35+1=36人、Yahoo! 23人、計60人。前回（Google14人・Yahoo!9人・Bing2人=25人）から2.4倍に増加。SEOの積み上げ効果が着実に出ています。",
+        "【Facebook急減】前回22人→今回4人。SNSシェアのタイミングによる波があると見られます。",
+        "【PV 369回・直帰率79%に注意】訪問者が253人に増えた一方でPVは369回（前回588回）と減少。1人当たりPVは約1.5回（前回4.7回）と大幅低下。Instagramから来た新規ユーザーがトップページだけ見て離脱するパターンが多いと考えられます。",
+        "【トップページへの集中】/が248人（全訪問者の98%）。内部ページ（/staff等）への誘導をトップページで工夫するとPV・滞在時間の改善が期待できます。",
+        "【モバイル比率97%・iOS84%】過去最高のモバイル比率。Instagram経由の流入増が影響しています。モバイル最適化の継続が引き続き最重要です。",
+        "【国内集中】日本98%（前回89%）。海外流入は大幅に減少しました。"
+      ]
+    },
+    {
       "snapshotDate": "2026-05-14",
       "exportTitle": "サイトの訪問状況（やさしいまとめ）・2回目",
       "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/05/14 21:51 出力）に書き出したデータを読み取り整理しています。同日 17:09 版から Instagram・Facebook シェア後の 3 時間分を上書き更新。",
