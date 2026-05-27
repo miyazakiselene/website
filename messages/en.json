@@ -80,6 +80,7 @@
     "sectionLabel": "Activity",
     "title": "Activity Records",
     "description": "Thank you to all the teams we have competed against. We look forward to future matches.",
+    "latestResult": "Latest Activity",
     "openList": "View Records",
     "closeList": "Close Records",
     "pastResults": "Past Records",

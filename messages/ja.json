@@ -80,6 +80,7 @@
     "sectionLabel": "Activity",
     "title": "活動記録",
     "description": "対戦していただいたチームの皆様、ありがとうございました。今後ともよろしくお願いいたします。",
+    "latestResult": "直近の活動記録",
     "openList": "活動記録一覧を開く",
     "closeList": "活動記録一覧を閉じる",
     "pastResults": "過去の活動記録を見る",

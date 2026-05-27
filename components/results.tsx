@@ -283,8 +283,25 @@ function MobileResultsList({
   const t = useTranslations("results")
   const [open, setOpen] = useState(false)
 
+  const pinnedTournament = visibleTournaments[0] ?? null
+  const remainingTournaments = visibleTournaments.slice(1)
+
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="mx-auto max-w-4xl md:hidden">
+    <div className="mx-auto max-w-4xl space-y-4 md:hidden">
+      {pinnedTournament && (
+        <AnimatedSection animation="fadeInUp" delay={100}>
+          <div className="relative rounded-2xl border-2 border-primary bg-primary/5 p-0.5 shadow-md shadow-primary/20 ring-2 ring-primary/30">
+            <div className="absolute -top-3 left-4 rounded-full bg-primary px-3 py-0.5 text-xs font-bold tracking-wide text-primary-foreground shadow">
+              {t("latestResult")}
+            </div>
+            <div className="rounded-xl overflow-hidden">
+              <ResultsAccordionCard tournament={pinnedTournament} />
+            </div>
+          </div>
+        </AnimatedSection>
+      )}
+
+      <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-4 py-4 text-center">
         <p className="text-base font-bold text-foreground">{t("openList")}</p>
         <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -292,7 +309,7 @@ function MobileResultsList({
       <CollapsibleContent>
         <div className="space-y-4 border-t border-border pt-4">
           <div className="grid gap-4">
-            {visibleTournaments.map((tournament, index) => (
+            {remainingTournaments.map((tournament, index) => (
               <AnimatedSection key={tournament.id} animation="fadeInUp" delay={100 + index * 100}>
                 <ResultsAccordionCard tournament={tournament} />
               </AnimatedSection>
@@ -327,7 +344,8 @@ function MobileResultsList({
           ) : null}
         </div>
       </CollapsibleContent>
-    </Collapsible>
+      </Collapsible>
+    </div>
   )
 }
 
