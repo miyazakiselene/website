@@ -69,6 +69,7 @@
     "sectionLabel": "News",
     "title": "お知らせ",
     "description": "今後の活動予定（試合予定）を掲載します。",
+    "latestNews": "直近のお知らせ",
     "openList": "お知らせ一覧を開く",
     "closeList": "お知らせ一覧を閉じる",
     "pastNews": "過去のお知らせを見る",

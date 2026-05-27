@@ -73,8 +73,25 @@ function MobileNewsList({
   const t = useTranslations("news")
   const [open, setOpen] = useState(false)
 
+  const pinnedItem = currentNews[0] ?? pastNews[0] ?? null
+  const remainingCurrent = currentNews.slice(1)
+
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="mx-auto max-w-4xl md:hidden">
+    <div className="mx-auto max-w-4xl space-y-4 md:hidden">
+      {pinnedItem && (
+        <AnimatedSection animation="fadeInUp" delay={100}>
+          <div className="relative rounded-2xl border-2 border-primary bg-primary/5 p-0.5 shadow-md shadow-primary/20 ring-2 ring-primary/30">
+            <div className="absolute -top-3 left-4 rounded-full bg-primary px-3 py-0.5 text-xs font-bold tracking-wide text-primary-foreground shadow">
+              {t("latestNews")}
+            </div>
+            <div className="rounded-xl overflow-hidden">
+              <NewsCard item={pinnedItem} />
+            </div>
+          </div>
+        </AnimatedSection>
+      )}
+
+      <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-background px-4 py-4 text-center">
         <p className="text-base font-bold text-foreground">{t("openList")}</p>
         <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -82,7 +99,7 @@ function MobileNewsList({
       <CollapsibleContent>
         <div className="space-y-4 border-t border-border pt-4">
           <div className="grid gap-4">
-            {currentNews.map((plan, index) => (
+            {remainingCurrent.map((plan, index) => (
               <AnimatedSection key={plan.id} animation="fadeInUp" delay={100 + index * 100}>
                 <NewsCard item={plan} />
               </AnimatedSection>
@@ -136,7 +153,8 @@ function MobileNewsList({
           </AnimatedSection>
         </div>
       </CollapsibleContent>
-    </Collapsible>
+      </Collapsible>
+    </div>
   )
 }
 

@@ -69,6 +69,7 @@
     "sectionLabel": "News",
     "title": "News",
     "description": "Upcoming schedules and match announcements.",
+    "latestNews": "Latest News",
     "openList": "View News",
     "closeList": "Close News",
     "pastNews": "Past News",
