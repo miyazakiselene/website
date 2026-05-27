@@ -181,7 +181,7 @@ function localizeYearLabel(period: string, locale: string): string {
   return period
 }
 
-function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
+function ResultsAccordionCard({ tournament, defaultOpen = false }: { tournament: Tournament; defaultOpen?: boolean }) {
   const t      = useTranslations("results")
   const locale = useLocale()
   const period =
@@ -193,7 +193,7 @@ function ResultsAccordionCard({ tournament }: { tournament: Tournament }) {
   return (
     <Card className="h-full overflow-hidden border-border bg-card transition-all duration-300 hover:border-primary/30">
       <CardContent className="p-0">
-        <Collapsible className="group" defaultOpen={false}>
+        <Collapsible className="group" defaultOpen={defaultOpen}>
           <CollapsibleTrigger className="flex w-full items-center gap-3 border-b border-border bg-secondary/50 p-4 text-left outline-none transition-colors hover:bg-secondary/65 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 md:gap-4 md:p-6">
             <div className="flex min-w-0 flex-1 items-start gap-3 md:gap-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 md:h-12 md:w-12">
@@ -295,7 +295,7 @@ function MobileResultsList({
               {t("latestResult")}
             </div>
             <div className="rounded-xl overflow-hidden">
-              <ResultsAccordionCard tournament={pinnedTournament} />
+              <ResultsAccordionCard tournament={pinnedTournament} defaultOpen={true} />
             </div>
           </div>
         </AnimatedSection>
