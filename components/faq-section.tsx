@@ -31,9 +31,24 @@ function FaqList({ items }: { items: Array<{ question: string; answer: string }>
   )
 }
 
-export function FaqSection() {
+type FaqSectionProps = {
+  /** 「どんな大会に出場していますか？」の回答を参加状況に応じて差し替える（任意） */
+  tournamentFaqAnswer?: string
+}
+
+function isTournamentFaqQuestion(question: string): boolean {
+  return question.includes("大会") || /tournament/i.test(question)
+}
+
+export function FaqSection({ tournamentFaqAnswer }: FaqSectionProps = {}) {
   const t = useTranslations("faq")
-  const items = t.raw("items") as Array<{ question: string; answer: string }>
+  const rawItems = t.raw("items") as Array<{ question: string; answer: string }>
+  const items =
+    tournamentFaqAnswer != null
+      ? rawItems.map((item) =>
+          isTournamentFaqQuestion(item.question) ? { ...item, answer: tournamentFaqAnswer } : item,
+        )
+      : rawItems
 
   const faqSchema = {
     "@context": "https://schema.org",

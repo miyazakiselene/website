@@ -23,6 +23,7 @@ import { readStaffTournamentRecords } from "@/lib/staff-results-storage"
 import { getSiteLastUpdatedIso } from "@/lib/site-last-updated"
 import { getPublicSiteBaseHref } from "@/lib/site-base"
 import { siteDescriptionDefault, siteTitleDefault } from "@/lib/site-seo"
+import { getTournamentFaqAnswer } from "@/lib/tournament-participation"
 
 export const dynamic = "force-dynamic"
 
@@ -69,7 +70,8 @@ async function readMergedPublicResults(): Promise<Tournament[] | undefined> {
   }))
 }
 
-export default async function HomePage() {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   const embedRaw = process.env.NEXT_PUBLIC_INSTAGRAM_EMBED_URLS ?? process.env.INSTAGRAM_EMBED_URLS ?? ""
   const instagramEmbedPostUrls = parseInstagramEmbedPostUrlsFromEnv(embedRaw)
   const effectiveInstagramEmbedPostUrls =
@@ -78,6 +80,7 @@ export default async function HomePage() {
   const { photos: teamGalleryPhotos } = await getPublicTeamGallery()
   const newsItems = await readNewsRecords()
   const lastUpdatedIso = await getSiteLastUpdatedIso()
+  const tournamentFaqAnswer = await getTournamentFaqAnswer(locale)
 
   const siteBase = getPublicSiteBaseHref()
   const websiteJsonLd = {
@@ -104,7 +107,7 @@ export default async function HomePage() {
       <News initialItems={newsItems} />
       <Results initialTournaments={initialPublicResults} />
       <CheerMessageForm />
-      <FaqSection />
+      <FaqSection tournamentFaqAnswer={tournamentFaqAnswer} />
       <ClientOnly>
         <ContactForm />
       </ClientOnly>
