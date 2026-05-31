@@ -3,12 +3,34 @@
 import { Instagram, ArrowUp } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { AnimatedSection } from "@/components/animated-section"
 
-export function Footer() {
+type FooterProps = {
+  /** サイト更新日（"YYYY-MM-DD"）。指定時のみ「サイト更新日」を表示する。 */
+  lastUpdatedIso?: string
+}
+
+/** "YYYY-MM-DD" をロケールに合わせて表示用に整形（タイムゾーンずれを防ぐためローカル日付で生成）。 */
+function formatLastUpdated(iso: string, locale: string): string | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim())
+  if (m == null) return null
+  const [, y, mo, d] = m
+  const date = new Date(Number(y), Number(mo) - 1, Number(d))
+  if (Number.isNaN(date.getTime())) return null
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date)
+}
+
+export function Footer({ lastUpdatedIso }: FooterProps = {}) {
   const t = useTranslations("footer")
+  const locale = useLocale()
+  const lastUpdatedLabel =
+    lastUpdatedIso != null ? formatLastUpdated(lastUpdatedIso, locale) : null
 
   const navLinks = [
     { label: t("nav.home"),         href: "#hero" },
@@ -110,6 +132,12 @@ export function Footer() {
         {/* Copyright */}
         <AnimatedSection animation="fadeIn" delay={400}>
           <div className="border-t border-border pt-10">
+            {lastUpdatedLabel != null ? (
+              <p className="mb-2 text-center text-sm text-muted-foreground">
+                {t("lastUpdatedLabel")}:{" "}
+                <time dateTime={lastUpdatedIso}>{lastUpdatedLabel}</time>
+              </p>
+            ) : null}
             <p className="text-center text-base text-muted-foreground">
               {t("copyright")}
             </p>

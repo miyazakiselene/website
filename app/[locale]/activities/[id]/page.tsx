@@ -9,6 +9,7 @@ import { Header } from "@/components/header"
 import { readActivityRecords } from "@/lib/activities"
 import { formatActivityDateRangeJa, formatOpponentsDisplayJa } from "@/lib/activities-model"
 import { siteDescriptionBrandPrefix, siteNameTemplate } from "@/lib/site-seo"
+import { getSiteLastUpdatedIso } from "@/lib/site-last-updated"
 
 export const dynamic = "force-dynamic"
 
@@ -58,6 +59,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
   const item = items.find((a) => a.id === id)
   if (item == null) notFound()
 
+  const lastUpdatedIso = await getSiteLastUpdatedIso()
   const opponents = formatOpponentsDisplayJa(item.opponent)
   const dateLine = formatActivityDateRangeJa(item.startDate, item.endDate)
   const homeHref = locale === "en" ? "/en" : "/"
@@ -126,7 +128,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
           <p className="text-muted-foreground">{noContentLabel}</p>
         )}
       </article>
-      <Footer />
+      <Footer lastUpdatedIso={lastUpdatedIso} />
     </main>
   )
 }

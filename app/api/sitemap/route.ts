@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { readActivityRecords } from "@/lib/activities"
 import { readNewsRecords } from "@/lib/news"
 import { getPublicSiteBaseHref } from "@/lib/site-base"
+import { getSiteLastUpdatedDate } from "@/lib/site-last-updated"
 
 export const dynamic = "force-dynamic"
 
@@ -27,13 +28,18 @@ function lastModFromIsoDate(value: string | undefined): Date | undefined {
 
 export async function GET() {
   const base = getPublicSiteBaseHref()
-  const [newsItems, activityItems] = await Promise.all([readNewsRecords(), readActivityRecords()])
+  const [newsItems, activityItems, siteLastUpdated] = await Promise.all([
+    readNewsRecords(),
+    readActivityRecords(),
+    getSiteLastUpdatedDate(),
+  ])
 
   type Row = { loc: string; lastmod: string; changefreq: string; priority: string }
-  const now = formatLastmod(new Date())
+  // トップページの lastmod は実際の最終更新日（お知らせ/活動記録/Instagram/その他修正の最新日）
+  const home = formatLastmod(siteLastUpdated)
   const rows: Row[] = [
-    { loc: `${base}/`,    lastmod: now, changefreq: "weekly", priority: "1.0" },
-    { loc: `${base}/en/`, lastmod: now, changefreq: "weekly", priority: "1.0" },
+    { loc: `${base}/`,    lastmod: home, changefreq: "weekly", priority: "1.0" },
+    { loc: `${base}/en/`, lastmod: home, changefreq: "weekly", priority: "1.0" },
     ...newsItems.flatMap((item) => {
       const d = lastModFromIsoDate(item.eventEndDate)
       const lastmod = formatLastmod(d ?? new Date())

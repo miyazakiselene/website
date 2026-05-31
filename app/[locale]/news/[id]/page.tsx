@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { readNewsRecords } from "@/lib/news"
 import { siteDescriptionBrandPrefix, siteNameTemplate } from "@/lib/site-seo"
+import { getSiteLastUpdatedIso } from "@/lib/site-last-updated"
 
 export const dynamic = "force-dynamic"
 
@@ -54,6 +55,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
   const item = items.find((n) => n.id === id)
   if (item == null) notFound()
 
+  const lastUpdatedIso = await getSiteLastUpdatedIso()
   const homeHref = locale === "en" ? "/en" : "/"
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -96,7 +98,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
           </p>
         )}
       </article>
-      <Footer />
+      <Footer lastUpdatedIso={lastUpdatedIso} />
     </main>
   )
 }

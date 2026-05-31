@@ -20,6 +20,9 @@ import { filterStaffTournamentsForPublicTop } from "@/lib/public-results-dedupe"
 import { getPublicTeamGallery } from "@/lib/team-images"
 import { readNewsRecords } from "@/lib/news"
 import { readStaffTournamentRecords } from "@/lib/staff-results-storage"
+import { getSiteLastUpdatedIso } from "@/lib/site-last-updated"
+import { getPublicSiteBaseHref } from "@/lib/site-base"
+import { siteDescriptionDefault, siteTitleDefault } from "@/lib/site-seo"
 
 export const dynamic = "force-dynamic"
 
@@ -74,9 +77,25 @@ export default async function HomePage() {
   const initialPublicResults = await readMergedPublicResults()
   const { photos: teamGalleryPhotos } = await getPublicTeamGallery()
   const newsItems = await readNewsRecords()
+  const lastUpdatedIso = await getSiteLastUpdatedIso()
+
+  const siteBase = getPublicSiteBaseHref()
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteTitleDefault,
+    description: siteDescriptionDefault,
+    url: siteBase,
+    inLanguage: "ja-JP",
+    dateModified: lastUpdatedIso,
+  }
 
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
       <ClientOnly>
         <Header />
       </ClientOnly>
@@ -92,7 +111,7 @@ export default async function HomePage() {
       <InstagramFeed embedPostUrls={effectiveInstagramEmbedPostUrls} />
       <RelatedLinks />
       <Sponsors />
-      <Footer />
+      <Footer lastUpdatedIso={lastUpdatedIso} />
     </main>
   )
 }
