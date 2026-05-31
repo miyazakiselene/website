@@ -3,6 +3,7 @@ import "server-only"
 import { isValid, parseISO } from "date-fns"
 import { readActivityRecords } from "@/lib/activities"
 import { readNewsRecords } from "@/lib/news"
+import { readLatestSupabaseContentUpdatedAt } from "@/lib/supabase-content-updated-at"
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -49,6 +50,8 @@ type ComputeInput = {
   activityEndDates: string[]
   /** ビルド（デプロイ）日（YYYY-MM-DD）。サイトの文章・データ・コードの変更を反映。 */
   buildDate?: string
+  /** Supabase 上の表示コンテンツの最終更新日（YYYY-MM-DD）。DBの文章編集を反映。 */
+  dbContentDate?: string
   /** 判定基準の現在時刻。 */
   now?: Date
 }
@@ -56,10 +59,11 @@ type ComputeInput = {
 /**
  * サイト更新日（"YYYY-MM-DD"）= 次の候補のうち「今日（日本時間）以前で最も新しい日」。
  *   - ビルド（デプロイ）日 … サイト内の文章・FAQ・写真・データ・コードを変更すると更新
+ *   - Supabase コンテンツの最終更新日 … 関係者ページからDBの文章を編集すると更新
  *   - お知らせのイベント終了日（過去に移動した日）
  *   - 活動記録の終了日（更新があった日）
  *
- * 文章を一文字でも変更してデプロイすれば、その日が自動的に更新日になる。
+ * 文章を一文字でも変更すれば、その日が自動的に更新日になる。
  * 未来日（これから開催の予定など）は、SEO 上 lastmod が未来にならないよう除外する。
  * 日付は "YYYY-MM-DD" 文字列のまま辞書順で比較するため、タイムゾーンの影響を受けない。
  */
@@ -69,6 +73,7 @@ export function computeSiteLastUpdatedIso(input: ComputeInput): string {
   const candidates: string[] = []
   for (const value of [
     input.buildDate ?? "",
+    input.dbContentDate ?? "",
     ...input.newsEndDates,
     ...input.activityEndDates,
   ]) {
@@ -88,11 +93,17 @@ export function computeSiteLastUpdated(input: ComputeInput): Date {
 }
 
 async function loadComputeInput(now: Date): Promise<ComputeInput> {
-  const [news, activities] = await Promise.all([readNewsRecords(), readActivityRecords()])
+  const [news, activities, dbUpdatedAt] = await Promise.all([
+    readNewsRecords(),
+    readActivityRecords(),
+    readLatestSupabaseContentUpdatedAt(),
+  ])
+  const dbDate = dbUpdatedAt != null ? getTokyoDateIso(new Date(dbUpdatedAt)) : undefined
   return {
     newsEndDates: news.map((n) => n.eventEndDate),
     activityEndDates: activities.map((a) => a.endDate),
     buildDate: getBuildDateIso(now),
+    dbContentDate: dbDate,
     now,
   }
 }
