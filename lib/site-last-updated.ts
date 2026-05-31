@@ -4,24 +4,35 @@ import { isValid, parseISO } from "date-fns"
 import { readActivityRecords } from "@/lib/activities"
 import { readNewsRecords } from "@/lib/news"
 
-/**
- * サイトの「中身が最後に変わった日」を表す手動の基準日（YYYY-MM-DD）。
- *
- * 次のような変更をしたら、この日付を更新してください:
- *   - お知らせ／活動記録以外の文章・写真・FAQ・選手紹介などを修正したとき
- *   - 仕組み（コード）を更新したとき
- *
- * お知らせ・活動記録の日付からも自動で最新日を拾うため、ここを更新し忘れても
- * 極端に古い日付にはなりません。
- */
-const SITE_CONTENT_EDITED_DATE = process.env.SITE_CONTENT_EDITED_DATE ?? "2026-06-01"
-
-/**
- * 直近の Instagram 投稿日（YYYY-MM-DD）。Instagram に投稿したら更新してください。
- */
-const INSTAGRAM_LAST_POST_DATE = process.env.INSTAGRAM_LAST_POST_DATE ?? "2026-05-31"
-
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
+
+/**
+ * 指定時刻の「日本（Asia/Tokyo）での日付」を "YYYY-MM-DD" で返す。
+ * Vercel など UTC で動くサーバーでも、日本時間の日付で判定するために使う。
+ */
+function getTokyoDateIso(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date)
+}
+
+/**
+ * ビルド（デプロイ）時刻を日本時間の日付（YYYY-MM-DD）で返す。
+ *
+ * next.config.mjs で埋め込む `SITE_BUILD_TIME`（ビルド時の ISO 文字列）を基準にする。
+ * これにより、文章・FAQ・選手紹介・写真・データ・コードなど「サイトの中身」を
+ * 変更してデプロイすれば、その日が自動的に「サイト更新日」へ反映される（完全自動）。
+ * 取得できない場合は実行時の現在時刻にフォールバックする。
+ */
+function getBuildDateIso(now: Date): string {
+  const raw = process.env.SITE_BUILD_TIME
+  const base = raw != null && raw.trim().length > 0 ? new Date(raw) : now
+  const safe = isValid(base) ? base : now
+  return getTokyoDateIso(safe)
+}
 
 /** "YYYY-MM-DD" として妥当な文字列だけを返す（前後空白は除去）。 */
 function normalizeIso(value: string | undefined | null): string | null {
@@ -31,51 +42,35 @@ function normalizeIso(value: string | undefined | null): string | null {
   return isValid(parseISO(trimmed)) ? trimmed : null
 }
 
-/**
- * 指定時刻の「日本（Asia/Tokyo）での今日」を "YYYY-MM-DD" で返す。
- * Vercel など UTC で動くサーバーでも、日本時間の日付で判定するために使う。
- */
-function getTodayIsoInTokyo(now: Date): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(now)
-}
-
 type ComputeInput = {
   /** お知らせのイベント終了日（YYYY-MM-DD）。終了＝「過去のお知らせ」へ移動した日。 */
   newsEndDates: string[]
   /** 活動記録の終了日（YYYY-MM-DD）。最新の活動＝更新があった日。 */
   activityEndDates: string[]
-  /** Instagram の最終投稿日（YYYY-MM-DD）。 */
-  instagramDate?: string
-  /** その他のサイト修正日（YYYY-MM-DD）。 */
-  manualDate?: string
-  /** 判定基準の現在時刻（テスト用）。 */
+  /** ビルド（デプロイ）日（YYYY-MM-DD）。サイトの文章・データ・コードの変更を反映。 */
+  buildDate?: string
+  /** 判定基準の現在時刻。 */
   now?: Date
 }
 
 /**
  * サイト更新日（"YYYY-MM-DD"）= 次の候補のうち「今日（日本時間）以前で最も新しい日」。
+ *   - ビルド（デプロイ）日 … サイト内の文章・FAQ・写真・データ・コードを変更すると更新
  *   - お知らせのイベント終了日（過去に移動した日）
  *   - 活動記録の終了日（更新があった日）
- *   - Instagram 投稿日
- *   - その他のサイト修正日
  *
+ * 文章を一文字でも変更してデプロイすれば、その日が自動的に更新日になる。
  * 未来日（これから開催の予定など）は、SEO 上 lastmod が未来にならないよう除外する。
  * 日付は "YYYY-MM-DD" 文字列のまま辞書順で比較するため、タイムゾーンの影響を受けない。
  */
 export function computeSiteLastUpdatedIso(input: ComputeInput): string {
-  const todayIso = getTodayIsoInTokyo(input.now != null && isValid(input.now) ? input.now : new Date())
+  const todayIso = getTokyoDateIso(input.now != null && isValid(input.now) ? input.now : new Date())
 
   const candidates: string[] = []
   for (const value of [
+    input.buildDate ?? "",
     ...input.newsEndDates,
     ...input.activityEndDates,
-    input.instagramDate ?? "",
-    input.manualDate ?? "",
   ]) {
     const iso = normalizeIso(value)
     if (iso != null && iso <= todayIso) {
@@ -97,8 +92,7 @@ async function loadComputeInput(now: Date): Promise<ComputeInput> {
   return {
     newsEndDates: news.map((n) => n.eventEndDate),
     activityEndDates: activities.map((a) => a.endDate),
-    instagramDate: INSTAGRAM_LAST_POST_DATE,
-    manualDate: SITE_CONTENT_EDITED_DATE,
+    buildDate: getBuildDateIso(now),
     now,
   }
 }

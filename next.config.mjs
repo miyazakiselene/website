@@ -4,6 +4,11 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts")
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // ビルド（デプロイ）時刻を埋め込む。コード・文章・データのいずれかを変更して
+  // デプロイすると更新され、「サイト更新日」の自動算出に使う。
+  env: {
+    SITE_BUILD_TIME: new Date().toISOString(),
+  },
   async rewrites() {
     return {
       beforeFiles: [{ source: "/sitemap.xml", destination: "/api/sitemap" }],
