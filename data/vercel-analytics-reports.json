@@ -558,6 +558,208 @@
         "【モバイル比率98%・iOS85%】過去最高のモバイル比率を更新。Instagram経由の流入が主因で、モバイル最適化の継続が引き続き最重要です。",
         "【国内集中】日本99%（前回98%）。海外（スウェーデン・アメリカ）はごくわずかでした。"
       ]
+    },
+    {
+      "snapshotDate": "2026-06-10",
+      "exportTitle": "サイトの訪問状況（やさしいまとめ）・7回目",
+      "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/06/10 13:42 出力、期間: Last 30 Days）に書き出したデータを読み取り整理しています。",
+      "analysisPeriod": "直近30日間（PDF: Last 30 Days、5/11〜6/10 ごろ）",
+      "deployment": "Production（本番の公開サイト）",
+      "targetSite": "miyazaki-selene.vercel.app",
+      "stats": {
+        "uniqueVisitors": 613,
+        "bouncePercent": 74,
+        "pageViewsEstimate": 1395
+      },
+      "metrics": [
+        {
+          "title": "訪問した人の数",
+          "subtitle": "同じ人が何回きても「1人」と数えます（Visitors）",
+          "value": "613",
+          "unit": "人",
+          "weekOverWeek": "+3.7K%"
+        },
+        {
+          "title": "直帰率",
+          "subtitle": "1ページだけ見てすぐ離脱した割合（Bounce Rate）",
+          "value": "74",
+          "unit": "%",
+          "weekOverWeek": "+49%"
+        },
+        {
+          "title": "ページビュー（全体）",
+          "subtitle": "30日間のページ読み込み合計（Page Views）",
+          "value": "1,395",
+          "unit": "回",
+          "weekOverWeek": "+634%"
+        }
+      ],
+      "pageTable": {
+        "caption": "ページ別の閲覧人数（PDFの Pages / Routes の VISITORS 列）",
+        "columnLabels": ["ページの説明", "パス", "人数"],
+        "rows": [
+          { "label": "トップページ（日本語）", "path": "/", "count": "584" },
+          { "label": "関係者ページ（入り口）", "path": "/staff", "count": "64" },
+          { "label": "トップページ（英語）", "path": "/en", "count": "42" },
+          { "label": "試合結果の管理", "path": "/staff/results", "count": "22" },
+          { "label": "関係者ダッシュボード", "path": "/staff/dashboard", "count": "15" },
+          { "label": "お知らせ管理", "path": "/staff/news", "count": "15" },
+          { "label": "管理画面（チーム画像）", "path": "/admin/team-images", "count": "14" }
+        ]
+      },
+      "referrers": {
+        "caption": "どのサイトから来たか（参照元）",
+        "columnLabels": ["参照元", "人数"],
+        "rows": [
+          { "label": "Instagram", "value": "256" },
+          { "label": "Google 検索", "value": "87" },
+          { "label": "Yahoo! 検索", "value": "55" },
+          { "label": "Facebook", "value": "19" },
+          { "label": "Bing 検索", "value": "8" },
+          { "label": "Facebook（モバイル）", "value": "7" },
+          { "label": "Facebook（リンク）", "value": "3" }
+        ]
+      },
+      "countries": {
+        "caption": "国・地域",
+        "columnLabels": ["地域", "割合"],
+        "rows": [
+          { "label": "日本", "value": "97%" },
+          { "label": "アメリカ合衆国", "value": "2%" },
+          { "label": "ドイツ", "value": "<0.5%" },
+          { "label": "スウェーデン", "value": "<0.5%" },
+          { "label": "アイルランド", "value": "<0.5%" }
+        ]
+      },
+      "devices": {
+        "caption": "使われた端末の種類",
+        "columnLabels": ["端末", "割合"],
+        "rows": [
+          { "label": "スマートフォン（モバイル）", "value": "91%" },
+          { "label": "パソコン（デスクトップ）", "value": "9%" },
+          { "label": "タブレット", "value": "<0.5%" }
+        ]
+      },
+      "operatingSystems": {
+        "caption": "OSの種類",
+        "columnLabels": ["OS", "割合"],
+        "rows": [
+          { "label": "iOS（iPhone など）", "value": "79%" },
+          { "label": "Android", "value": "12%" },
+          { "label": "Mac", "value": "5%" },
+          { "label": "Windows", "value": "4%" },
+          { "label": "Chrome OS", "value": "<0.5%" }
+        ]
+      },
+      "notes": [
+        "【初の30日間集計】今回は直近7日間ではなく30日間のデータです。期間が長いため、前回（7日間・254人）と単純比較はできませんが、サイト全体の成長像が見えやすくなっています。",
+        "【30日間で613人・PV1,395回】1人当たりPVは約2.3回（前回7日間は約1.5回）。直帰率も82→74%と改善し、トップ以外のページ閲覧が増え始めています。",
+        "【Instagramが最大流入源】256人（参照元の約42%）。SNS拡散が30日間を通じてサイトの柱になっています。",
+        "【検索流入が大幅増】Google 87人・Yahoo! 55人・Bing 8人の計150人。7日間集計のピーク（計60人）を大きく上回り、SEOの積み上げが着実に効いています。",
+        "【Facebookも復調】PC+モバイル+リンク合計29人（7日間集計の4人から増加）。SNS全体（Instagram+Facebook）で285人。",
+        "【内部ページへの流入拡大】/staff 64人・/en 42人・/staff/results 22人と、関係者・英語ページへの訪問が増加。トップ（584人）以外への導線が機能し始めています。",
+        "【デスクトップ比率9%】7日間集計（2%）から上昇。Mac 5%・Windows 4%と、PCからの閲覧も少しずつ増えています。",
+        "【国内97%・海外3%】日本が中心のまま、アメリカ（2%）・ドイツ・スウェーデン・アイルランドからの訪問もわずかに見られます。"
+      ]
+    },
+    {
+      "snapshotDate": "2026-07-02",
+      "exportTitle": "サイトの訪問状況（やさしいまとめ）・8回目",
+      "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/07/02 8:28 出力、期間: Last 30 Days）に書き出したデータを読み取り整理しています。",
+      "analysisPeriod": "直近30日間（PDF: Last 30 Days、6/3〜7/2 ごろ）",
+      "deployment": "Production（本番の公開サイト）",
+      "targetSite": "miyazaki-selene.vercel.app",
+      "stats": {
+        "uniqueVisitors": 366,
+        "bouncePercent": 82,
+        "pageViewsEstimate": 500
+      },
+      "metrics": [
+        {
+          "title": "訪問した人の数",
+          "subtitle": "同じ人が何回きても「1人」と数えます（Visitors）",
+          "value": "366",
+          "unit": "人",
+          "weekOverWeek": "-30%"
+        },
+        {
+          "title": "直帰率",
+          "subtitle": "1ページだけ見てすぐ離脱した割合（Bounce Rate）",
+          "value": "82",
+          "unit": "%",
+          "weekOverWeek": "+9%"
+        },
+        {
+          "title": "ページビュー（全体）",
+          "subtitle": "30日間のページ読み込み合計（Page Views）",
+          "value": "500",
+          "unit": "回",
+          "weekOverWeek": "-61%"
+        }
+      ],
+      "pageTable": {
+        "caption": "ページ別の閲覧人数（PDFの Pages / Routes の VISITORS 列）",
+        "columnLabels": ["ページの説明", "パス", "人数"],
+        "rows": [
+          { "label": "トップページ（日本語）", "path": "/", "count": "356" },
+          { "label": "関係者ページ（入り口）", "path": "/staff", "count": "16" },
+          { "label": "トップページ（英語）", "path": "/en", "count": "8" },
+          { "label": "お知らせ管理", "path": "/staff/news", "count": "4" },
+          { "label": "試合結果の管理", "path": "/staff/results", "count": "4" },
+          { "label": "応援メッセージ管理", "path": "/staff/messages", "count": "3" },
+          { "label": "不明なURL（文字化けの可能性）", "path": "/%E3%82%93", "count": "1" }
+        ]
+      },
+      "referrers": {
+        "caption": "どのサイトから来たか（参照元）",
+        "columnLabels": ["参照元", "人数"],
+        "rows": [
+          { "label": "Instagram", "value": "157" },
+          { "label": "Google 検索", "value": "96" },
+          { "label": "Yahoo! 検索", "value": "46" },
+          { "label": "Bing 検索", "value": "5" },
+          { "label": "Facebook", "value": "3" },
+          { "label": "vercel.com", "value": "2" },
+          { "label": "Google 検索（.co.jp）", "value": "1" }
+        ]
+      },
+      "countries": {
+        "caption": "国・地域",
+        "columnLabels": ["地域", "割合"],
+        "rows": [
+          { "label": "日本", "value": "98%" },
+          { "label": "アメリカ合衆国", "value": "1%" },
+          { "label": "スウェーデン", "value": "1%" }
+        ]
+      },
+      "devices": {
+        "caption": "使われた端末の種類",
+        "columnLabels": ["端末", "割合"],
+        "rows": [
+          { "label": "スマートフォン（モバイル）", "value": "92%" },
+          { "label": "パソコン（デスクトップ）", "value": "8%" },
+          { "label": "タブレット", "value": "<0.5%" }
+        ]
+      },
+      "operatingSystems": {
+        "caption": "OSの種類",
+        "columnLabels": ["OS", "割合"],
+        "rows": [
+          { "label": "iOS（iPhone など）", "value": "72%" },
+          { "label": "Android", "value": "20%" },
+          { "label": "Windows", "value": "6%" },
+          { "label": "Mac", "value": "1%" },
+          { "label": "Chrome OS", "value": "1%" }
+        ]
+      },
+      "notes": [
+        "【前回集計から減少】前回（2026-06-10・30日間集計、613人）と比べて訪問者366人（-30%）、ページビュー500回（-61%）、直帰率82%（+9pt）と、いずれも悪化しました。前回はイベント関連の話題でSNS拡散が伸びた時期だったため、その反動が出た形です。",
+        "【Instagramが依然として最大流入源】157人（参照元の約58%）。前回（256人）からは減りましたが、最大の流入経路であることは変わっていません。",
+        "【検索流入は一定水準を維持】Google 97人（96+.co.jp 1）・Yahoo! 46人・Bing 5人の計148人。Instagramに次ぐ規模を維持しており、SEOの積み上げは崩れていません。",
+        "【モバイル比率92%】前回（91%）とほぼ同水準。iOS72%・Android20%とスマートフォン中心の傾向は継続。",
+        "【国内98%・海外2%】日本が中心のまま、アメリカ・スウェーデンからの訪問がわずかに見られます。",
+        "【不明なURLを1件検出】「/%E3%82%93」という文字化けしたパスへのアクセスが1件ありました。正規のページではなく、外部リンクの誤りやボットアクセスの可能性があります。"
+      ]
     }
   ]
 }
