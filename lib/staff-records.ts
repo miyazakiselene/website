@@ -35,9 +35,13 @@ export function normalizeTournamentRecords(records: TournamentRecord[]): Tournam
   }))
 }
 
+function countFilledVideoUrls(urls: string[]): number {
+  return urls.filter((u) => u.trim().length > 0).length
+}
+
 /**
- * サーバー（リポジトリの JSON 等）から取ったデータに、この端末の試合動画 URL を足し合わせる。
- * 同一 match.id なら「サーバー側に URL があればそれを優先、なければローカル」を採用。
+ * サーバー（DB）から取ったデータに、この端末の試合動画 URL を足し合わせる。
+ * 同一 match.id なら「登録件数が多い方（サーバー or ローカル）を丸ごと採用」する。
  * ローカルだけにある大会は末尾に残す。
  */
 export function mergeStaffRecordsFromServerAndLocal(
@@ -59,16 +63,10 @@ export function mergeStaffRecordsFromServerAndLocal(
     matches: t.matches.map((m) => {
       const lm = localMatchById.get(m.id)
       if (!lm) return normalizeMatchVideoUrls(m)
-      const q = Math.max(0, m.quarter)
       const fromServer = m.videoUrls ?? []
       const fromLocal = lm.videoUrls ?? []
-      const merged: string[] = []
-      for (let i = 0; i < q; i++) {
-        const s = (fromServer[i] ?? "").trim()
-        const l = (fromLocal[i] ?? "").trim()
-        merged.push(s || l)
-      }
-      return normalizeMatchVideoUrls({ ...m, videoUrls: merged })
+      const winner = countFilledVideoUrls(fromLocal) > countFilledVideoUrls(fromServer) ? fromLocal : fromServer
+      return normalizeMatchVideoUrls({ ...m, videoUrls: winner })
     }),
   }))
 

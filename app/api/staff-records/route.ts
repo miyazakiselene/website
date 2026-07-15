@@ -25,17 +25,10 @@ function staffCodeMatches(input: string): boolean {
   }
 }
 
-function stripVideoUrls(records: TournamentRecord[]): TournamentRecord[] {
-  return records.map((record) => ({
-    ...record,
-    matches: record.matches.map(({ videoUrls: _drop, ...match }) => match),
-  }))
-}
-
 export async function GET() {
   const records = await readStaffTournamentRecords()
   return NextResponse.json(
-    { records: stripVideoUrls(records) },
+    { records },
     {
       headers: {
         "Cache-Control": "private, no-store, max-age=0",
