@@ -760,6 +760,104 @@
         "【国内98%・海外2%】日本が中心のまま、アメリカ・スウェーデンからの訪問がわずかに見られます。",
         "【不明なURLを1件検出】「/%E3%82%93」という文字化けしたパスへのアクセスが1件ありました。正規のページではなく、外部リンクの誤りやボットアクセスの可能性があります。"
       ]
+    },
+    {
+      "snapshotDate": "2026-07-22",
+      "exportTitle": "サイトの訪問状況（やさしいまとめ）・9回目",
+      "dataSourceNote": "Vercel Web Analytics の画面を PDF（website – Analytics – Vercel, 2026/07/22 13:23 出力、期間: Last 30 Days）に書き出したデータを読み取り整理しています。",
+      "analysisPeriod": "直近30日間（PDF: Last 30 Days、6/22〜7/22 ごろ）",
+      "deployment": "Production（本番の公開サイト）",
+      "targetSite": "miyazaki-selene.vercel.app",
+      "stats": {
+        "uniqueVisitors": 261,
+        "bouncePercent": 84,
+        "pageViewsEstimate": 405
+      },
+      "metrics": [
+        {
+          "title": "訪問した人の数",
+          "subtitle": "同じ人が何回きても「1人」と数えます（Visitors）",
+          "value": "261",
+          "unit": "人",
+          "weekOverWeek": "-54%"
+        },
+        {
+          "title": "直帰率",
+          "subtitle": "1ページだけ見てすぐ離脱した割合（Bounce Rate）",
+          "value": "84",
+          "unit": "%",
+          "weekOverWeek": "+3%"
+        },
+        {
+          "title": "ページビュー（全体）",
+          "subtitle": "30日間のページ読み込み合計（Page Views）",
+          "value": "405",
+          "unit": "回",
+          "weekOverWeek": "-49%"
+        }
+      ],
+      "pageTable": {
+        "caption": "ページ別の閲覧人数（PDFの Pages / Routes の VISITORS 列）",
+        "columnLabels": ["ページの説明", "パス", "人数"],
+        "rows": [
+          { "label": "トップページ（日本語）", "path": "/", "count": "246" },
+          { "label": "関係者ページ（入り口）", "path": "/staff", "count": "14" },
+          { "label": "トップページ（英語）", "path": "/en", "count": "8" },
+          { "label": "活動記録の詳細ページ", "path": "/activities/activity-bbc34cc6-8863-40f3-8a6e-ce1ad9243b88", "count": "4" },
+          { "label": "お知らせの詳細ページ", "path": "/news/news-e7f6624c-6d7e-4b57-bb19-ab2e1ca3e5c3", "count": "4" },
+          { "label": "お知らせ管理", "path": "/staff/news", "count": "4" },
+          { "label": "試合結果の管理", "path": "/staff/results", "count": "4" }
+        ]
+      },
+      "referrers": {
+        "caption": "どのサイトから来たか（参照元）",
+        "columnLabels": ["参照元", "人数"],
+        "rows": [
+          { "label": "Google 検索", "value": "103" },
+          { "label": "Instagram", "value": "68" },
+          { "label": "Yahoo! 検索", "value": "48" },
+          { "label": "Facebook", "value": "2" },
+          { "label": "Google 検索（.co.jp）", "value": "1" },
+          { "label": "Facebook（モバイル）", "value": "1" },
+          { "label": "vercel.com", "value": "1" }
+        ]
+      },
+      "countries": {
+        "caption": "国・地域",
+        "columnLabels": ["地域", "割合"],
+        "rows": [
+          { "label": "日本", "value": "96%" },
+          { "label": "アメリカ合衆国", "value": "3%" },
+          { "label": "スウェーデン", "value": "<0.5%" }
+        ]
+      },
+      "devices": {
+        "caption": "使われた端末の種類",
+        "columnLabels": ["端末", "割合"],
+        "rows": [
+          { "label": "スマートフォン（モバイル）", "value": "87%" },
+          { "label": "パソコン（デスクトップ）", "value": "12%" },
+          { "label": "タブレット", "value": "<0.5%" }
+        ]
+      },
+      "operatingSystems": {
+        "caption": "OSの種類",
+        "columnLabels": ["OS", "割合"],
+        "rows": [
+          { "label": "iOS（iPhone など）", "value": "64%" },
+          { "label": "Android", "value": "24%" },
+          { "label": "Windows", "value": "8%" },
+          { "label": "Mac", "value": "4%" },
+          { "label": "Chrome OS", "value": "<0.5%" }
+        ]
+      },
+      "notes": [
+        "【前回集計から減少】前回（2026-07-02・30日間集計、366人）と比べて訪問者261人（-54%）、ページビュー405回（-49%）、直帰率84%（+3pt）と、いずれも減少・悪化しました。イベントの端境期でSNS発信のペースが落ち着いていることが背景と考えられます。",
+        "【検索流入がInstagramを上回る】Google 103人・Yahoo! 48人・google.co.jp 1人の計152人が検索経由。前回まで最大流入源だったInstagram（68人）を初めて上回りました。SEOの積み上げが安定した流入源になりつつあります。",
+        "【個別記事ページへの流入が新たに発生】活動記録・お知らせの個別ページ（それぞれ4人）に直接アクセスがありました。SNSシェアなどで個別記事が直接開かれるケースが出てきています。",
+        "【モバイル比率87%】前回（92%）よりやや低下し、デスクトップが12%に増加。PCからの閲覧も一定数見られます。",
+        "【国内96%・海外4%】日本が中心のまま、アメリカ・スウェーデンからの訪問がわずかに見られます。"
+      ]
     }
   ]
 }
