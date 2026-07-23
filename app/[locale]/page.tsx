@@ -103,8 +103,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Header />
       </ClientOnly>
       <Hero />
-      <TeamAbout galleryPhotos={teamGalleryPhotos} />
       <News initialItems={newsItems} />
+      <TeamAbout galleryPhotos={teamGalleryPhotos} />
       <Results initialTournaments={initialPublicResults} />
       <CheerMessageForm />
       <FaqSection tournamentFaqAnswer={tournamentFaqAnswer} />
