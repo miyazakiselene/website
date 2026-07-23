@@ -31,6 +31,14 @@ const sponsors = [
     width: 150,
     height: 120,
   },
+  {
+    id: "4",
+    name: "株式会社内田工業",
+    url: "",
+    logo: "/sponsor-uchida.jpg",
+    width: 300,
+    height: 100,
+  },
 ]
 
 export function Sponsors() {
@@ -58,14 +66,9 @@ export function Sponsors() {
 
         {/* Sponsor Logos */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
-          {sponsors.map((sponsor, index) => (
-            <AnimatedSection key={sponsor.id} animation="scaleIn" delay={100 + index * 150}>
-              <Link
-                href={sponsor.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group h-full flex flex-col items-center justify-between gap-4 p-4 md:p-5 rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1"
-              >
+          {sponsors.map((sponsor, index) => {
+            const content = (
+              <>
                 <div className="relative w-full h-20 sm:h-24 md:h-28 rounded-lg bg-white">
                   <Image
                     src={sponsor.logo}
@@ -80,9 +83,23 @@ export function Sponsors() {
                     {sponsor.name}
                   </p>
                 </div>
-              </Link>
-            </AnimatedSection>
-          ))}
+              </>
+            )
+            const cardClassName =
+              "group h-full flex flex-col items-center justify-between gap-4 p-4 md:p-5 rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1"
+
+            return (
+              <AnimatedSection key={sponsor.id} animation="scaleIn" delay={100 + index * 150}>
+                {sponsor.url ? (
+                  <Link href={sponsor.url} target="_blank" rel="noopener noreferrer" className={cardClassName}>
+                    {content}
+                  </Link>
+                ) : (
+                  <div className={cardClassName}>{content}</div>
+                )}
+              </AnimatedSection>
+            )
+          })}
         </div>
 
         {/* Thank you message */}
