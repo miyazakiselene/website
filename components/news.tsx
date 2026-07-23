@@ -40,7 +40,7 @@ function NewsCard({ item }: { item: NewsRecord }) {
   return (
     <Card className="border-border bg-background transition-colors duration-300 hover:border-primary/40">
       <CardContent className="p-4 md:p-7">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
+        <div className="flex flex-col gap-3">
           <div className="min-w-0 flex-1">
             <div className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-primary md:mb-2 md:text-base">
               <CalendarDays className="h-4 w-4 shrink-0 md:h-5 md:w-5" />
@@ -53,9 +53,20 @@ function NewsCard({ item }: { item: NewsRecord }) {
               </p>
             ) : null}
           </div>
-          <div className="flex shrink-0 items-center gap-2 text-sm text-muted-foreground md:text-base">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground md:text-base">
             <MapPin className="h-3.5 w-3.5 shrink-0 md:h-4 md:w-4" />
-            <span>{item.venue}</span>
+            {item.venue.startsWith("http") ? (
+              <Link
+                href={item.venue}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="truncate text-primary underline underline-offset-2 hover:text-primary/80"
+              >
+                {item.venue}
+              </Link>
+            ) : (
+              <span>{item.venue}</span>
+            )}
           </div>
         </div>
       </CardContent>

@@ -34,7 +34,7 @@ const sponsors = [
   {
     id: "4",
     name: "株式会社内田工業",
-    url: "",
+    url: "https://www.miyazaki-en-bridge.jp/uchida/",
     logo: "/sponsor-uchida.jpg",
     width: 300,
     height: 100,
