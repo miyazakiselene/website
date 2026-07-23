@@ -14,6 +14,7 @@ const siteUrl     = new URL(getPublicSiteBaseHref())
 const ogImageUrl  = new URL('/images/team-gallery/team-05-group.png', siteUrl).toString()
 const logoImageUrl = new URL('/icon-512.png', siteUrl).toString()
 const instagramUrl = 'https://www.instagram.com/2026.selene/'
+const googleMapsUrl = 'https://www.google.com/maps/place/%E5%AE%AE%E5%B4%8ESELENE/data=!4m2!3m1!1s0x0:0x7628381bc4bccf7d'
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -74,7 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         url: siteUrl.toString(),
         logo: { "@type": "ImageObject", url: logoImageUrl, width: 512, height: 512 },
         image: [{ "@type": "ImageObject", url: ogImageUrl, width: 1200, height: 630 }],
-        sameAs: [instagramUrl, siteUrl.toString()],
+        sameAs: [instagramUrl, siteUrl.toString(), googleMapsUrl],
         areaServed: { "@type": "AdministrativeArea", name: "宮崎県", containedInPlace: { "@type": "State", name: "宮崎県", addressCountry: "JP" } },
         location: { "@type": "Place", name: "宮崎県宮崎市", address: { "@type": "PostalAddress", addressLocality: "宮崎市", addressRegion: "宮崎県", addressCountry: "JP" } },
         contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: `${siteUrl.toString()}#contact`, availableLanguage: ["Japanese","English"] },
