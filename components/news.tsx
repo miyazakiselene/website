@@ -84,13 +84,13 @@ function MobileNewsList({
   const t = useTranslations("news")
   const [open, setOpen] = useState(false)
 
-  const pinnedItem = currentNews[0] ?? pastNews[0] ?? null
-  const remainingCurrent = currentNews.slice(1)
+  const pinnedItems = currentNews.length > 0 ? currentNews.slice(0, 2) : pastNews.slice(0, 1)
+  const remainingCurrent = currentNews.slice(pinnedItems.length)
 
   return (
     <div className="mx-auto max-w-4xl space-y-4 md:hidden">
-      {pinnedItem && (
-        <AnimatedSection animation="fadeInUp" delay={100}>
+      {pinnedItems.map((pinnedItem, index) => (
+        <AnimatedSection key={pinnedItem.id} animation="fadeInUp" delay={100 + index * 100}>
           <div className="relative rounded-2xl border-2 border-primary bg-primary/5 p-0.5 shadow-md shadow-primary/20 ring-2 ring-primary/30">
             <div className="absolute -top-3 left-4 rounded-full bg-primary px-3 py-0.5 text-xs font-bold tracking-wide text-primary-foreground shadow">
               {t("latestNews")}
@@ -100,7 +100,7 @@ function MobileNewsList({
             </div>
           </div>
         </AnimatedSection>
-      )}
+      ))}
 
       <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-background px-4 py-4 text-center">
