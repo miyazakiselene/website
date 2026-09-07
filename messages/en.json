@@ -61,6 +61,11 @@
           "name": "Shinichi Hisadome",
           "role": "Assistant Coach (AC) / Representative",
           "description": "Oversees team operations and player support, with a strong focus on parent communication."
+        },
+        {
+          "name": "Katsuhide Shinohara",
+          "role": "Assistant Coach (AC) / Grade B Referee",
+          "description": "Brings a referee's perspective on the rules to his coaching."
         }
       ]
     }
