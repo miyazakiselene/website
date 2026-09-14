@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { CheckCircle, Clock, RefreshCw, Trash2 } from "lucide-react"
+import { CheckCircle, Clock, Lock, RefreshCw, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -145,6 +145,17 @@ export function StaffMessagesManager() {
                           未承認
                         </Badge>
                       )}
+                      {msg.consent_to_publish ? (
+                        <Badge variant="outline" className="gap-1 text-xs text-primary border-primary/40">
+                          <CheckCircle className="h-3 w-3" />
+                          掲載同意あり
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="gap-1 text-xs text-muted-foreground">
+                          <Lock className="h-3 w-3" />
+                          関係者内のみ
+                        </Badge>
+                      )}
                       <span className="text-xs text-muted-foreground">
                         {new Date(msg.created_at).toLocaleString("ja-JP", {
                           year:   "numeric",
@@ -166,8 +177,10 @@ export function StaffMessagesManager() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="gap-1.5 border-emerald-600/40 text-emerald-600 hover:border-emerald-600 hover:bg-emerald-600/10"
+                        className="gap-1.5 border-emerald-600/40 text-emerald-600 hover:border-emerald-600 hover:bg-emerald-600/10 disabled:border-border disabled:text-muted-foreground"
                         onClick={() => handleApprove(msg.id)}
+                        disabled={!msg.consent_to_publish}
+                        title={msg.consent_to_publish ? undefined : "投稿者が掲載に同意していないため承認できません。"}
                       >
                         <CheckCircle className="h-3.5 w-3.5" />
                         承認

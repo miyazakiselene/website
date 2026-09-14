@@ -58,9 +58,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "現在この機能は無効です。" }, { status: 503 })
   }
   try {
-    const body     = await request.json()
-    const nickname = typeof body.nickname === "string" ? body.nickname.trim() : ""
-    const content  = typeof body.content  === "string" ? body.content.trim()  : ""
+    const body             = await request.json()
+    const nickname         = typeof body.nickname === "string" ? body.nickname.trim() : ""
+    const content          = typeof body.content  === "string" ? body.content.trim()  : ""
+    const consentToPublish = body.consentToPublish === true
 
     if (nickname.length === 0 || nickname.length > MESSAGE_NICKNAME_MAX) {
       return NextResponse.json(
@@ -75,7 +76,7 @@ export async function POST(request: Request) {
       )
     }
 
-    await insertMessage(nickname, content)
+    await insertMessage(nickname, content, consentToPublish)
     after(() => sendCheerMessageNotification(nickname, content))
     return NextResponse.json({ ok: true }, { status: 201 })
   } catch (error) {

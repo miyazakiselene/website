@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { AnimatedSection } from "@/components/animated-section"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -25,6 +26,7 @@ export function CheerMessageForm() {
   const [open,     setOpen]     = useState(false)
   const [nickname, setNickname] = useState("")
   const [content,  setContent]  = useState("")
+  const [consentToPublish, setConsentToPublish] = useState(false)
   const [status,   setStatus]   = useState<Status>("idle")
   const [errorMsg, setErrorMsg] = useState("")
 
@@ -37,7 +39,11 @@ export function CheerMessageForm() {
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nickname: nickname.trim(), content: content.trim() }),
+        body: JSON.stringify({
+          nickname: nickname.trim(),
+          content: content.trim(),
+          consentToPublish,
+        }),
       })
       const json = await res.json()
       if (!res.ok) {
@@ -48,6 +54,7 @@ export function CheerMessageForm() {
       setStatus("success")
       setNickname("")
       setContent("")
+      setConsentToPublish(false)
     } catch {
       setErrorMsg(t("networkError"))
       setStatus("error")
@@ -147,6 +154,25 @@ export function CheerMessageForm() {
                           required
                           className="resize-none"
                         />
+                      </div>
+
+                      {/* Consent to publish */}
+                      <div className="space-y-1.5 rounded-lg border border-border bg-secondary/30 p-3.5">
+                        <div className="flex items-start gap-2.5">
+                          <Checkbox
+                            id="cheer-consent"
+                            checked={consentToPublish}
+                            onCheckedChange={(checked) => setConsentToPublish(checked === true)}
+                            disabled={status === "submitting"}
+                            className="mt-0.5"
+                          />
+                          <Label htmlFor="cheer-consent" className="text-sm font-semibold leading-snug">
+                            サイトへの掲載に同意します（ニックネームのみ掲載）
+                          </Label>
+                        </div>
+                        <p className="pl-6 text-xs leading-relaxed text-muted-foreground">
+                          チェックを入れない場合、サイトには掲載せず、監督・コーチなどチーム関係者にのみ共有させていただきます。
+                        </p>
                       </div>
 
                       {/* Error */}

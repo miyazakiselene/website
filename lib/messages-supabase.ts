@@ -14,15 +14,22 @@ export type MessageRecord = {
   nickname: string
   content: string
   is_approved: boolean
+  consent_to_publish: boolean
 }
 
 export function isMessagesSupabaseEnabled(): boolean {
   return isSupabaseServiceConfigured()
 }
 
-export async function insertMessage(nickname: string, content: string): Promise<void> {
+export async function insertMessage(
+  nickname: string,
+  content: string,
+  consentToPublish: boolean,
+): Promise<void> {
   const supabase = getSupabaseServiceClient()
-  const { error } = await supabase.from(TABLE).insert({ nickname, content })
+  const { error } = await supabase
+    .from(TABLE)
+    .insert({ nickname, content, consent_to_publish: consentToPublish })
   if (error) throw error
 }
 
@@ -30,7 +37,7 @@ export async function listMessages(): Promise<MessageRecord[]> {
   const supabase = getSupabaseServiceClient()
   const { data, error } = await supabase
     .from(TABLE)
-    .select("id,created_at,nickname,content,is_approved")
+    .select("id,created_at,nickname,content,is_approved,consent_to_publish")
     .order("created_at", { ascending: false })
   if (error) throw error
   return (data ?? []) as MessageRecord[]
